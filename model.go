@@ -1,4 +1,4 @@
-package model
+package main
 
 import (
 	"database/sql"
@@ -12,8 +12,8 @@ type Model struct{
 	database *sqlx.DB
 }
 
-// New creates a new fully initialized Model
-func New() (Model, error) {
+// NewModel creates a new fully initialized Model with an sqlite3 database
+func NewModel() (Model, error) {
 	model := Model{}
 	db, err := sqlx.Open("sqlite3", "./abv.sqlite")
 	if err != nil {
