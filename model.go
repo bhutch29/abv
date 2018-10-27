@@ -2,36 +2,9 @@ package model
 
 import (
 	"database/sql"
-	// TODO: Can't remember why a blank was needed here, but it fixed a bug.
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/jmoiron/sqlx"
 )
-
-//create table Drinks
-//(
-//barcode       integer primary key,
-//brand         varchar(255),
-//name          varchar(255),
-//abv           integer,
-//type          varchar(255),
-//date          integer
-//)
-
-//create table Input
-//(
-//id            integer primary key,
-//barcode       integer,
-//quantity      integer,
-//date          integer
-//)
-
-//create table Output
-//(
-//id            integer primary key,
-//barcode       integer,
-//quantity      integer,
-//date          integer
-//)
 
 // Model controls all the data flow into and out of the database layer
 type Model struct{
@@ -45,8 +18,16 @@ func New() (Model, error) {
 	if err != nil {
 		return model, err
 	}
+	CreateTablesIfNeeded(db)
 	model.database = db
 	return model, nil
+}
+
+// CreateTablesIfNeeded ensures that the database has the necessary tables
+func CreateTablesIfNeeded(db *sqlx.DB){
+	db.Exec("create table if not exists Drinks(barcode integer primary key, brand varchar(255), name varchar(255), abv integer, type varchar(255), date integer)")
+	db.Exec("create table if not exists Input (id integer primary key, barcode integer, quantity integer, date integer)")
+	db.Exec("create table if not exists Output (id integer primary key, barcode integer, quantity integer, date integer)")
 }
 
 // Drink stores information about an available beverage
@@ -65,6 +46,10 @@ type DrinkEntry struct{
 	Quantity int
 	Date int
 }
+
+//TODO DeleteDrink
+//TODO UpdateDrink
+//TODO GetAllStockedDrinks
 
 // CreateDrink adds an entry to the Drinks table, returning the id
 func (m Model) CreateDrink(d Drink) (int, error){
