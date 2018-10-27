@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	// Registers the sqlite3 database driver
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/jmoiron/sqlx"
 )
@@ -25,7 +26,7 @@ func New() (Model, error) {
 
 // CreateTablesIfNeeded ensures that the database has the necessary tables
 func CreateTablesIfNeeded(db *sqlx.DB){
-	db.Exec("create table if not exists Drinks(barcode integer primary key, brand varchar(255), name varchar(255), abv integer, type varchar(255), date integer)")
+	db.Exec("create table if not exists Drinks(barcode integer primary key, brand varchar(255), name varchar(255), abv real, ibu real, type varchar(255), date integer)")
 	db.Exec("create table if not exists Input (id integer primary key, barcode integer, quantity integer, date integer)")
 	db.Exec("create table if not exists Output (id integer primary key, barcode integer, quantity integer, date integer)")
 }
@@ -35,7 +36,8 @@ type Drink struct{
 	Barcode int
 	Brand string
 	Name string
-	Abv int
+	Abv float32
+	Ibu float32
 	Type int
 	Date int
 }
@@ -55,7 +57,11 @@ type DrinkEntry struct{
 func (m Model) CreateDrink(d Drink) (int, error){
 	now := time.Now().Unix()
 	res, err := m.database.Exec(
-	"insert into Drinks (barcode, brand, name, abv, type, date) Values (?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Type, now)
+	"insert into Drinks (barcode, brand, name, abv, ibu, type, date) Values (?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, now)
+	if err != nil {
+		return -1, err
+	}
+	return getID(res)
 }
 
 // InputDrinks adds an entry to the Input table, returning the id
