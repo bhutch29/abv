@@ -5,6 +5,8 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+var popupDisplayed = false
+
 func layout(g *gocui.Gui) (err error) {
 	if err = makePrompt(g); err != nil {
 		return
@@ -15,6 +17,9 @@ func layout(g *gocui.Gui) (err error) {
 	if err = makeInfoPanel(g); err != nil {
 		return
 	}
+	if err = makeSelectOptionsPopup(g); err != nil {
+		return
+	}
 	return
 }
 
@@ -22,7 +27,6 @@ func layout(g *gocui.Gui) (err error) {
 const (
 	inputHeight    = 4
 	inputCursorPos = 4
-	promptWidth    = 21
 )
 
 func makeMainPanels(g *gocui.Gui) error {
@@ -45,19 +49,57 @@ func makeMainPanels(g *gocui.Gui) error {
 	return nil
 }
 
+func makeSelectOptionsPopup(g *gocui.Gui) error {
+	maxX, maxY := g.Size()
+	w := maxX / 2
+	h := maxY / 4
+	x0 := (maxX / 2) - (w / 2)
+	y0 := (maxY / 2) - (h / 2)
+	x1 := x0 + w
+	y1 := y0 + h
+
+	if v, err := g.SetView("Popup", x0, y0, x1, y1); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+
+		v.Title = "Choose desired drink..."
+		v.Frame = true
+		v.Highlight = true
+		g.SetViewOnBottom("Popup")
+	}
+	return nil
+}
+
+func togglePopup(g *gocui.Gui, v *gocui.View) error {
+	vn := "Popup"
+
+	if !popupDisplayed {
+		g.SetViewOnTop(vn)
+		g.SetCurrentView(vn)
+	} else {
+		g.SetViewOnBottom(vn)
+		g.SetCurrentView("Input")
+	}
+
+	popupDisplayed = !popupDisplayed
+	return nil
+}
+
 // Draw two panels on the bottom of the screen, one for input and one
 // for keybinding information
 func makePrompt(g *gocui.Gui) error {
 	maxX, maxY := g.Size()
 	promptStartHeight := maxY - inputHeight
 	promptDividerHeight := maxY - (inputHeight / 2)
+	promptString := generateKeybindString()
 
-	if v, err := g.SetView("Prompt", 0, promptStartHeight, promptWidth, promptDividerHeight); err != nil {
+	if v, err := g.SetView("Prompt", 0, promptStartHeight, maxY, promptDividerHeight); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
 		v.Frame = false
-		printPrompt(g)
+		fmt.Fprintf(v, promptString)
 	}
 
 	if v, err := g.SetView("Input", inputCursorPos, promptDividerHeight, maxX, maxY); err != nil {
@@ -97,12 +139,9 @@ func makeInfoPanel(g *gocui.Gui) error {
 	return nil
 }
 
-func printPrompt(g *gocui.Gui) {
-	promptString := "C-c: Quit"
-
+func clearInput(g *gocui.Gui) {
 	g.Update(func(g *gocui.Gui) error {
 		input, err := g.View("Input")
-		prompt, err := g.View("Prompt")
 		if err != nil {
 			return err
 		}
@@ -110,8 +149,6 @@ func printPrompt(g *gocui.Gui) {
 		x, y := input.Cursor()
 		input.MoveCursor(-x, -y, true)
 
-		prompt.Clear()
-		fmt.Fprintf(prompt, promptString)
 		return nil
 	})
 }
@@ -140,4 +177,39 @@ func promptEditor(v *gocui.View, key gocui.Key, ch rune, mod gocui.Modifier) {
 	case gocui.KeyArrowRight:
 		v.MoveCursor(1, 0, false)
 	}
+}
+
+func displayError(g *gocui.Gui, e error) error {
+	maxX, maxY := g.Size()
+	x0 := maxX / 6
+	x1 := maxY / 6
+	y0 := 5 * (maxX / 6)
+	y1 := 5 * (maxY / 6)
+
+	if v, err := g.SetView("errors", x0, y0, x1, y1); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+
+		// Settings
+		v.Title = "ERROR"
+		v.Frame = true
+		v.Wrap = true
+		v.Autoscroll = true
+		v.BgColor = gocui.ColorRed
+		v.FgColor = gocui.ColorWhite
+
+		// Content
+		v.Clear()
+		fmt.Fprintln(v, e.Error())
+
+		// Send to forground
+		g.SetCurrentView(v.Name())
+	}
+
+	return nil
+}
+
+func hideError(g *gocui.Gui) {
+	g.DeleteView("errors")
 }

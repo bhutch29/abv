@@ -45,8 +45,8 @@ type Drink struct {
 	Barcode int
 	Brand   string
 	Name    string
-	Abv     float32
-	Ibu     float32
+	Abv     float64
+	Ibu     int
 	Type    string
 	Date    int
 }
