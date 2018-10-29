@@ -6,16 +6,42 @@ import (
 	"log"
 )
 
-var g gocui.Gui
+var (
+	g *gocui.Gui
+
+	// View names
+	mainView     = "Main"
+	input        = "Input"
+	info         = "Info"
+	popup        = "Popup"
+	prompt       = "Prompt"
+	promptSymbol = "PromptSymbol"
+	errorView    = "Errors"
+)
+
+// List of project level todos:
+// TODO: Refactor: should any of these functions be methods? are they in the right files?
+// TODO: Refactor colors
+// TODO: Handle errors more consistently instead of just passing them up. What level should print errors for user?
+// TODO: Set operation into 3 "modes": Stocking, Serving, and Auditing(Admin mode). How to manage these modes?
+// TODO: Change "Stocking" mode entry point to be via barcode scanner (instead of entering name) and only ask for name if barcode is not found
+// TODO: Organize the GUI into useful elements. Thoughts: Log (for displaying a feed of user info), Keybindings? (For displaying keybindings for current view), Input (For inputting text), Mode (For making it very apparent what mode we are in)
+// TODO: Write log to text file for debugging?
+// TODO: Stocking mode: Display number of scanned drink in inventory when scanned
+// TODO: Serving mode: Display appropriate information when scanning drink out
+// TODO: Admin mode: deleteDrink action, backup and clear inventory action
 
 var keys []key = []key{
 	key{"", gocui.KeyCtrlC, quit, "C-c", "quit"},
-	key{"", gocui.KeyEnter, parseInput, "Enter", "confirm"},
-	key{"", gocui.KeyCtrl2, togglePopup, "C-2", "temporary"},
+	key{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
+	key{popup, gocui.KeyArrowUp, popupScrollUp, "Up", "scrollUp"},
+	key{popup, gocui.KeyArrowDown, popupScrollDown, "Down", "scrollDown"},
+	key{popup, gocui.KeyEnter, popupSelectItem, "Enter", "Select"},
 }
 
 func main() {
-	g, err := gocui.NewGui(gocui.OutputNormal)
+	gui, err := gocui.NewGui(gocui.OutputNormal)
+	g = gui
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -24,7 +50,7 @@ func main() {
 	g.SetManagerFunc(layout)
 	g.Cursor = true
 
-	if err := configureKeys(g); err != nil {
+	if err := configureKeys(); err != nil {
 		log.Fatalln(err)
 	}
 
@@ -33,8 +59,8 @@ func main() {
 	}
 }
 
-func logToMain(s interface{}) error {
-	v, err := g.View("Main")
+func logToMainView(s ...interface{}) error {
+	v, err := g.View(mainView)
 	if err != nil {
 		return err
 	}
@@ -43,51 +69,39 @@ func logToMain(s interface{}) error {
 }
 
 func parseInput(g *gocui.Gui, v *gocui.View) error {
-	main, err := g.View("Main")
+	vn, err := g.View(mainView)
 	if err != nil {
-		return err
+		displayError(err)
 	}
-	fmt.Fprintf(main, "You typed: " + v.Buffer())
-	togglePopup(g, v)
-	updatePopup(g, v.Buffer())
-	clearInput(g)
+	fmt.Fprintf(vn, "You typed: "+v.Buffer())
+	updatePopup(v.Buffer())
+	togglePopup()
+	clearInput()
 	return nil
 }
 
-func updatePopup(g *gocui.Gui, name string) {
+func updatePopup(name string) {
 	g.Update(func(g *gocui.Gui) error {
-		v, err := g.View("Popup")
+		v, err := g.View(popup)
 		if err != nil {
 			return err
 		}
 
 		drinks, err := SearchUntappdByName(name)
 		if err != nil {
-			displayError(g, err)
+			logToMainView(err)
+			displayError(err)
 			return nil
 		}
-		hideError(g)
-
+		hideError()
 		v.Clear()
 
 		for _, drink := range drinks {
-			fmt.Fprintf(v, "%s: %s", drink.Brand, drink.Name)
+			fmt.Fprintf(v, "%s: %s\n", drink.Brand, drink.Name)
 		}
 
 		return nil
 	})
-}
-
-func getViewLine(g *gocui.Gui, v *gocui.View) (string, error) {
-	var l string
-	var err error
-
-	_, cy := v.Cursor()
-	if l, err = v.Line(cy); err != nil {
-		l = ""
-	}
-
-	return l, err
 }
 
 func quit(g *gocui.Gui, v *gocui.View) error {

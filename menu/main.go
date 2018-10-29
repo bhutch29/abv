@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/bhutch29/abv/model"
-	"fmt"
-	"net/http"
-	"log"
 	"encoding/json"
+	"fmt"
+	"github.com/bhutch29/abv/model"
+	"log"
+	"net/http"
 	"time"
 )
 
@@ -18,7 +18,6 @@ func main() {
 	}
 
 	client := &http.Client{}
-
 	for {
 		resp, err := client.Do(req)
 		if err != nil {
@@ -36,4 +35,3 @@ func main() {
 		time.Sleep(2 * time.Second)
 	}
 }
-

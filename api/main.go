@@ -1,13 +1,13 @@
 package main
 
 import (
+	"encoding/json"
+	"github.com/bhutch29/abv/model"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
 	"io"
 	"log"
 	"net/http"
-	"encoding/json"
-	"github.com/bhutch29/abv/model"
 )
 
 var m model.Model
@@ -25,14 +25,12 @@ func main() {
 	router.GET("/inventory", getInventory)
 
 	corsEnabledHandler := cors.Default().Handler(router)
-
 	log.Fatal(http.ListenAndServe(":8081", corsEnabledHandler))
 }
 
 func healthCheck(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.WriteHeader(http.StatusOK)
 	setHeader(w)
-
 	// TODO: Expand Health Check
 	io.WriteString(w, `{"alive": true}`)
 }
