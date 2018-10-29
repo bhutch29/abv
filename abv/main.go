@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/jroimartin/gocui"
 	"log"
+
+	"github.com/jroimartin/gocui"
 )
 
 var g gocui.Gui
 
-var keys []key = []key{
+var keys = []key{
 	key{"", gocui.KeyCtrlC, quit, "C-c", "quit"},
 	key{"", gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	key{"", gocui.KeyCtrl2, togglePopup, "C-2", "temporary"},
@@ -47,7 +48,7 @@ func parseInput(g *gocui.Gui, v *gocui.View) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(main, "You typed: " + v.Buffer())
+	fmt.Fprintf(main, "You typed: "+v.Buffer())
 	togglePopup(g, v)
 	updatePopup(g, v.Buffer())
 	clearInput(g)

@@ -2,13 +2,15 @@ package main
 
 import (
 	"database/sql"
+	"time"
+
 	// Registers the sqlite3 database driver
-	_ "github.com/mattn/go-sqlite3"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 // Model controls all the data flow into and out of the database layer
-type Model struct{
+type Model struct {
 	database *sqlx.DB
 }
 
@@ -25,28 +27,28 @@ func NewModel() (Model, error) {
 }
 
 // CreateTablesIfNeeded ensures that the database has the necessary tables
-func CreateTablesIfNeeded(db *sqlx.DB){
+func CreateTablesIfNeeded(db *sqlx.DB) {
 	db.Exec("create table if not exists Drinks(barcode integer primary key, brand varchar(255), name varchar(255), abv real, ibu real, type varchar(255), date integer)")
 	db.Exec("create table if not exists Input (id integer primary key, barcode integer, quantity integer, date integer)")
 	db.Exec("create table if not exists Output (id integer primary key, barcode integer, quantity integer, date integer)")
 }
 
 // Drink stores information about an available beverage
-type Drink struct{
+type Drink struct {
 	Barcode int
-	Brand string
-	Name string
-	Abv float32
-	Ibu float32
-	Type int
-	Date int
+	Brand   string
+	Name    string
+	Abv     float32
+	Ibu     float32
+	Type    int
+	Date    int
 }
 
 // DrinkEntry defines quantities of drinks for transactions
-type DrinkEntry struct{
-	Barcode int
+type DrinkEntry struct {
+	Barcode  int
 	Quantity int
-	Date int
+	Date     int
 }
 
 //TODO DeleteDrink
@@ -54,10 +56,10 @@ type DrinkEntry struct{
 //TODO GetAllStockedDrinks
 
 // CreateDrink adds an entry to the Drinks table, returning the id
-func (m Model) CreateDrink(d Drink) (int, error){
+func (m Model) CreateDrink(d Drink) (int, error) {
 	now := time.Now().Unix()
 	res, err := m.database.Exec(
-	"insert into Drinks (barcode, brand, name, abv, ibu, type, date) Values (?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, now)
+		"insert into Drinks (barcode, brand, name, abv, ibu, type, date) Values (?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, now)
 	if err != nil {
 		return -1, err
 	}
@@ -65,7 +67,7 @@ func (m Model) CreateDrink(d Drink) (int, error){
 }
 
 // InputDrinks adds an entry to the Input table, returning the id
-func (m Model) InputDrinks(d DrinkEntry) (int, error){
+func (m Model) InputDrinks(d DrinkEntry) (int, error) {
 	now := time.Now().Unix()
 	res, err := m.database.Exec(
 		"insert into Input (barcode, quantity, date) Values (?, ?, ?)", d.Barcode, d.Quantity, now)
@@ -76,7 +78,7 @@ func (m Model) InputDrinks(d DrinkEntry) (int, error){
 }
 
 // OutputDrinks adds an entry to the Output table, returning the id
-func (m Model) OutputDrinks(d DrinkEntry) (int, error){
+func (m Model) OutputDrinks(d DrinkEntry) (int, error) {
 	now := time.Now().Unix()
 	res, err := m.database.Exec(
 		"insert into Output (barcode, quantity, date) Values (?, ?, ?)", d.Barcode, d.Quantity, now)

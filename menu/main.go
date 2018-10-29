@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/bhutch29/abv/model"
-	"fmt"
-	"net/http"
-	"log"
 	"encoding/json"
+	"fmt"
+	"log"
+	"net/http"
 	"time"
+
+	"github.com/bhutch29/abv/model"
 )
 
 func main() {
@@ -36,4 +37,3 @@ func main() {
 		time.Sleep(2 * time.Second)
 	}
 }
-

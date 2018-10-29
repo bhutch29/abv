@@ -2,11 +2,12 @@ package model
 
 import (
 	"database/sql"
+	"os"
+	"time"
+
 	"github.com/jmoiron/sqlx"
 	// Registers the sqlite3 database driver
 	_ "github.com/mattn/go-sqlite3"
-	"os"
-	"time"
 )
 
 // Model controls all the data flow into and out of the database layer
@@ -72,6 +73,7 @@ func (m Model) CreateDrink(d Drink) (int, error) {
 	return getID(res)
 }
 
+// GetInventory queries the entries in the Drinks table
 func (m Model) GetInventory() ([]Drink, error) {
 	var drinks []Drink
 	err := m.database.Select(&drinks, "select * from Drinks")

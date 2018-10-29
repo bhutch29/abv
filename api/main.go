@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/julienschmidt/httprouter"
-	"github.com/rs/cors"
+	"encoding/json"
 	"io"
 	"log"
 	"net/http"
-	"encoding/json"
+
 	"github.com/bhutch29/abv/model"
+	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 )
 
 var m model.Model

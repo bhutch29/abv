@@ -2,10 +2,11 @@ package main
 
 import (
 	"encoding/json"
-	"net/http"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
+
 	"github.com/bhutch29/abv/model"
 )
 

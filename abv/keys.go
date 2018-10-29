@@ -1,15 +1,16 @@
 package main
 
 import (
-	"github.com/jroimartin/gocui"
 	"fmt"
+
+	"github.com/jroimartin/gocui"
 )
 
 type key struct {
-	viewname string
-	key      interface{}
-	handler  func(*gocui.Gui, *gocui.View) error
-	shortkey string
+	viewname  string
+	key       interface{}
+	handler   func(*gocui.Gui, *gocui.View) error
+	shortkey  string
 	shortname string
 }
 
