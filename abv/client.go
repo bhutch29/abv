@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/bhutch29/abv/model"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
+
+	"github.com/bhutch29/abv/model"
 )
 
 // SearchUntappdByName uses the Untappd API to gather a list of Drinks that match the named search
@@ -42,8 +43,12 @@ func queryUntappdByName(name string) (map[string]interface{}, error) {
 	safeName := url.QueryEscape(name)
 	clientID := os.Getenv("UntappedID")
 	clientSecret := os.Getenv("UntappedSecret")
-	url := fmt.Sprintf("https://api.untappd.com/v4/search/beer?client_id=%s&client_secret=%s&q=%s", clientID, clientSecret, safeName)
+	clientID, clientSecret, err := fetchClientCredentials()
+	if err != nil {
+		return result, err
+	}
 
+	url := fmt.Sprintf("https://api.untappd.com/v4/search/beer?client_id=%s&client_secret=%s&q=%s", clientID, clientSecret, safeName)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return result, err
@@ -58,5 +63,30 @@ func queryUntappdByName(name string) (map[string]interface{}, error) {
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
 	json.Unmarshal(body, &result)
+	err = validateUntappdResponse(result)
+	if err != nil {
+		return result, err
+	}
 	return result, nil
+}
+
+func fetchClientCredentials() (clientID, clientSecret string, err error) {
+	clientID = os.Getenv("UntappedID")
+	if clientID == "" {
+		return clientID, clientSecret, fmt.Errorf("UntappedID not supplied by client")
+	}
+	clientSecret = os.Getenv("UntappedSecret")
+	if clientSecret == "" {
+		return clientID, clientSecret, fmt.Errorf("UntappedSecret not supplied by client")
+	}
+	return clientID, clientSecret, nil
+}
+
+func validateUntappdResponse(response map[string]interface{}) (err error) {
+	meta := response["meta"].(map[string]interface{})
+	code := int(meta["code"].(float64))
+	if code != http.StatusOK {
+		return fmt.Errorf("Untappd status code %v: %v", code, http.StatusText(code))
+	}
+	return nil
 }
