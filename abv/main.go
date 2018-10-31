@@ -8,9 +8,10 @@ import (
 
 var (
 	g *gocui.Gui
+)
 
-	// View names
-	mainView     = "Main"
+const (
+	logView      = "Log"
 	input        = "Input"
 	info         = "Info"
 	popup        = "Popup"
@@ -19,19 +20,24 @@ var (
 	errorView    = "Errors"
 )
 
+// List of bugs
+// TODO: Fix scrolling up at top of beer selection popup
+
 // List of project level todos:
 // TODO: Refactor: should any of these functions be methods? are they in the right files?
 // TODO: Refactor colors
 // TODO: Handle errors more consistently instead of just passing them up. What level should print errors for user?
 // TODO: Set operation into 3 "modes": Stocking, Serving, and Auditing(Admin mode). How to manage these modes?
 // TODO: Change "Stocking" mode entry point to be via barcode scanner (instead of entering name) and only ask for name if barcode is not found
+// TODO: Connect GUI to database
 // TODO: Organize the GUI into useful elements. Thoughts: Log (for displaying a feed of user info), Keybindings? (For displaying keybindings for current view), Input (For inputting text), Mode (For making it very apparent what mode we are in)
 // TODO: Write log to text file for debugging?
 // TODO: Stocking mode: Display number of scanned drink in inventory when scanned
-// TODO: Serving mode: Display appropriate information when scanning drink out
+// TODO: Serving mode: Display appropriate information when scanning drink out, add optional view for seeing current inventory
 // TODO: Admin mode: deleteDrink action, backup and clear inventory action
+// TODO: Change beep tone of scanner on specific event (found vs missing beer entry)
 
-var keys []key = []key{
+var keys = []key{
 	key{"", gocui.KeyCtrlC, quit, "C-c", "quit"},
 	key{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	key{popup, gocui.KeyArrowUp, popupScrollUp, "Up", "scrollUp"},
@@ -60,7 +66,7 @@ func main() {
 }
 
 func logToMainView(s ...interface{}) error {
-	v, err := g.View(mainView)
+	v, err := g.View(logView)
 	if err != nil {
 		return err
 	}
@@ -69,7 +75,7 @@ func logToMainView(s ...interface{}) error {
 }
 
 func parseInput(g *gocui.Gui, v *gocui.View) error {
-	vn, err := g.View(mainView)
+	vn, err := g.View(logView)
 	if err != nil {
 		displayError(err)
 	}

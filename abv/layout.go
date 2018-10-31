@@ -8,10 +8,10 @@ import (
 var popupDisplayed = false
 
 func layout(g *gocui.Gui) (err error) {
-	if err = makePrompt(); err != nil {
+	if err = makePromptPanel(); err != nil {
 		return
 	}
-	if err = makeMainPanels(); err != nil {
+	if err = makeLogPanel(); err != nil {
 		return
 	}
 	if err = makeInfoPanel(); err != nil {
@@ -29,7 +29,7 @@ const (
 	inputCursorPos = 4
 )
 
-func makeMainPanels() error {
+func makeLogPanel() error {
 	maxX, maxY := g.Size()
 	viewHeight := maxY - inputHeight
 	branchViewWidth := (maxX / 5) * 2
@@ -39,7 +39,7 @@ func makeMainPanels() error {
 	x0, x1 = 0, branchViewWidth*2
 	y0, y1 = 0, viewHeight
 
-	if v, err := g.SetView(mainView, x0, y0, x1, y1); err != nil {
+	if v, err := g.SetView(logView, x0, y0, x1, y1); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
@@ -89,7 +89,7 @@ func togglePopup() error {
 
 // Draw two panels on the bottom of the screen, one for input and one
 // for keybinding information
-func makePrompt() error {
+func makePromptPanel() error {
 	maxX, maxY := g.Size()
 	promptStartHeight := maxY - inputHeight
 	promptDividerHeight := maxY - (inputHeight / 2)

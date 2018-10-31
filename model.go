@@ -5,6 +5,7 @@ import (
 	// Registers the sqlite3 database driver
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/jmoiron/sqlx"
+	"time"
 )
 
 // Model controls all the data flow into and out of the database layer
