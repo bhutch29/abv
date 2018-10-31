@@ -69,13 +69,13 @@ func queryUntappdByName(name string) (map[string]interface{}, error) {
 }
 
 func fetchClientCredentials() (clientID, clientSecret string, err error) {
-	clientID = os.Getenv("UntappedID")
+	clientID = os.Getenv("UntappdID")
 	if clientID == "" {
-		return clientID, clientSecret, fmt.Errorf("UntappedID not supplied by client")
+		return clientID, clientSecret, fmt.Errorf("UntappdID not supplied by client")
 	}
-	clientSecret = os.Getenv("UntappedSecret")
+	clientSecret = os.Getenv("UntappdSecret")
 	if clientSecret == "" {
-		return clientID, clientSecret, fmt.Errorf("UntappedSecret not supplied by client")
+		return clientID, clientSecret, fmt.Errorf("UntappdSecret not supplied by client")
 	}
 	return clientID, clientSecret, nil
 }
