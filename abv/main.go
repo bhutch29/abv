@@ -25,10 +25,23 @@ const (
 
 var keys = []key{
 	{"", gocui.KeyCtrlC, quit, "C-c", "quit"},
+	{"", gocui.KeyCtrlE, testError, "C-e", "error"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	{popup, gocui.KeyArrowUp, popupScrollUp, "Up", "scrollUp"},
 	{popup, gocui.KeyArrowDown, popupScrollDown, "Down", "scrollDown"},
 	{popup, gocui.KeyEnter, popupSelectItem, "Enter", "Select"},
+}
+
+func testError(g *gocui.Gui, v *gocui.View) error {
+	logGui.WithFields(logrus.Fields{
+		"Category": "Test",
+		"CurrentView": v.Name(),
+	}).Error("This is an example error for testing purposes")
+	logFile.WithFields(logrus.Fields{
+		"Category": "Test",
+		"CurrentView": v.Name(),
+	}).Error("This is an example error for testing purposes")
+	return nil
 }
 
 func main() {
@@ -36,7 +49,14 @@ func main() {
 	setupGui()
 	defer g.Close()
 
-	file, err := os.OpenFile("abv.log", os.O_CREATE|os.O_WRONLY, 0666)
+	//Setup loggers
+	f := logrus.TextFormatter{}
+	f.ForceColors = true
+	f.DisableTimestamp = true
+	f.DisableLevelTruncation = true
+	logGui.Formatter = &f
+
+	file, err := os.OpenFile("abv.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	defer file.Close()
 	if err == nil {
 		logFile.Out = file
@@ -68,8 +88,8 @@ func setupGui() {
 func parseInput(g *gocui.Gui, v *gocui.View) error {
 	logFile.WithFields(logrus.Fields{
 		"category": "userEntry",
-		"action": "searchSelection",
-	}).Info(v.Buffer())
+		"entry": v.Buffer(),
+	}).Info("User searched for a drink")
 	updatePopup(v.Buffer())
 	togglePopup()
 	clearInput()

@@ -242,8 +242,8 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 	resetViewCursor(v)
 	logFile.WithFields(logrus.Fields{
 		"category": "userEntry",
-		"action": "searchSelection",
-	}).Info(line)
+		"entry": line,
+	}).Info("User selected a beer")
 
 	//TODO Do something with selected value
 	logGui.Info("You selected: " + line)
