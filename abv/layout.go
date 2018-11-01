@@ -251,9 +251,11 @@ func moveViewCursorDown(v *gocui.View, allowEmpty bool) error {
 func moveViewCursorUp(v *gocui.View, dY int) error {
 	ox, oy := v.Origin()
 	cx, cy := v.Cursor()
-	if err := v.SetCursor(cx, cy-1); err != nil {
-		if err := v.SetOrigin(ox, oy-1); err != nil {
-			return err
+	if cy > dY {
+		if err := v.SetCursor(cx, cy-1); err != nil {
+			if err := v.SetOrigin(ox, oy-1); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
