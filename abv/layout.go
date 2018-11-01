@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/jroimartin/gocui"
-	"github.com/sirupsen/logrus"
 )
 
 var popupDisplayed = false
@@ -233,20 +232,6 @@ func popupScrollDown(g *gocui.Gui, v *gocui.View) error {
 		logFile.Error(err)
 		logGui.Error(err)
 	}
-	return err
-}
-
-func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
-	line, err := getViewLine(v)
-	togglePopup()
-	resetViewCursor(v)
-	logFile.WithFields(logrus.Fields{
-		"category": "userEntry",
-		"entry": line,
-	}).Info("User selected a beer")
-
-	//TODO Do something with selected value
-	logGui.Info("You selected: " + line)
 	return err
 }
 

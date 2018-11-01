@@ -9,6 +9,7 @@ import (
 
 var (
 	g       *gocui.Gui
+	c       Controller
 	logFile = logrus.New()
 	logGui  = logrus.New()
 )
@@ -34,11 +35,11 @@ var keys = []key{
 
 func testError(g *gocui.Gui, v *gocui.View) error {
 	logGui.WithFields(logrus.Fields{
-		"Category": "Test",
+		"Category":    "Test",
 		"CurrentView": v.Name(),
 	}).Error("This is an example error for testing purposes")
 	logFile.WithFields(logrus.Fields{
-		"Category": "Test",
+		"Category":    "Test",
 		"CurrentView": v.Name(),
 	}).Error("This is an example error for testing purposes")
 	return nil
@@ -88,7 +89,7 @@ func setupGui() {
 func parseInput(g *gocui.Gui, v *gocui.View) error {
 	logFile.WithFields(logrus.Fields{
 		"category": "userEntry",
-		"entry": v.Buffer(),
+		"entry":    v.Buffer(),
 	}).Info("User searched for a drink")
 	updatePopup(v.Buffer())
 	togglePopup()
@@ -118,6 +119,25 @@ func updatePopup(name string) {
 
 		return
 	})
+}
+
+func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
+	line, err := getViewLine(v)
+	togglePopup()
+	resetViewCursor(v)
+	logFile.WithFields(logrus.Fields{
+		"category": "userEntry",
+		"entry":    line,
+	}).Info("User selected a beer")
+
+	//TODO Do something with selected value
+	// c, err := New()
+	// if err != nil {
+	// 	logFile.Error(err)
+	// 	logGui.Error(err)
+	// }
+	logGui.Info("You selected: " + line)
+	return err
 }
 
 func quit(g *gocui.Gui, v *gocui.View) error {
