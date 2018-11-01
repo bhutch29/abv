@@ -3,31 +3,36 @@ package main
 import (
 	"fmt"
 	"github.com/jroimartin/gocui"
+	"github.com/sirupsen/logrus"
 )
 
 var popupDisplayed = false
-
-func layout(g *gocui.Gui) (err error) {
-	if err = makePromptPanel(); err != nil {
-		return
-	}
-	if err = makeLogPanel(); err != nil {
-		return
-	}
-	if err = makeInfoPanel(); err != nil {
-		return
-	}
-	if err = makeSelectOptionsPopup(); err != nil {
-		return
-	}
-	return
-}
 
 // Define Prompt dimensions
 const (
 	inputHeight    = 4
 	inputCursorPos = 4
 )
+
+func layout(g *gocui.Gui) (err error) {
+	if err = makeLogPanel(); err != nil {
+		logFile.Fatal(err)
+		return
+	}
+	if err = makePromptPanel(); err != nil {
+		logFile.Fatal(err)
+		return
+	}
+	if err = makeInfoPanel(); err != nil {
+		logFile.Fatal(err)
+		return
+	}
+	if err = makeSelectOptionsPopup(); err != nil {
+		logFile.Fatal(err)
+		return
+	}
+	return
+}
 
 func makeLogPanel() error {
 	maxX, maxY := g.Size()
@@ -44,6 +49,8 @@ func makeLogPanel() error {
 			return err
 		}
 		v.Wrap = true
+		logFile.Info(v.Name())
+		logGui.Out = v
 	}
 
 	return nil
@@ -72,7 +79,7 @@ func makeSelectOptionsPopup() error {
 	return nil
 }
 
-func togglePopup() error {
+func togglePopup(){
 	vn := popup
 
 	if !popupDisplayed {
@@ -84,7 +91,6 @@ func togglePopup() error {
 	}
 
 	popupDisplayed = !popupDisplayed
-	return nil
 }
 
 // Draw two panels on the bottom of the screen, one for input and one
@@ -123,6 +129,7 @@ func makePromptPanel() error {
 		v.Frame = false
 		fmt.Fprintf(v, ">>")
 	}
+
 	return nil
 }
 
@@ -213,11 +220,19 @@ func hideError() {
 
 func popupScrollUp(g *gocui.Gui, v *gocui.View) error {
 	err := moveViewCursorUp(v, 0)
-	return err
+	if err != nil {
+		logFile.Error(err)
+		logGui.Error(err)
+	}
+	return err //TODO: Verify what happens if error is returned to gocui layer like this. Should we return nil?
 }
 
 func popupScrollDown(g *gocui.Gui, v *gocui.View) error {
 	err := moveViewCursorDown(v, false)
+	if err != nil {
+		logFile.Error(err)
+		logGui.Error(err)
+	}
 	return err
 }
 
@@ -225,8 +240,13 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 	line, err := getViewLine(v)
 	togglePopup()
 	resetViewCursor(v)
-	logToMainView("You selected: " + line)
+	logFile.WithFields(logrus.Fields{
+		"category": "userEntry",
+		"action": "searchSelection",
+	}).Info(line)
+
 	//TODO Do something with selected value
+	logGui.Info("You selected: " + line)
 	return err
 }
 

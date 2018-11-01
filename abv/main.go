@@ -3,11 +3,14 @@ package main
 import (
 	"fmt"
 	"github.com/jroimartin/gocui"
-	"log"
+	"github.com/sirupsen/logrus"
+	"os"
 )
 
 var (
-	g *gocui.Gui
+	g       *gocui.Gui
+	logFile = logrus.New()
+	logGui  = logrus.New()
 )
 
 const (
@@ -29,40 +32,44 @@ var keys = []key{
 }
 
 func main() {
+	//Setup GUI
+	setupGui()
+	defer g.Close()
+
+	file, err := os.OpenFile("abv.log", os.O_CREATE|os.O_WRONLY, 0666)
+	defer file.Close()
+	if err == nil {
+		logFile.Out = file
+	} else {
+		logFile.Info("Failed to log to file, using default stderr")
+	}
+
+	// Start Gui
+	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
+		logFile.Fatal(err)
+	}
+}
+
+func setupGui() {
 	gui, err := gocui.NewGui(gocui.OutputNormal)
 	g = gui
 	if err != nil {
-		log.Fatalln(err)
+		logFile.Fatal(err)
 	}
-	defer g.Close()
 
 	g.SetManagerFunc(layout)
 	g.Cursor = true
 
 	if err := configureKeys(); err != nil {
-		log.Fatalln(err)
+		logFile.Fatalln(err)
 	}
-
-	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
-		log.Fatalln(err)
-	}
-}
-
-func logToMainView(s ...interface{}) error {
-	v, err := g.View(logView)
-	if err != nil {
-		return err
-	}
-	fmt.Fprintln(v, s)
-	return nil
 }
 
 func parseInput(g *gocui.Gui, v *gocui.View) error {
-	vn, err := g.View(logView)
-	if err != nil {
-		displayError(err)
-	}
-	fmt.Fprintf(vn, "You typed: "+v.Buffer())
+	logFile.WithFields(logrus.Fields{
+		"category": "userEntry",
+		"action": "searchSelection",
+	}).Info(v.Buffer())
 	updatePopup(v.Buffer())
 	togglePopup()
 	clearInput()
@@ -70,26 +77,26 @@ func parseInput(g *gocui.Gui, v *gocui.View) error {
 }
 
 func updatePopup(name string) {
-	g.Update(func(g *gocui.Gui) error {
+	g.Update(func(g *gocui.Gui) (err error) {
 		v, err := g.View(popup)
 		if err != nil {
-			return err
+			logFile.Error(err)
+			return
 		}
 
 		drinks, err := SearchUntappdByName(name)
 		if err != nil {
-			logToMainView(err)
+			logFile.Error(err)
 			displayError(err)
-			return nil
+			return
 		}
-		hideError()
 		v.Clear()
 
 		for _, drink := range drinks {
 			fmt.Fprintf(v, "%s: %s\n", drink.Brand, drink.Name)
 		}
 
-		return nil
+		return
 	})
 }
 
