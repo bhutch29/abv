@@ -1,3 +1,8 @@
+#Ignore files without extensions
+*
+!/**/
+!*.*
+
 *.sqlite
 *.exe
 *.exe~
