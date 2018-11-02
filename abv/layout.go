@@ -219,7 +219,7 @@ func hideError() {
 }
 
 func popupScrollUp(g *gocui.Gui, v *gocui.View) error {
-	err := moveViewCursorUp(v, 0)
+	err := moveViewCursorUp(v)
 	if err != nil {
 		logFile.Error(err)
 		logGui.Error(err)
@@ -268,10 +268,10 @@ func moveViewCursorDown(v *gocui.View, allowEmpty bool) error {
 	return nil
 }
 
-func moveViewCursorUp(v *gocui.View, dY int) error {
+func moveViewCursorUp(v *gocui.View) error {
 	ox, oy := v.Origin()
 	cx, cy := v.Cursor()
-	if cy > dY {
+	if cy >= 0 && oy > 0 {
 		if err := v.SetCursor(cx, cy-1); err != nil {
 			if err := v.SetOrigin(ox, oy-1); err != nil {
 				return err
