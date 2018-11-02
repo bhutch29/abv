@@ -13,14 +13,6 @@ const (
 	administration
 )
 
-// Controller defines methods required to communicate with the ABV backend
-type Controller interface {
-	GetMode() Mode
-	SetMode(Mode)
-	CreateDrink(model.Drink)
-	HandleScannedDrink(model.Drink)
-}
-
 // ModalController supports using the GUI via distinct behavioral modes
 type ModalController struct {
 	currentMode Mode
@@ -28,8 +20,8 @@ type ModalController struct {
 }
 
 // New creates a new fully initialized ModalController
-func New() (Controller, error) {
-	m := &ModalController{}
+func New() (ModalController, error) {
+	m := ModalController{}
 	m.currentMode = serving
 	backend, err := model.New()
 	if err != nil {

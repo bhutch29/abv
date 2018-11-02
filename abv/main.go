@@ -9,7 +9,7 @@ import (
 
 var (
 	g       *gocui.Gui
-	c       Controller
+	c       ModalController
 	logFile = logrus.New()
 	logGui  = logrus.New()
 )
