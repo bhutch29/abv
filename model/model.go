@@ -61,6 +61,20 @@ type DrinkEntry struct {
 //TODO DeleteDrink
 //TODO UpdateDrink
 
+// BarcodeExists checks if a barcode is already in the database
+func (m Model) BarcodeExists(bc int) (bool, error) {
+	var barcodes []int
+	if err := m.db.Select(&barcodes, "select barcode from Drinks"); err != nil {
+		return false, err
+	}
+	for _, code := range barcodes {
+		if code == bc {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 // CreateDrink adds an entry to the Drinks table, returning the id
 func (m Model) CreateDrink(d Drink) (int, error) {
 	now := time.Now().Unix()
