@@ -26,9 +26,9 @@ func New() (ModalController, error) {
 	m.currentMode = serving
 	backend, err := model.New()
 	if err != nil {
-		m.backend = backend
 		return m, err
 	}
+	m.backend = backend
 	return m, nil
 }
 
@@ -66,13 +66,15 @@ func (c *ModalController) NewDrink(d model.Drink) error {
 	if c.currentMode != stocking {
 		return fmt.Errorf("NewDrink can only be called from stocking mode")
 	}
-	c.backend.CreateDrink(d)
+	if _, err := c.backend.CreateDrink(d); err != nil {
+		return err
+	}
 	c.handleDrink(d.Barcode)
 	return nil
 }
 
 func (c *ModalController) handleDrink(bc int) {
-	d := model.DrinkEntry{Barcode: bc, Quantity: 0} //TODO add quantity handling
+	d := model.DrinkEntry{Barcode: bc, Quantity: 1} //TODO add quantity handling
 	if c.currentMode == stocking {
 		c.backend.InputDrinks(d)
 	} else if c.currentMode == serving {

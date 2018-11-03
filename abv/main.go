@@ -78,10 +78,11 @@ func main() {
 	} else {
 		logFile.Info("Failed to log to file, using default stderr")
 	}
+	logFile.SetLevel(logrus.DebugLevel)
 
 	c, err = New()
 	if err != nil {
-		logFile.Error(err)
+		logFile.Error("Error creating controller: ", err)
 	}
 
 	// Start Gui
@@ -196,14 +197,20 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 	d.Barcode = c.LastBarcode()
 	logGui.Info("Adding new drink", d)
 	logFile.Info("Adding new drink", d)
-	c.NewDrink(d)
-	return err
+	if err = c.NewDrink(d); err != nil {
+		logGui.Error(err)
+		logFile.Error(err)
+	}
+	return nil
 }
 
 func findDrinkFromSelection(line string) model.Drink {
+	logFile.Debug("Finding drink from selected text: ", line)
 	var d model.Drink
-	var brand, name string
-	fmt.Sscanf(line, drinkFormat, &brand, &name)
+	s := strings.Split(line, ":")
+	brand := s[0]
+	name := strings.TrimSpace(s[1])
+	logFile.Debug("Determined that brand = " + brand + " and name = " + name)
 	for _, drink := range drinks {
 		if drink.Brand == brand && drink.Name == name {
 			d = drink

@@ -7,6 +7,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"os"
 	"time"
+	"fmt"
 )
 
 // Model controls all the data flow into and out of the db layer
@@ -34,7 +35,7 @@ func New() (Model, error) {
 }
 
 // CreateTablesIfNeeded ensures that the db has the necessary tables
-func (m Model) CreateTablesIfNeeded() {
+func (m *Model) CreateTablesIfNeeded() {
 	m.db.Exec("create table if not exists Drinks (barcode integer primary key, brand varchar(255), name varchar(255), abv real, ibu real, type varchar(255), date integer)")
 	m.db.Exec("create table if not exists Input (id integer primary key, barcode integer, quantity integer, date integer)")
 	m.db.Exec("create table if not exists Output (id integer primary key, barcode integer, quantity integer, date integer)")
@@ -62,21 +63,23 @@ type DrinkEntry struct {
 //TODO UpdateDrink
 
 // BarcodeExists checks if a barcode is already in the database
-func (m Model) BarcodeExists(bc int) (bool, error) {
-	// var barcode int
-	// TODO: Throws Seg Fault
-	// if err := m.db.Select(&barcode, "select barcode from Drinks where barcode = ?", bc); err != nil {
-	// 	return false, err
-	// }
-	// if barcode == bc {
-	// 	return true, nil
-	// }
+func (m *Model) BarcodeExists(bc int) (bool, error) {
+	var barcode int
+	if err := m.db.Get(&barcode, "select barcode from Drinks where barcode = ? limit 1", bc); err != nil {
+		return false, err
+	}
+	if barcode == bc {
+		return true, nil
+	}
 	return false, nil
 }
 
 // CreateDrink adds an entry to the Drinks table, returning the id
-func (m Model) CreateDrink(d Drink) (int, error) {
+func (m *Model) CreateDrink(d Drink) (int, error) {
 	now := time.Now().Unix()
+	if m.db == nil {
+		return -1, fmt.Errorf("database is nil")
+	}
 	res, err := m.db.Exec(
 		"insert into Drinks (barcode, brand, name, abv, ibu, type, date) Values (?, ?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, now)
 	if err != nil {
@@ -86,14 +89,14 @@ func (m Model) CreateDrink(d Drink) (int, error) {
 }
 
 // GetAllStoredDrinks returns every saved Drink row in the database
-func (m Model) GetAllStoredDrinks() ([]Drink, error) {
+func (m *Model) GetAllStoredDrinks() ([]Drink, error) {
 	var drinks []Drink
 	err := m.db.Select(&drinks, "select * from Drinks")
 	return drinks, err
 }
 
 // InputDrinks adds an entry to the Input table, returning the id
-func (m Model) InputDrinks(d DrinkEntry) (int, error) {
+func (m *Model) InputDrinks(d DrinkEntry) (int, error) {
 	now := time.Now().Unix()
 	res, err := m.db.Exec(
 		"insert into Input (barcode, quantity, date) Values (?, ?, ?)", d.Barcode, d.Quantity, now)
@@ -104,7 +107,7 @@ func (m Model) InputDrinks(d DrinkEntry) (int, error) {
 }
 
 // OutputDrinks adds an entry to the Output table, returning the id
-func (m Model) OutputDrinks(d DrinkEntry) (int, error) {
+func (m *Model) OutputDrinks(d DrinkEntry) (int, error) {
 	now := time.Now().Unix()
 	res, err := m.db.Exec(
 		"insert into Output (barcode, quantity, date) Values (?, ?, ?)", d.Barcode, d.Quantity, now)

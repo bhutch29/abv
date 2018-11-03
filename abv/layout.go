@@ -51,7 +51,6 @@ func makeLogPanel() error {
 			return err
 		}
 		v.Wrap = true
-		logFile.Info(v.Name())
 		logGui.Out = v
 	}
 
