@@ -55,8 +55,7 @@ func (c *ModalController) HandleBarcode(bc string) (bool, error) {
 		return false, err
 	}
 	if exists {
-		logGui.Info("Barcode found") //TODO Return info on scanned beer!
-		logFile.Info("Known barcode scanned", bc)
+		logFile.Info("Known barcode scanned: ", bc)
 		c.handleDrink(bc)
 		return true, nil
 	}
@@ -77,7 +76,16 @@ func (c *ModalController) NewDrink(d model.Drink) error {
 
 func (c *ModalController) handleDrink(bc string) {
 	d := model.DrinkEntry{Barcode: bc, Quantity: 1} //TODO add quantity handling
+
+	drink, err := c.backend.GetDrinkByBarcode(d.Barcode)
+	if err != nil {
+		logGui.Error(err)
+		logFile.Error(err)
+	}
+
 	if c.currentMode == stocking {
+		logGui.Info("Drink added to inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
+		logFile.Info("Drink added to inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
 		c.backend.InputDrinks(d)
 	} else if c.currentMode == serving {
 		count, err := c.backend.GetCountByBarcode(d.Barcode)
@@ -87,15 +95,12 @@ func (c *ModalController) handleDrink(bc string) {
 			return
 		}
 		if count <= 0 {
-			drink, err := c.backend.GetDrinkByBarcode(d.Barcode)
-			if err != nil {
-				logGui.Error(err)
-				logFile.Error(err)
-			}
 			logGui.Warn("That drink was not in the inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
 			logFile.Warn("Drink scanned out that was not in the inventory!", drink)
 			return
 		}
+		logGui.Info("Drink removed from inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
+		logFile.Info("Drink removed from inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
 		c.backend.OutputDrinks(d)
 	}
 }
