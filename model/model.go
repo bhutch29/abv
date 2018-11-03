@@ -3,15 +3,16 @@ package model
 import (
 	"database/sql"
 	"github.com/jmoiron/sqlx"
-	// Registers the sqlite3 database driver
+	// Registers the sqlite3 db driver
 	_ "github.com/mattn/go-sqlite3"
 	"os"
 	"time"
+	"fmt"
 )
 
-// Model controls all the data flow into and out of the database layer
+// Model controls all the data flow into and out of the db layer
 type Model struct {
-	database *sqlx.DB
+	db *sqlx.DB
 }
 
 // New creates a new fully initialized Model
@@ -28,16 +29,16 @@ func New() (Model, error) {
 		return model, err
 	}
 
-	CreateTablesIfNeeded(db)
-	model.database = db
+	model.db = db
+	model.CreateTablesIfNeeded()
 	return model, nil
 }
 
-// CreateTablesIfNeeded ensures that the database has the necessary tables
-func CreateTablesIfNeeded(db *sqlx.DB) {
-	db.Exec("create table if not exists Drinks (barcode integer primary key, brand varchar(255), name varchar(255), abv real, ibu real, type varchar(255), date integer)")
-	db.Exec("create table if not exists Input (id integer primary key, barcode integer, quantity integer, date integer)")
-	db.Exec("create table if not exists Output (id integer primary key, barcode integer, quantity integer, date integer)")
+// CreateTablesIfNeeded ensures that the db has the necessary tables
+func (m *Model) CreateTablesIfNeeded() {
+	m.db.Exec("create table if not exists Drinks (barcode integer primary key, brand varchar(255), name varchar(255), abv real, ibu real, type varchar(255), date integer)")
+	m.db.Exec("create table if not exists Input (id integer primary key, barcode integer, quantity integer, date integer)")
+	m.db.Exec("create table if not exists Output (id integer primary key, barcode integer, quantity integer, date integer)")
 }
 
 // Drink stores information about an available beverage
@@ -61,10 +62,25 @@ type DrinkEntry struct {
 //TODO DeleteDrink
 //TODO UpdateDrink
 
+// BarcodeExists checks if a barcode is already in the database
+func (m *Model) BarcodeExists(bc int) (bool, error) {
+	var barcode int
+	if err := m.db.Get(&barcode, "select barcode from Drinks where barcode = ? limit 1", bc); err != nil {
+		return false, err
+	}
+	if barcode == bc {
+		return true, nil
+	}
+	return false, nil
+}
+
 // CreateDrink adds an entry to the Drinks table, returning the id
-func (m Model) CreateDrink(d Drink) (int, error) {
+func (m *Model) CreateDrink(d Drink) (int, error) {
 	now := time.Now().Unix()
-	res, err := m.database.Exec(
+	if m.db == nil {
+		return -1, fmt.Errorf("database is nil")
+	}
+	res, err := m.db.Exec(
 		"insert into Drinks (barcode, brand, name, abv, ibu, type, date) Values (?, ?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, now)
 	if err != nil {
 		return -1, err
@@ -72,16 +88,17 @@ func (m Model) CreateDrink(d Drink) (int, error) {
 	return getID(res)
 }
 
-func (m Model) GetInventory() ([]Drink, error) {
+// GetAllStoredDrinks returns every saved Drink row in the database
+func (m *Model) GetAllStoredDrinks() ([]Drink, error) {
 	var drinks []Drink
-	err := m.database.Select(&drinks, "select * from Drinks")
+	err := m.db.Select(&drinks, "select * from Drinks")
 	return drinks, err
 }
 
 // InputDrinks adds an entry to the Input table, returning the id
-func (m Model) InputDrinks(d DrinkEntry) (int, error) {
+func (m *Model) InputDrinks(d DrinkEntry) (int, error) {
 	now := time.Now().Unix()
-	res, err := m.database.Exec(
+	res, err := m.db.Exec(
 		"insert into Input (barcode, quantity, date) Values (?, ?, ?)", d.Barcode, d.Quantity, now)
 	if err != nil {
 		return -1, err
@@ -90,9 +107,9 @@ func (m Model) InputDrinks(d DrinkEntry) (int, error) {
 }
 
 // OutputDrinks adds an entry to the Output table, returning the id
-func (m Model) OutputDrinks(d DrinkEntry) (int, error) {
+func (m *Model) OutputDrinks(d DrinkEntry) (int, error) {
 	now := time.Now().Unix()
-	res, err := m.database.Exec(
+	res, err := m.db.Exec(
 		"insert into Output (barcode, quantity, date) Values (?, ?, ?)", d.Barcode, d.Quantity, now)
 	if err != nil {
 		return -1, err
