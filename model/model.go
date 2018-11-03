@@ -36,14 +36,14 @@ func New() (Model, error) {
 
 // CreateTablesIfNeeded ensures that the db has the necessary tables
 func (m *Model) CreateTablesIfNeeded() {
-	m.db.Exec("create table if not exists Drinks (barcode integer primary key, brand varchar(255), name varchar(255), abv real, ibu real, type varchar(255), date integer)")
+	m.db.Exec("create table if not exists Drinks (barcode varchar(255) primary key, brand varchar(255), name varchar(255), abv real, ibu real, type varchar(255), date integer)")
 	m.db.Exec("create table if not exists Input (id integer primary key, barcode integer, quantity integer, date integer)")
 	m.db.Exec("create table if not exists Output (id integer primary key, barcode integer, quantity integer, date integer)")
 }
 
 // Drink stores information about an available beverage
 type Drink struct {
-	Barcode int
+	Barcode string
 	Brand   string
 	Name    string
 	Abv     float64
@@ -54,7 +54,7 @@ type Drink struct {
 
 // DrinkEntry defines quantities of drinks for transactions
 type DrinkEntry struct {
-	Barcode  int
+	Barcode  string
 	Quantity int
 	Date     int
 }
@@ -63,9 +63,10 @@ type DrinkEntry struct {
 //TODO UpdateDrink
 
 // BarcodeExists checks if a barcode is already in the database
-func (m *Model) BarcodeExists(bc int) (bool, error) {
-	var barcode int
-	if err := m.db.Get(&barcode, "select barcode from Drinks where barcode = ? limit 1", bc); err != nil {
+func (m *Model) BarcodeExists(bc string) (bool, error) {
+	var barcode string
+	err := m.db.Get(&barcode, "select barcode from Drinks where barcode = ? limit 1", bc)
+	if err != nil && err != sql.ErrNoRows {
 		return false, err
 	}
 	if barcode == bc {
