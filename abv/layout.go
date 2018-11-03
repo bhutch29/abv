@@ -8,7 +8,6 @@ import (
 var popupDisplayed = false
 
 const (
-	// Define Prompt dimensions
 	inputHeight    = 4
 	inputCursorPos = 4
 
@@ -119,11 +118,9 @@ func togglePopup() {
 		g.SetViewOnTop(searchSymbol)
 		g.SetViewOnTop(search)
 		g.SetCurrentView(search)
-		s, _ := g.View(searchOutline)
-		s.Title = "Enter brewery and beer name..."
+		setTitle(searchOutline, "Enter brewery and beer name...")
 	} else {
-		p, _ := g.View(popup)
-		p.Title = ""
+		setTitle(popup, "")
 		g.SetViewOnBottom(popup)
 		g.SetViewOnBottom(searchSymbol)
 		g.SetViewOnBottom(searchOutline)
@@ -255,8 +252,9 @@ func displayError(e error) error {
 	return nil
 }
 
-func hideError() {
+func hideError(g *gocui.Gui, v *gocui.View) error {
 	g.DeleteView(errorView)
+	return nil
 }
 
 func popupScrollUp(g *gocui.Gui, v *gocui.View) error {
@@ -341,4 +339,9 @@ func resetViewCursor(v *gocui.View) error {
 		}
 	}
 	return nil
+}
+
+func setTitle(view string, title string) {
+	v, _ := g.View(view)
+	v.Title = title
 }

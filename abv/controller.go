@@ -52,9 +52,11 @@ func (c *ModalController) HandleBarcode(bc int) (bool, error) {
 	c.lastBarcode = bc
 	exists, err := c.backend.BarcodeExists(bc)
 	if err != nil {
-		return exists, err
+		return false, err
 	}
 	if exists {
+		logGui.Info("Barcode found") //TODO Return info on scanned beer!
+		logFile.Info("Known barcode scanned", bc)
 		c.handleDrink(bc)
 		return true, nil
 	}

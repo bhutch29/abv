@@ -45,6 +45,7 @@ var keys = []key{
 	{popup, gocui.KeyArrowDown, popupScrollDown, "Down", "scrollDown"},
 	{popup, gocui.KeyCtrlJ, popupScrollDown, "Down", "scrollDown"},
 	{popup, gocui.KeyEnter, popupSelectItem, "Enter", "Select"},
+	{errorView, gocui.KeyEsc, hideError, "Esc", "close error dialog"},
 }
 
 func testError(g *gocui.Gui, v *gocui.View) error {
@@ -72,16 +73,16 @@ func main() {
 	logGui.Formatter = &f
 
 	file, err := os.OpenFile("abv.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	defer file.Close()
 	if err == nil {
 		logFile.Out = file
 	} else {
 		logFile.Info("Failed to log to file, using default stderr")
 	}
+	defer file.Close()
 	logFile.SetLevel(logrus.DebugLevel)
 
-	c, err = New()
-	if err != nil {
+	//Create Controller
+	if c, err = New(); err != nil {
 		logFile.Error("Error creating controller: ", err)
 	}
 
@@ -92,8 +93,8 @@ func main() {
 }
 
 func setupGui() {
-	gui, err := gocui.NewGui(gocui.OutputNormal)
-	g = gui
+	var err error
+	g, err = gocui.NewGui(gocui.OutputNormal)
 	if err != nil {
 		logFile.Fatal(err)
 	}
@@ -108,78 +109,77 @@ func setupGui() {
 
 func parseInput(g *gocui.Gui, v *gocui.View) error {
 	text := strings.TrimSuffix(v.Buffer(), "\n")
+	clearView(input)
+
 	bc, err := strconv.Atoi(text)
-	if err == nil {
-		if handleBarcode(bc) {
-			togglePopup()
-		}
-	} else {
+	if err != nil {
 		logGui.Warn("Barcode entry must be an integer")
 		logFile.Warn("Non-integer barcode entered", text)
+		return nil
 	}
-	clearView(input)
+
+	handleBarcodeEntry(bc)
 	return nil
 }
 
-func handleSearch(g *gocui.Gui, v *gocui.View) error {
-	s, _ := g.View(searchOutline)
-	s.Title = ""
-	clearView(search)
-	text := v.Buffer()
-	logFile.WithFields(logrus.Fields{
-		"category": "userEntry",
-		"entry":    text,
-	}).Info("User searched for a drink")
-	updatePopup(text)
-	g.SetCurrentView(popup)
-	p, _ := g.View(popup)
-	p.Title = "Select desired drink..."
-	return nil
-}
-
-func handleBarcode(bc int) bool {
-	logGui.Info("Scanned barcode ", bc)
-	logFile.Info("Scanned barcode ", bc)
+func handleBarcodeEntry(bc int) {
+	logGui.Info("Scanned barcode: ", bc)
+	logFile.Info("Scanned barcode: ", bc)
 
 	exists, err := c.HandleBarcode(bc)
 	if err != nil {
 		logGui.Error("Failed to search database for barcode", err)
 		logFile.Error("Failed to search database for barcode", err)
 	}
+
 	if !exists {
-		if c.GetMode() != stocking {
-			logGui.Warn("Barcode not recognized while serving. Drink will not be recorded")
-			return false
-		}
-		logGui.Info("Barcode not recognized. Please enter drink brand and name.")
-		//TODO Change view state to indicate data entry needed? Maybe prevent data entry until this happens somehow?
-		logFile.Info("Unknown barcode scanned", bc)
-		return true
+		handleNewBarcode(bc)
 	}
-	logGui.Info("Barcode found") //TODO Return info on scanned beer!
-	logFile.Info("Known barcode scanned", bc)
-	return false
 }
 
-func updatePopup(name string) {
-	v, err := g.View(popup)
-	if err != nil {
-		logFile.Error(err)
+func handleNewBarcode(bc int) {
+	if c.GetMode() != stocking {
+		logGui.Warn("Barcode not recognized while serving. Drink will not be recorded")
 		return
 	}
 
+	logGui.Info("Barcode not recognized. Please enter drink brand and name.")
+	logFile.Info("Unknown barcode scanned: ", bc)
+	togglePopup()
+}
+
+func handleSearch(g *gocui.Gui, v *gocui.View) error {
+	text := v.Buffer()
+
+	logFile.WithFields(logrus.Fields{
+		"category": "userEntry",
+		"entry":    text,
+	}).Info("User searched for a drink")
+
+	setTitle(searchOutline, "")
+	clearView(search)
+	updatePopup(text)
+	setTitle(popup, "Select desired drink...")
+	return nil
+}
+
+func updatePopup(name string) {
+	v, _ := g.View(popup)
+
+	var err error
 	drinks, err = SearchUntappdByName(name)
 	if err != nil {
 		logFile.Error(err)
 		displayError(err)
 		return
 	}
-	v.Clear()
 
+	v.Clear()
 	for _, drink := range drinks {
 		fmt.Fprintf(v, drinkFormat, drink.Brand, drink.Name)
 	}
 
+	g.SetCurrentView(popup)
 	return
 }
 
@@ -187,36 +187,49 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 	line, err := getViewLine(v)
 	togglePopup()
 	resetViewCursor(v)
+
 	logFile.WithFields(logrus.Fields{
 		"category": "userEntry",
 		"entry":    line,
 	}).Info("User selected a beer")
 	logGui.Info("You selected: " + line)
 
-	d := findDrinkFromSelection(line)
+	d, err := findDrinkFromSelection(line)
+	if err != nil {
+		logGui.Error(err)
+		logFile.Error(err)
+		return nil
+	}
+
 	d.Barcode = c.LastBarcode()
+
 	logGui.Info("Adding new drink", d)
 	logFile.Info("Adding new drink", d)
+
 	if err = c.NewDrink(d); err != nil {
 		logGui.Error(err)
 		logFile.Error(err)
 	}
+
 	return nil
 }
 
-func findDrinkFromSelection(line string) model.Drink {
+func findDrinkFromSelection(line string) (model.Drink, error) {
 	logFile.Debug("Finding drink from selected text: ", line)
 	var d model.Drink
+
 	s := strings.Split(line, ":")
 	brand := s[0]
 	name := strings.TrimSpace(s[1])
+
 	logFile.Debug("Determined that brand = " + brand + " and name = " + name)
+
 	for _, drink := range drinks {
 		if drink.Brand == brand && drink.Name == name {
-			d = drink
+			return drink, nil
 		}
 	}
-	return d
+	return d, fmt.Errorf("Could not parse brand and drink name from selected text: " + line)
 }
 
 func setInputMode(g *gocui.Gui, v *gocui.View) error {
