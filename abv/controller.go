@@ -80,6 +80,22 @@ func (c *ModalController) handleDrink(bc string) {
 	if c.currentMode == stocking {
 		c.backend.InputDrinks(d)
 	} else if c.currentMode == serving {
+		count, err := c.backend.GetCountByBarcode(d.Barcode)
+		if err != nil {
+			logGui.Error("Could not get count by barcode: ", err)
+			logFile.Error("Could not get count by barcode: ", err)
+			return
+		}
+		if count <= 0 {
+			drink, err := c.backend.GetDrinkByBarcode(d.Barcode)
+			if err != nil {
+				logGui.Error(err)
+				logFile.Error(err)
+			}
+			logGui.Warn("That drink was not in the inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
+			logFile.Warn("Drink scanned out that was not in the inventory!", drink)
+			return
+		}
 		c.backend.OutputDrinks(d)
 	}
 }

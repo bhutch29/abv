@@ -4,10 +4,10 @@ import (
 	"database/sql"
 	"github.com/jmoiron/sqlx"
 	// Registers the sqlite3 db driver
+	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
 	"time"
-	"fmt"
 )
 
 // Model controls all the data flow into and out of the db layer
@@ -61,6 +61,35 @@ type DrinkEntry struct {
 
 //TODO DeleteDrink
 //TODO UpdateDrink
+
+// GetCountByBarcode returns the total number of currently stocked beers with a specific barcode
+func (m *Model) GetCountByBarcode(bc string) (int, error) {
+	// TODO Convert to full SQL implementation
+	var input, output []int
+	if err := m.db.Select(&input, "select quantity from Input where barcode = ?", bc); err != nil {
+		return -1, err
+	}
+	if err := m.db.Select(&output, "select quantity from Output where barcode = ?", bc); err != nil {
+		return -1, err
+	}
+
+	var count int
+	for _, x := range input {
+		count += x
+	}
+	for _, x := range output {
+		count -= x
+	}
+	return count, nil
+}
+
+// GetDrinkByBarcode returns all stored information about a drink based on its barcode
+func (m *Model) GetDrinkByBarcode(bc string) (Drink, error) {
+	var d Drink
+	err := m.db.Get(&d, "select * from Drinks where barcode = ?", bc)
+	//TODO Check that a value got returned? Specific sql.Err___?
+	return d, err
+}
 
 // BarcodeExists checks if a barcode is already in the database
 func (m *Model) BarcodeExists(bc string) (bool, error) {
