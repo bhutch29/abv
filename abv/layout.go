@@ -138,7 +138,7 @@ func makePromptPanel() error {
 	promptDividerHeight := maxY - (inputHeight / 2)
 	promptString := generateKeybindString()
 
-	if v, err := g.SetView(prompt, 0, promptStartHeight, maxY, promptDividerHeight); err != nil {
+	if v, err := g.SetView(prompt, 0, promptStartHeight, maxX, promptDividerHeight); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
