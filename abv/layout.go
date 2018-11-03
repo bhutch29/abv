@@ -7,10 +7,13 @@ import (
 
 var popupDisplayed = false
 
-// Define Prompt dimensions
 const (
+	// Define Prompt dimensions
 	inputHeight    = 4
 	inputCursorPos = 4
+
+	searchEntryHeight = 3
+	searchCursorPos   = 4
 )
 
 func layout(g *gocui.Gui) (err error) {
@@ -69,23 +72,63 @@ func makeSelectOptionsPopup() error {
 			return err
 		}
 
-		v.Title = "Choose desired drink..."
 		v.Frame = true
 		v.Highlight = true
 		//TODO: Set Selected FG and BG colors
 		g.SetViewOnBottom(popup)
 	}
+
+
+	if v, err := g.SetView(search, x0 + searchCursorPos, y0 + h + 1, x1, y0 + h + searchEntryHeight); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+
+		v.Editable = true
+		v.Wrap = false
+		v.Frame = false
+		v.Editor = gocui.EditorFunc(promptEditor)
+		g.SetViewOnBottom(search)
+	}
+
+
+	if v, err := g.SetView(searchSymbol, x0, y0 + h + 1, x0 + searchCursorPos, y0 + h + searchEntryHeight); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		v.Frame = false
+		fmt.Fprintf(v, ">>")
+		g.SetViewOnBottom(searchSymbol)
+	}
+
+
+	if v, err := g.SetView(searchOutline, x0, y0 + h, x1, y0 + h + searchEntryHeight); err != nil {
+		if err != gocui.ErrUnknownView {
+			return err
+		}
+		v.Frame = true
+		g.SetViewOnBottom(searchOutline)
+	}
+
 	return nil
 }
 
-func togglePopup(){
-	vn := popup
-
+func togglePopup() {
 	if !popupDisplayed {
-		g.SetViewOnTop(vn)
-		g.SetCurrentView(vn)
+		g.SetViewOnTop(popup)
+		g.SetViewOnTop(searchOutline)
+		g.SetViewOnTop(searchSymbol)
+		g.SetViewOnTop(search)
+		g.SetCurrentView(search)
+		s, _ := g.View(searchOutline)
+		s.Title = "Enter brewery and beer name..."
 	} else {
-		g.SetViewOnBottom(vn)
+		p, _ := g.View(popup)
+		p.Title = ""
+		g.SetViewOnBottom(popup)
+		g.SetViewOnBottom(searchSymbol)
+		g.SetViewOnBottom(searchOutline)
+		g.SetViewOnBottom(search)
 		g.SetCurrentView(input)
 	}
 
@@ -146,15 +189,15 @@ func makeInfoPanel() error {
 	return nil
 }
 
-func clearInput() {
+func clearView(view string) {
 	g.Update(func(g *gocui.Gui) error {
-		input, err := g.View(input)
+		v, err := g.View(view)
 		if err != nil {
 			return err
 		}
-		input.Clear()
-		x, y := input.Cursor()
-		input.MoveCursor(-x, -y, true)
+		v.Clear()
+		x, y := v.Cursor()
+		v.MoveCursor(-x, -y, true)
 
 		return nil
 	})
@@ -182,7 +225,7 @@ func promptEditor(v *gocui.View, key gocui.Key, ch rune, mod gocui.Modifier) {
 	case gocui.KeyArrowLeft:
 		v.MoveCursor(-1, 0, false)
 	case gocui.KeyArrowRight:
-		v.MoveCursor(1, 0, false)
+
 	}
 }
 

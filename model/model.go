@@ -63,15 +63,14 @@ type DrinkEntry struct {
 
 // BarcodeExists checks if a barcode is already in the database
 func (m Model) BarcodeExists(bc int) (bool, error) {
-	var barcodes []int
-	if err := m.db.Select(&barcodes, "select barcode from Drinks"); err != nil {
-		return false, err
-	}
-	for _, code := range barcodes {
-		if code == bc {
-			return true, nil
-		}
-	}
+	// var barcode int
+	// TODO: Throws Seg Fault
+	// if err := m.db.Select(&barcode, "select barcode from Drinks where barcode = ?", bc); err != nil {
+	// 	return false, err
+	// }
+	// if barcode == bc {
+	// 	return true, nil
+	// }
 	return false, nil
 }
 
