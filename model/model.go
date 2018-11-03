@@ -61,22 +61,15 @@ type DrinkEntry struct {
 // GetCountByBarcode returns the total number of currently stocked beers with a specific barcode
 func (m *Model) GetCountByBarcode(bc string) (int, error) {
 	// TODO Convert to full SQL implementation
-	var input, output []int
-	if err := m.db.Select(&input, "select quantity from Input where barcode = ?", bc); err != nil {
+	var input, output int
+	if err := m.db.Get(&input, "select sum(quantity) from Input where barcode = ?", bc); err != nil {
 		return -1, err
 	}
-	if err := m.db.Select(&output, "select quantity from Output where barcode = ?", bc); err != nil {
+	if err := m.db.Get(&output, "select sum(quantity) from Output where barcode = ?", bc); err != nil {
 		return -1, err
 	}
 
-	var count int
-	for _, x := range input {
-		count += x
-	}
-	for _, x := range output {
-		count -= x
-	}
-	return count, nil
+	return input-output, nil
 }
 
 // GetDrinkByBarcode returns all stored information about a drink based on its barcode
