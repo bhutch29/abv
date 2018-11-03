@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/jroimartin/gocui"
@@ -292,17 +293,25 @@ func moveViewCursorDown(v *gocui.View, allowEmpty bool) error {
 	return nil
 }
 
-func moveViewCursorUp(v *gocui.View) error {
-	ox, oy := v.Origin()
+func moveViewCursorUp(v *gocui.View) (err error) {
 	cx, cy := v.Cursor()
-	if cy >= 0 && oy > 0 {
-		if err := v.SetCursor(cx, cy-1); err != nil {
-			if err := v.SetOrigin(ox, oy-1); err != nil {
-				return err
-			}
+	ox, oy := v.Origin()
+	switch {
+	case cy == 0 && oy == 0: // already at the top
+		return nil
+	case cy > 0: // cursor has priority over origin
+		if err = v.SetCursor(cx, cy-1); err != nil {
+			return err
 		}
+		return nil
+	case oy > 0:
+		if err = v.SetOrigin(ox, oy-1); err != nil {
+			return err
+		}
+		return nil
+	default:
+		return errors.New("invalid cursor or origin position")
 	}
-	return nil
 }
 
 func getViewLine(v *gocui.View) (string, error) {
