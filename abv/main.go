@@ -6,7 +6,6 @@ import (
 	"github.com/jroimartin/gocui"
 	"github.com/sirupsen/logrus"
 	"os"
-	"strconv"
 	"strings"
 )
 
@@ -108,21 +107,13 @@ func setupGui() {
 }
 
 func parseInput(g *gocui.Gui, v *gocui.View) error {
-	text := strings.TrimSuffix(v.Buffer(), "\n")
+	bc := strings.TrimSuffix(v.Buffer(), "\n")
 	clearView(input)
-
-	bc, err := strconv.Atoi(text)
-	if err != nil {
-		logGui.Warn("Barcode entry must be an integer")
-		logFile.Warn("Non-integer barcode entered", text)
-		return nil
-	}
-
 	handleBarcodeEntry(bc)
 	return nil
 }
 
-func handleBarcodeEntry(bc int) {
+func handleBarcodeEntry(bc string) {
 	logGui.Info("Scanned barcode: ", bc)
 	logFile.Info("Scanned barcode: ", bc)
 
@@ -137,7 +128,7 @@ func handleBarcodeEntry(bc int) {
 	}
 }
 
-func handleNewBarcode(bc int) {
+func handleNewBarcode(bc string) {
 	if c.GetMode() != stocking {
 		logGui.Warn("Barcode not recognized while serving. Drink will not be recorded")
 		return

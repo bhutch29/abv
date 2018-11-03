@@ -17,7 +17,7 @@ const (
 type ModalController struct {
 	currentMode Mode
 	backend     model.Model
-	lastBarcode int
+	lastBarcode string
 }
 
 // New creates a new fully initialized ModalController
@@ -43,12 +43,12 @@ func (c *ModalController) SetMode(m Mode) {
 }
 
 // LastBarcode returns the most recently cached barcode
-func (c *ModalController) LastBarcode() int {
+func (c *ModalController) LastBarcode() string {
 	return c.lastBarcode
 }
 
 // HandleBarcode inputs/outputs a drink and returns true if the barcode already exists or returns false if the barcode does not exist
-func (c *ModalController) HandleBarcode(bc int) (bool, error) {
+func (c *ModalController) HandleBarcode(bc string) (bool, error) {
 	c.lastBarcode = bc
 	exists, err := c.backend.BarcodeExists(bc)
 	if err != nil {
@@ -75,7 +75,7 @@ func (c *ModalController) NewDrink(d model.Drink) error {
 	return nil
 }
 
-func (c *ModalController) handleDrink(bc int) {
+func (c *ModalController) handleDrink(bc string) {
 	d := model.DrinkEntry{Barcode: bc, Quantity: 1} //TODO add quantity handling
 	if c.currentMode == stocking {
 		c.backend.InputDrinks(d)
