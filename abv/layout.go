@@ -262,7 +262,7 @@ func popupScrollUp(g *gocui.Gui, v *gocui.View) error {
 		logFile.Error(err)
 		logGui.Error(err)
 	}
-	return err //TODO: Verify what happens if error is returned to gocui layer like this. Should we return nil?
+	return nil
 }
 
 func popupScrollDown(g *gocui.Gui, v *gocui.View) error {

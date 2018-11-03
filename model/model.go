@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"github.com/jmoiron/sqlx"
 	// Registers the sqlite3 db driver
-	"fmt"
 	_ "github.com/mattn/go-sqlite3"
 	"os"
 	"time"
@@ -59,9 +58,6 @@ type DrinkEntry struct {
 	Date     int
 }
 
-//TODO DeleteDrink
-//TODO UpdateDrink
-
 // GetCountByBarcode returns the total number of currently stocked beers with a specific barcode
 func (m *Model) GetCountByBarcode(bc string) (int, error) {
 	// TODO Convert to full SQL implementation
@@ -87,7 +83,7 @@ func (m *Model) GetCountByBarcode(bc string) (int, error) {
 func (m *Model) GetDrinkByBarcode(bc string) (Drink, error) {
 	var d Drink
 	err := m.db.Get(&d, "select * from Drinks where barcode = ?", bc)
-	//TODO Check that a value got returned? Specific sql.Err___?
+	//TODO Check that a value got returned, or at least throws a sql.Err___ if nothing found
 	return d, err
 }
 
@@ -104,12 +100,15 @@ func (m *Model) BarcodeExists(bc string) (bool, error) {
 	return false, nil
 }
 
+// DeleteDrink removes an entry from the Drinks table using its barcode
+func (m *Model) DeleteDrink(bc string) (error) {
+	_, err := m.db.Exec("delete from Drinks where barcode = ?", bc)
+	return err
+}
+
 // CreateDrink adds an entry to the Drinks table, returning the id
 func (m *Model) CreateDrink(d Drink) (int, error) {
 	now := time.Now().Unix()
-	if m.db == nil {
-		return -1, fmt.Errorf("database is nil")
-	}
 	res, err := m.db.Exec(
 		"insert into Drinks (barcode, brand, name, abv, ibu, type, date) Values (?, ?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, now)
 	if err != nil {
