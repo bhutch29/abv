@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/jroimartin/gocui"
 )
 
@@ -50,6 +51,7 @@ func makeLogPanel() error {
 			return err
 		}
 		v.Wrap = true
+		v.Autoscroll = true
 		logGui.Out = v
 	}
 
@@ -76,8 +78,7 @@ func makeSelectOptionsPopup() error {
 		g.SetViewOnBottom(popup)
 	}
 
-
-	if v, err := g.SetView(search, x0 + searchCursorPos, y0 + h + 1, x1, y0 + h + searchEntryHeight); err != nil {
+	if v, err := g.SetView(search, x0+searchCursorPos, y0+h+1, x1, y0+h+searchEntryHeight); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
@@ -89,8 +90,7 @@ func makeSelectOptionsPopup() error {
 		g.SetViewOnBottom(search)
 	}
 
-
-	if v, err := g.SetView(searchSymbol, x0, y0 + h + 1, x0 + searchCursorPos, y0 + h + searchEntryHeight); err != nil {
+	if v, err := g.SetView(searchSymbol, x0, y0+h+1, x0+searchCursorPos, y0+h+searchEntryHeight); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
@@ -99,8 +99,7 @@ func makeSelectOptionsPopup() error {
 		g.SetViewOnBottom(searchSymbol)
 	}
 
-
-	if v, err := g.SetView(searchOutline, x0, y0 + h, x1, y0 + h + searchEntryHeight); err != nil {
+	if v, err := g.SetView(searchOutline, x0, y0+h, x1, y0+h+searchEntryHeight); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
