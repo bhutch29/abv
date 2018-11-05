@@ -47,6 +47,16 @@ func (c *ModalController) LastBarcode() string {
 	return c.lastBarcode
 }
 
+// GetInventory returns the currently stocked inventory
+func (c *ModalController) GetInventory() []model.StockedDrink {
+	result, err := c.backend.GetInventory()
+	if err != nil {
+		logGui.Error(err)
+		logFile.Error(err)
+	}
+	return result
+}
+
 // HandleBarcode inputs/outputs a drink and returns true if the barcode already exists or returns false if the barcode does not exist
 func (c *ModalController) HandleBarcode(bc string) (bool, error) {
 	c.lastBarcode = bc
@@ -86,7 +96,10 @@ func (c *ModalController) handleDrink(bc string) {
 	if c.currentMode == stocking {
 		logGui.Info("Drink added to inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
 		logFile.Info("Drink added to inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
-		c.backend.InputDrinks(d)
+		if _, err := c.backend.InputDrinks(d); err != nil {
+			logGui.Error(err)
+			logFile.Error(err)
+		}
 	} else if c.currentMode == serving {
 		count, err := c.backend.GetCountByBarcode(d.Barcode)
 		if err != nil {

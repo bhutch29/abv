@@ -8,6 +8,8 @@ import (
 
 var popupDisplayed = false
 
+var stockDivisor = 2.5
+
 const (
 	inputHeight    = 4
 	inputCursorPos = 4
@@ -39,11 +41,11 @@ func layout(g *gocui.Gui) (err error) {
 func makeLogPanel() error {
 	maxX, maxY := g.Size()
 	viewHeight := maxY - inputHeight
-	branchViewWidth := (maxX / 5) * 2
+	logWidth := float64(maxX) - float64(maxX) / stockDivisor
 
 	var x0, x1, y0, y1 int
 
-	x0, x1 = 0, branchViewWidth*2
+	x0, x1 = 0, int(logWidth)
 	y0, y1 = 0, viewHeight
 
 	if v, err := g.SetView(logView, x0, y0, x1, y1); err != nil {
@@ -51,6 +53,7 @@ func makeLogPanel() error {
 			return err
 		}
 		v.Wrap = true
+		v.Title = "Log"
 		v.Autoscroll = true
 		logGui.Out = v
 	}
@@ -173,14 +176,18 @@ func makePromptPanel() error {
 func makeInfoPanel() error {
 	maxX, maxY := g.Size()
 	viewHeight := maxY - inputHeight
-	branchViewWidth := (maxX / 5) * 2
+	infoStart := float64(maxX) - float64(maxX) / stockDivisor
 
-	if v, err := g.SetView(info, branchViewWidth*2, 0, maxX-2, viewHeight); err != nil {
+	if v, err := g.SetView(info, int(infoStart), 0, maxX-2, viewHeight); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
-		v.Title = "Info"
+		v.Title = "Stock"
+		v.Wrap = true
+		v.Clear()
+		refreshInventory(g, v)
 	}
+
 	return nil
 }
 

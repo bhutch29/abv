@@ -37,6 +37,7 @@ var keys = []key{
 	{"", gocui.KeyCtrlE, testError, "C-e", "error"},
 	{"", gocui.KeyCtrlI, setInputMode, "C-i", "stocking mode"},
 	{"", gocui.KeyCtrlO, setOutputMode, "C-o", "serving mode"},
+	{"", gocui.KeyCtrlQ, refreshInventory, "C-q", "get inventory"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},
 	{popup, gocui.KeyArrowUp, popupScrollUp, "Up", "scrollUp"},
@@ -93,7 +94,7 @@ func main() {
 
 func setupGui() {
 	var err error
-	g, err = gocui.NewGui(gocui.OutputNormal)
+	g, err = gocui.NewGui(gocui.Output256)
 	if err != nil {
 		logFile.Fatal(err)
 	}
@@ -104,6 +105,21 @@ func setupGui() {
 	if err := configureKeys(); err != nil {
 		logFile.Fatalln(err)
 	}
+}
+
+func refreshInventory(g *gocui.Gui, v *gocui.View) error {
+	view, err := g.View(info)
+	if err != nil {
+		logGui.Error(err)
+		logFile.Error(err)
+	}
+	view.Clear()
+	inventory := c.GetInventory()
+	for _, drink := range inventory {
+		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
+		fmt.Fprintf(view, "%-40s%-20s%6d\n", drink.Brand, drink.Name, drink.Quantity)
+	}
+	return nil
 }
 
 func parseInput(g *gocui.Gui, v *gocui.View) error {
@@ -126,6 +142,9 @@ func handleBarcodeEntry(bc string) {
 	if !exists {
 		handleNewBarcode(bc)
 	}
+
+	v, _ := g.View(info)
+	refreshInventory(g, v)
 }
 
 func handleNewBarcode(bc string) {
@@ -136,6 +155,7 @@ func handleNewBarcode(bc string) {
 
 	logGui.Info("Barcode not recognized. Please enter drink brand and name.")
 	logFile.Info("Unknown barcode scanned: ", bc)
+	clearView(popup)
 	togglePopup()
 }
 
@@ -201,6 +221,8 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 		logGui.Error(err)
 		logFile.Error(err)
 	}
+
+	refreshInventory(g, v)
 
 	return nil
 }
