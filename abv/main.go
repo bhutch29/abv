@@ -37,7 +37,6 @@ var keys = []key{
 	{"", gocui.KeyCtrlE, testError, "C-e", "error"},
 	{"", gocui.KeyCtrlI, setInputMode, "C-i", "stocking mode"},
 	{"", gocui.KeyCtrlO, setOutputMode, "C-o", "serving mode"},
-	{"", gocui.KeyCtrlQ, refreshInventory, "C-q", "get inventory"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},
 	{search, gocui.KeyCtrlZ, cancelSearch, "C-c", "cancel"},
@@ -115,7 +114,7 @@ func setupGui() {
 	}
 }
 
-func refreshInventory(g *gocui.Gui, v *gocui.View) error {
+func refreshInventory() error {
 	view, err := g.View(info)
 	if err != nil {
 		logGui.Error(err)
@@ -151,8 +150,7 @@ func handleBarcodeEntry(bc string) {
 		handleNewBarcode(bc)
 	}
 
-	v, _ := g.View(info)
-	refreshInventory(g, v)
+	refreshInventory()
 }
 
 func handleNewBarcode(bc string) {
@@ -230,7 +228,7 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 		logFile.Error(err)
 	}
 
-	refreshInventory(g, v)
+	refreshInventory()
 
 	return nil
 }
