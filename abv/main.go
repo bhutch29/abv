@@ -40,12 +40,20 @@ var keys = []key{
 	{"", gocui.KeyCtrlQ, refreshInventory, "C-q", "get inventory"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},
+	{search, gocui.KeyCtrlZ, cancelSearch, "C-c", "cancel"},
 	{popup, gocui.KeyArrowUp, popupScrollUp, "Up", "scrollUp"},
 	{popup, gocui.KeyCtrlK, popupScrollUp, "Up", "scrollUp"},
 	{popup, gocui.KeyArrowDown, popupScrollDown, "Down", "scrollDown"},
 	{popup, gocui.KeyCtrlJ, popupScrollDown, "Down", "scrollDown"},
 	{popup, gocui.KeyEnter, popupSelectItem, "Enter", "Select"},
 	{errorView, gocui.KeyEsc, hideError, "Esc", "close error dialog"},
+}
+
+func cancelSearch(g *gocui.Gui, v *gocui.View) error {
+	togglePopup()
+	logGui.Info("Canceled entering information for new barcode")
+	logFile.Info("Canceled entering information for new barcode")
+	return nil
 }
 
 func testError(g *gocui.Gui, v *gocui.View) error {
