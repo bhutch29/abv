@@ -94,7 +94,7 @@ func main() {
 
 func setupGui() {
 	var err error
-	g, err = gocui.NewGui(gocui.OutputNormal)
+	g, err = gocui.NewGui(gocui.Output256)
 	if err != nil {
 		logFile.Fatal(err)
 	}
@@ -108,14 +108,12 @@ func setupGui() {
 }
 
 func refreshInventory(g *gocui.Gui, v *gocui.View) error {
-	view, _ := g.View(info)
+	view, err := g.View(info)
+	if err != nil {
+		logGui.Error(err)
+		logFile.Error(err)
+	}
 	view.Clear()
-	writeInventory()
-	return nil
-}
-
-func writeInventory() error {
-	view, _ := g.View(info)
 	inventory := c.GetInventory()
 	for _, drink := range inventory {
 		//TODO: Make this more robust to handle arbitrary length Brand and Name strings

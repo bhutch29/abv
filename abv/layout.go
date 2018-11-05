@@ -184,6 +184,8 @@ func makeInfoPanel() error {
 		}
 		v.Title = "Stock"
 		v.Wrap = true
+		v.Clear()
+		refreshInventory(g, v)
 	}
 
 	return nil
