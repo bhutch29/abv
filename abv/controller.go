@@ -96,7 +96,10 @@ func (c *ModalController) handleDrink(bc string) {
 	if c.currentMode == stocking {
 		logGui.Info("Drink added to inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
 		logFile.Info("Drink added to inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
-		c.backend.InputDrinks(d)
+		if _, err := c.backend.InputDrinks(d); err != nil {
+			logGui.Error(err)
+			logFile.Error(err)
+		}
 	} else if c.currentMode == serving {
 		count, err := c.backend.GetCountByBarcode(d.Barcode)
 		if err != nil {
