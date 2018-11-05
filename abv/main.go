@@ -7,6 +7,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"os"
 	"strings"
+	"flag"
 )
 
 var (
@@ -28,8 +29,6 @@ const (
 	search        = "Search"
 	searchSymbol  = "SearchSymbol"
 	searchOutline = "SearchOutline"
-
-	drinkFormat = "%s: %s\n"
 )
 
 var keys = []key{
@@ -47,14 +46,16 @@ var keys = []key{
 	{errorView, gocui.KeyEsc, hideError, "Esc", "close error dialog"},
 }
 
-func cancelSearch(g *gocui.Gui, v *gocui.View) error {
-	togglePopup()
-	logGui.Info("Canceled entering information for new barcode")
-	logFile.Info("Canceled entering information for new barcode")
-	return nil
-}
-
 func main() {
+	//Command Line flags
+	handleFlags()
+
+	//Create Controller
+	var err error
+	if c, err = New(); err != nil {
+		logFile.Error("Error creating controller: ", err)
+	}
+
 	//Setup GUI
 	setupGui()
 	defer g.Close()
@@ -75,14 +76,20 @@ func main() {
 	defer file.Close()
 	logFile.SetLevel(logrus.DebugLevel)
 
-	//Create Controller
-	if c, err = New(); err != nil {
-		logFile.Error("Error creating controller: ", err)
-	}
-
 	// Start Gui
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
 		logFile.Fatal(err)
+	}
+}
+
+func handleFlags() {
+	backup := flag.Bool("backup", false, "Backs up the sqlite database")
+
+	flag.Parse()
+
+	if *backup {
+		//TODO: Backup sqlite file (either directly or using .dump)
+		os.Exit(0)
 	}
 }
 
@@ -97,7 +104,7 @@ func setupGui() {
 	g.Cursor = true
 
 	if err := configureKeys(); err != nil {
-		logFile.Fatalln(err)
+		logFile.Fatal(err)
 	}
 }
 
@@ -167,6 +174,13 @@ func handleSearch(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
+func cancelSearch(g *gocui.Gui, v *gocui.View) error {
+	togglePopup()
+	logGui.Info("Canceled entering information for new barcode")
+	logFile.Info("Canceled entering information for new barcode")
+	return nil
+}
+
 func updatePopup(name string) {
 	v, _ := g.View(popup)
 
@@ -180,7 +194,7 @@ func updatePopup(name string) {
 
 	v.Clear()
 	for _, drink := range drinks {
-		fmt.Fprintf(v, drinkFormat, drink.Brand, drink.Name)
+		fmt.Fprintf(v, "%s: %s\n", drink.Brand, drink.Name)
 	}
 
 	g.SetCurrentView(popup)

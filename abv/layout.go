@@ -7,7 +7,6 @@ import (
 )
 
 var popupDisplayed = false
-
 var stockDivisor = 2.5
 
 const (
