@@ -94,10 +94,10 @@ order by A.Brand
 // GetCountByBarcode returns the total number of currently stocked beers with a specific barcode
 func (m *Model) GetCountByBarcode(bc string) (int, error) {
 	var input, output int
-	if err := m.db.Get(&input, "select sum(quantity) from Input where barcode = ?", bc); err != nil {
+	if err := m.db.Get(&input, "select case when sum(quantity)is null then 0 else sum(quantity) end quantity from Input where barcode = ?", bc); err != nil {
 		return -1, err
 	}
-	if err := m.db.Get(&output, "select sum(quantity) from Output where barcode = ?", bc); err != nil {
+	if err := m.db.Get(&output, "select case when sum(quantity) is null then 0 else sum(quantity) end quantity from Output where barcode = ?", bc); err != nil {
 		return -1, err
 	}
 
