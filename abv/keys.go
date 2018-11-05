@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/jroimartin/gocui"
+	aur "github.com/logrusorgru/aurora"
 )
 
 type key struct {
@@ -17,7 +18,7 @@ func generateKeybindString() string {
 	var result string
 	for _, k := range keys {
 		if k.viewname == "" {
-			s := fmt.Sprintf("%s->%s ", k.shortkey, k.shortname)
+			s := fmt.Sprintf("%s->%s ", aur.Green(k.shortkey), k.shortname)
 			result = result + s
 		}
 	}
