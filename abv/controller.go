@@ -47,6 +47,16 @@ func (c *ModalController) LastBarcode() string {
 	return c.lastBarcode
 }
 
+// GetInventory returns the currently stocked inventory
+func (c *ModalController) GetInventory() []model.StockedDrink {
+	result, err := c.backend.GetInventory()
+	if err != nil {
+		logGui.Error(err)
+		logFile.Error(err)
+	}
+	return result
+}
+
 // HandleBarcode inputs/outputs a drink and returns true if the barcode already exists or returns false if the barcode does not exist
 func (c *ModalController) HandleBarcode(bc string) (bool, error) {
 	c.lastBarcode = bc

@@ -37,6 +37,7 @@ var keys = []key{
 	{"", gocui.KeyCtrlE, testError, "C-e", "error"},
 	{"", gocui.KeyCtrlI, setInputMode, "C-i", "stocking mode"},
 	{"", gocui.KeyCtrlO, setOutputMode, "C-o", "serving mode"},
+	{"", gocui.KeyCtrlQ, refreshInventory, "C-q", "get inventory"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},
 	{popup, gocui.KeyArrowUp, popupScrollUp, "Up", "scrollUp"},
@@ -104,6 +105,23 @@ func setupGui() {
 	if err := configureKeys(); err != nil {
 		logFile.Fatalln(err)
 	}
+}
+
+func refreshInventory(g *gocui.Gui, v *gocui.View) error {
+	view, _ := g.View(info)
+	view.Clear()
+	writeInventory()
+	return nil
+}
+
+func writeInventory() error {
+	view, _ := g.View(info)
+	inventory := c.GetInventory()
+	for _, drink := range inventory {
+		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
+		fmt.Fprintf(view, "%-40s%-20s%6d\n", drink.Brand, drink.Name, drink.Quantity)
+	}
+	return nil
 }
 
 func parseInput(g *gocui.Gui, v *gocui.View) error {

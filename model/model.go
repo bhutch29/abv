@@ -58,9 +58,23 @@ type DrinkEntry struct {
 	Date     int
 }
 
+// StockedDrink is an extension of drink with an additional field for quantity
+type StockedDrink struct {
+	Drink
+	Quantity int
+}
+
+// GetInventory returns every drink with at least one quantity in stock
+func (m *Model) GetInventory() ([]StockedDrink, error) {
+	var result []StockedDrink
+	if err := m.db.Select(&result, "select A.*, (B.InputQuantity - C.OutputQuantity) quantity from Drinks A left join (select barcode, sum(quantity) as InputQuantity from Input group by barcode) B on A.Barcode = B.Barcode left join (select barcode, sum(quantity) as OutputQuantity from Output group by barcode) C on A.Barcode = C.Barcode where quantity > 0 order by A.Brand"); err != nil {
+return result, err
+	}
+	return result, nil
+}
+
 // GetCountByBarcode returns the total number of currently stocked beers with a specific barcode
 func (m *Model) GetCountByBarcode(bc string) (int, error) {
-	// TODO Convert to full SQL implementation
 	var input, output int
 	if err := m.db.Get(&input, "select sum(quantity) from Input where barcode = ?", bc); err != nil {
 		return -1, err
@@ -69,7 +83,7 @@ func (m *Model) GetCountByBarcode(bc string) (int, error) {
 		return -1, err
 	}
 
-	return input-output, nil
+	return input - output, nil
 }
 
 // GetDrinkByBarcode returns all stored information about a drink based on its barcode
@@ -94,7 +108,7 @@ func (m *Model) BarcodeExists(bc string) (bool, error) {
 }
 
 // DeleteDrink removes an entry from the Drinks table using its barcode
-func (m *Model) DeleteDrink(bc string) (error) {
+func (m *Model) DeleteDrink(bc string) error {
 	_, err := m.db.Exec("delete from Drinks where barcode = ?", bc)
 	return err
 }

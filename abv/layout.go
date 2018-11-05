@@ -183,7 +183,9 @@ func makeInfoPanel() error {
 			return err
 		}
 		v.Title = "Stock"
+		v.Wrap = true
 	}
+
 	return nil
 }
 
