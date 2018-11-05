@@ -48,14 +48,14 @@ type Drink struct {
 	Abv     float64
 	Ibu     int
 	Type    string
-	Date    int
+	Date    int64
 }
 
 // DrinkEntry defines quantities of drinks for transactions
 type DrinkEntry struct {
 	Barcode  string
 	Quantity int
-	Date     int
+	Date     int64
 }
 
 // StockedDrink is an extension of drink with an additional field for quantity
