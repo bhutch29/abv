@@ -68,7 +68,12 @@ type StockedDrink struct {
 func (m *Model) GetInventory() ([]StockedDrink, error) {
 	var result []StockedDrink
 	sql := `
-select A.*, (B.InputQuantity - C.OutputQuantity) quantity
+select A.*,
+case
+  when B.InputQuantity is null then 0
+  when C.OutputQuantity is null then B.InputQuantity
+  else (B.InputQuantity - C.OutputQuantity)
+end quantity
 from Drinks A
 left join (
   select barcode, sum(quantity) as InputQuantity
