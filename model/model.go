@@ -67,10 +67,28 @@ type StockedDrink struct {
 // GetInventory returns every drink with at least one quantity in stock
 func (m *Model) GetInventory() ([]StockedDrink, error) {
 	var result []StockedDrink
-	if err := m.db.Select(&result, "select A.*, (B.InputQuantity - C.OutputQuantity) quantity from Drinks A left join (select barcode, sum(quantity) as InputQuantity from Input group by barcode) B on A.Barcode = B.Barcode left join (select barcode, sum(quantity) as OutputQuantity from Output group by barcode) C on A.Barcode = C.Barcode where quantity > 0 order by A.Brand"); err != nil {
-return result, err
-	}
-	return result, nil
+	sql := `
+select A.*, (B.InputQuantity - C.OutputQuantity) quantity
+from Drinks A
+left join (
+  select barcode, sum(quantity) as InputQuantity
+  from Input
+  group by barcode
+)
+B
+on A.Barcode = B.Barcode
+left join (
+  select barcode, sum(quantity) as OutputQuantity
+  from Output
+  group by barcode
+)
+C
+on A.Barcode = C.Barcode
+where quantity > 0
+order by A.Brand
+`
+	err := m.db.Select(&result, sql)
+	return result, err
 }
 
 // GetCountByBarcode returns the total number of currently stocked beers with a specific barcode
