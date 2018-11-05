@@ -142,6 +142,9 @@ func handleBarcodeEntry(bc string) {
 	if !exists {
 		handleNewBarcode(bc)
 	}
+
+	v, _ := g.View(info)
+	refreshInventory(g, v)
 }
 
 func handleNewBarcode(bc string) {
@@ -152,6 +155,7 @@ func handleNewBarcode(bc string) {
 
 	logGui.Info("Barcode not recognized. Please enter drink brand and name.")
 	logFile.Info("Unknown barcode scanned: ", bc)
+	clearView(popup)
 	togglePopup()
 }
 
@@ -217,6 +221,8 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 		logGui.Error(err)
 		logFile.Error(err)
 	}
+
+	refreshInventory(g, v)
 
 	return nil
 }
