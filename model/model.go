@@ -35,9 +35,31 @@ func New() (Model, error) {
 
 // CreateTablesIfNeeded ensures that the db has the necessary tables
 func (m *Model) CreateTablesIfNeeded() {
-	m.db.Exec("create table if not exists Drinks (barcode varchar(255) primary key, brand varchar(255), name varchar(255), abv real, ibu real, type varchar(255), date integer)")
-	m.db.Exec("create table if not exists Input (id integer primary key, barcode integer, quantity integer, date integer)")
-	m.db.Exec("create table if not exists Output (id integer primary key, barcode integer, quantity integer, date integer)")
+	m.db.Exec(`
+create table if not exists Drinks (
+barcode varchar(255) primary key,
+brand varchar(255),
+name varchar(255),
+abv real,
+ibu real,
+type varchar(255),
+logo varchar(255),
+date integer)
+`)
+	m.db.Exec(`
+create table if not exists Input (
+id integer primary key,
+barcode integer,
+quantity integer,
+date integer)
+`)
+	m.db.Exec(`
+create table if not exists Output (
+id integer primary key,
+barcode integer,
+quantity integer,
+date integer)
+`)
 }
 
 // Drink stores information about an available beverage
@@ -48,6 +70,7 @@ type Drink struct {
 	Abv     float64
 	Ibu     int
 	Type    string
+	Logo    string
 	Date    int64
 }
 
@@ -140,7 +163,7 @@ func (m *Model) DeleteDrink(bc string) error {
 func (m *Model) CreateDrink(d Drink) (int, error) {
 	now := time.Now().Unix()
 	res, err := m.db.Exec(
-		"insert into Drinks (barcode, brand, name, abv, ibu, type, date) Values (?, ?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, now)
+		"insert into Drinks (barcode, brand, name, abv, ibu, type, logo, date) Values (?, ?, ?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, d.Logo, now)
 	if err != nil {
 		return -1, err
 	}

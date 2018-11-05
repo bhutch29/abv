@@ -33,6 +33,7 @@ func SearchUntappdByName(name string) ([]model.Drink, error) {
 		drink.Abv = beer["beer_abv"].(float64)
 		drink.Ibu = int(beer["beer_ibu"].(float64))
 		drink.Type = beer["beer_style"].(string)
+		drink.Logo = brewery["brewery_label"].(string)
 		drinks = append(drinks, drink)
 	}
 	return drinks, nil
