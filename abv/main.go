@@ -34,7 +34,6 @@ const (
 
 var keys = []key{
 	{"", gocui.KeyCtrlC, quit, "C-c", "quit"},
-	{"", gocui.KeyCtrlE, testError, "C-e", "error"},
 	{"", gocui.KeyCtrlI, setInputMode, "C-i", "stocking mode"},
 	{"", gocui.KeyCtrlO, setOutputMode, "C-o", "serving mode"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
@@ -52,18 +51,6 @@ func cancelSearch(g *gocui.Gui, v *gocui.View) error {
 	togglePopup()
 	logGui.Info("Canceled entering information for new barcode")
 	logFile.Info("Canceled entering information for new barcode")
-	return nil
-}
-
-func testError(g *gocui.Gui, v *gocui.View) error {
-	logGui.WithFields(logrus.Fields{
-		"Category":    "Test",
-		"CurrentView": v.Name(),
-	}).Error("This is an example error for testing purposes")
-	logFile.WithFields(logrus.Fields{
-		"Category":    "Test",
-		"CurrentView": v.Name(),
-	}).Error("This is an example error for testing purposes")
 	return nil
 }
 
