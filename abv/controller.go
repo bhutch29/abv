@@ -117,3 +117,14 @@ func (c *ModalController) handleDrink(bc string) {
 		c.backend.OutputDrinks(d)
 	}
 }
+
+// ClearInputOutputRecords wipes out all stocking and serving records
+func (c *ModalController) ClearInputOutputRecords() error {
+	if err := c.backend.ClearInputTable(); err != nil {
+		return err
+	}
+	if err := c.backend.ClearOutputTable(); err != nil {
+		return err
+	}
+	return nil
+}

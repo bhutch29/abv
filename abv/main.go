@@ -1,13 +1,15 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/bhutch29/abv/model"
 	"github.com/jroimartin/gocui"
 	"github.com/sirupsen/logrus"
 	"os"
 	"strings"
-	"flag"
+	"log"
+	"os/exec"
 )
 
 var (
@@ -47,18 +49,11 @@ var keys = []key{
 }
 
 func main() {
-	//Command Line flags
-	handleFlags()
-
 	//Create Controller
 	var err error
 	if c, err = New(); err != nil {
 		logFile.Error("Error creating controller: ", err)
 	}
-
-	//Setup GUI
-	setupGui()
-	defer g.Close()
 
 	//Setup loggers
 	f := logrus.TextFormatter{}
@@ -76,6 +71,13 @@ func main() {
 	defer file.Close()
 	logFile.SetLevel(logrus.DebugLevel)
 
+	//Command Line flags
+	handleFlags()
+
+	//Setup GUI
+	setupGui()
+	defer g.Close()
+
 	// Start Gui
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
 		logFile.Fatal(err)
@@ -83,13 +85,32 @@ func main() {
 }
 
 func handleFlags() {
-	backup := flag.Bool("backup", false, "Backs up the sqlite database")
+	backup := flag.String("backup", "", "Backs up the sqlite database to specified file")
+	reset := flag.Bool("reset", false, "Backs up the database to the working directory and wipes out the Input and Output tables")
 
 	flag.Parse()
 
-	if *backup {
-		//TODO: Backup sqlite file (either directly or using .dump)
+	if *backup != "" {
+		backupDatabase(*backup)
 		os.Exit(0)
+	}
+
+	if *reset {
+		backupDatabase("backup.sqlite")
+		if err := c.ClearInputOutputRecords(); err != nil {
+			log.Print("Error clearing Input and Output records" + err.Error())
+			logFile.Fatal(err)
+		}
+		os.Exit(0)
+	}
+}
+
+func backupDatabase(destination string) {
+	log.Print("Backup up database to " + destination)
+	cmd := exec.Command("sqlite3", "abv.sqlite", ".backup " + destination)
+	if err := cmd.Run(); err != nil {
+		log.Print("Failed to backup database: " + err.Error())
+		logFile.Fatal(err)
 	}
 }
 

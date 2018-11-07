@@ -199,6 +199,18 @@ func (m *Model) OutputDrinks(d DrinkEntry) (int, error) {
 	return getID(res)
 }
 
+// ClearInputTable deletes all stocking records
+func (m *Model) ClearInputTable() error {
+	_, err := m.db.Exec("delete from Input")
+	return err
+}
+
+// ClearOutputTable deletes all serving records
+func (m *Model) ClearOutputTable() error {
+	_, err := m.db.Exec("delete from Output")
+	return err
+}
+
 func getID(result sql.Result) (int, error) {
 	id, err := result.LastInsertId()
 	if err != nil {
