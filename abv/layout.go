@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jroimartin/gocui"
+	aur "github.com/logrusorgru/aurora"
 )
 
 var popupDisplayed = false
@@ -12,7 +13,7 @@ var stockDivisor = 2.5
 
 const (
 	inputHeight    = 4
-	inputCursorPos = 4
+	inputCursorPos = 12
 
 	searchEntryHeight = 3
 	searchCursorPos   = 4
@@ -167,10 +168,22 @@ func makePromptPanel() error {
 			return err
 		}
 		v.Frame = false
-		fmt.Fprintf(v, ">>")
+		updatePromptSymbol()
 	}
 
 	return nil
+}
+
+func updatePromptSymbol() {
+	v, _ := g.View(promptSymbol)
+	v.Clear()
+        switch mode := c.GetMode(); mode {
+		case stocking:
+		fmt.Fprintf(v, "%s >>", aur.BgRed("Stocking"))
+	case serving:
+		fmt.Fprintf(v, "%s >>", aur.BgBlue("Serving"))
+	}
+
 }
 
 func makeInfoPanel() error {
