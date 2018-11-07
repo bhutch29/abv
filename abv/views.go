@@ -15,35 +15,40 @@ const (
 	searchCursorPos   = 4
 )
 
-func layout(g *gocui.Gui) (err error) {
-	if err = makeLogPanel(); err != nil {
+type viewDrawer struct {
+	maxX int
+	maxY int
+}
+
+func (vd *viewDrawer) layout(g *gocui.Gui) (err error) {
+	vd.maxX, vd.maxY = g.Size()
+	if err = vd.makeLogPanel(); err != nil {
 		logFile.Fatal(err)
 		return
 	}
-	if err = makePromptPanel(); err != nil {
+	if err = vd.makePromptPanels(); err != nil {
 		logFile.Fatal(err)
 		return
 	}
-	if err = makeInfoPanel(); err != nil {
+	if err = vd.makeInfoPanel(); err != nil {
 		logFile.Fatal(err)
 		return
 	}
-	if err = makeSelectOptionsPopup(); err != nil {
+	if err = vd.makeSelectOptionsPopup(); err != nil {
 		logFile.Fatal(err)
 		return
 	}
 	return
 }
 
-func makeLogPanel() error {
-	maxX, maxY := g.Size()
-	viewHeight := maxY - inputHeight
-	logWidth := float64(maxX) - float64(maxX) / stockDivisor
+func (vd *viewDrawer) makeLogPanel() error {
+	viewHeight := vd.maxY - inputHeight
+	logWidth := float64(vd.maxX) - float64(vd.maxX) / stockDivisor
 
-	var x0, x1, y0, y1 int
-
-	x0, x1 = 0, int(logWidth)
-	y0, y1 = 0, viewHeight
+	x0 := 0
+	x1 := int(logWidth)
+	y0 := 0
+	y1 := viewHeight
 
 	if v, err := g.SetView(logView, x0, y0, x1, y1); err != nil {
 		if err != gocui.ErrUnknownView {
@@ -58,12 +63,12 @@ func makeLogPanel() error {
 	return nil
 }
 
-func makeSelectOptionsPopup() error {
-	maxX, maxY := g.Size()
-	w := maxX / 2
-	h := maxY / 4
-	x0 := (maxX / 2) - (w / 2)
-	y0 := (maxY / 2) - (h / 2)
+func (vd *viewDrawer) makeSelectOptionsPopup() error {
+	w := vd.maxX / 2
+	h := vd.maxY / 4
+
+	x0 := (vd.maxX / 2) - (w / 2)
+	y0 := (vd.maxY / 2) - (h / 2)
 	x1 := x0 + w
 	y1 := y0 + h
 
@@ -110,12 +115,11 @@ func makeSelectOptionsPopup() error {
 	return nil
 }
 
-func makeInfoPanel() error {
-	maxX, maxY := g.Size()
-	viewHeight := maxY - inputHeight
-	infoStart := float64(maxX) - float64(maxX) / stockDivisor
+func (vd *viewDrawer) makeInfoPanel() error {
+	viewHeight := vd.maxY - inputHeight
+	infoStart := float64(vd.maxX) - float64(vd.maxX) / stockDivisor
 
-	if v, err := g.SetView(info, int(infoStart), 0, maxX-2, viewHeight); err != nil {
+	if v, err := g.SetView(info, int(infoStart), 0, vd.maxX-2, viewHeight); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
@@ -129,13 +133,12 @@ func makeInfoPanel() error {
 }
 
 
-func makePromptPanel() error {
-	maxX, maxY := g.Size()
-	promptStartHeight := maxY - inputHeight
-	promptDividerHeight := maxY - (inputHeight / 2)
+func (vd *viewDrawer) makePromptPanels() error {
+	promptStartHeight := vd.maxY - inputHeight
+	promptDividerHeight := vd.maxY - (inputHeight / 2)
 	promptString := generateKeybindString()
 
-	if v, err := g.SetView(prompt, 0, promptStartHeight, maxX, promptDividerHeight); err != nil {
+	if v, err := g.SetView(prompt, 0, promptStartHeight, vd.maxX, promptDividerHeight); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
@@ -143,7 +146,7 @@ func makePromptPanel() error {
 		fmt.Fprintf(v, promptString)
 	}
 
-	if v, err := g.SetView(input, inputCursorPos, promptDividerHeight, maxX, maxY); err != nil {
+	if v, err := g.SetView(input, inputCursorPos, promptDividerHeight, vd.maxX, vd.maxY); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}
@@ -156,7 +159,7 @@ func makePromptPanel() error {
 		}
 	}
 
-	if v, err := g.SetView(promptSymbol, 0, promptDividerHeight, inputCursorPos, maxY); err != nil {
+	if v, err := g.SetView(promptSymbol, 0, promptDividerHeight, inputCursorPos, vd.maxY); err != nil {
 		if err != gocui.ErrUnknownView {
 			return err
 		}

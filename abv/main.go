@@ -122,7 +122,8 @@ func setupGui() {
 		logFile.Fatal(err)
 	}
 
-	g.SetManagerFunc(layout)
+	vd := viewDrawer{}
+	g.SetManagerFunc(vd.layout)
 	g.Cursor = true
 
 	if err := configureKeys(); err != nil {
