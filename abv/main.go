@@ -11,6 +11,7 @@ import (
 	"log"
 	"os/exec"
 	"errors"
+	aur "github.com/logrusorgru/aurora"
 )
 
 var (
@@ -35,9 +36,9 @@ const (
 )
 
 var keys = []key{
+	{"", gocui.KeyCtrlI, setInputMode, "C-i", "stocking"},
+	{"", gocui.KeyCtrlO, setOutputMode, "C-o", "serving"},
 	{"", gocui.KeyCtrlC, quit, "C-c", "quit"},
-	{"", gocui.KeyCtrlI, setInputMode, "C-i", "stocking mode"},
-	{"", gocui.KeyCtrlO, setOutputMode, "C-o", "serving mode"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},
 	{search, gocui.KeyCtrlZ, cancelSearch, "C-c", "cancel"},
@@ -62,6 +63,7 @@ func main() {
 	f.DisableTimestamp = true
 	f.DisableLevelTruncation = true
 	logGui.Formatter = &f
+	logGui.SetLevel(logrus.InfoLevel)
 
 	file, err := os.OpenFile("abv.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err == nil {
@@ -141,7 +143,12 @@ func refreshInventory() error {
 	inventory := c.GetInventory()
 	for _, drink := range inventory {
 		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
-		fmt.Fprintf(view, "%-40s%-20s%6d\n", drink.Brand, drink.Name, drink.Quantity)
+		if len(drink.Name) < 30 {
+			fmt.Fprintf(view, "%-35s%-30s%6d\n", drink.Brand, drink.Name, drink.Quantity)
+		} else {
+			fmt.Fprintf(view, "%-35s%-30s%6d\n", drink.Brand, drink.Name[:30], drink.Quantity)
+			fmt.Fprintf(view, "%-35s%-30s%6s\n", "", drink.Name[30:], "")
+		}
 	}
 	return nil
 }
@@ -232,8 +239,8 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 	logFile.WithFields(logrus.Fields{
 		"category": "userEntry",
 		"entry":    line,
-	}).Info("User selected a beer")
-	logGui.Info("You selected: " + line)
+	}).Debug("User selected a beer")
+	logGui.Debug("You selected: " + line)
 
 	d, err := findDrinkFromSelection(line)
 	if err != nil {
@@ -244,8 +251,8 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 
 	d.Barcode = c.LastBarcode()
 
-	logGui.Info("Adding new drink", d)
-	logFile.Info("Adding new drink", d)
+	logGui.Debug("Adding new drink", d)
+	logFile.Debug("Adding new drink", d)
 
 	if err = c.NewDrink(d); err != nil {
 		logGui.Error(err)
@@ -278,7 +285,7 @@ func findDrinkFromSelection(line string) (model.Drink, error) {
 func setInputMode(g *gocui.Gui, v *gocui.View) error {
 	c.SetMode(stocking)
 	updatePromptSymbol()
-	logGui.WithField("mode", stocking).Info("Changed Mode")
+	logGui.Infof("Changed to %s Mode", aur.Red("Stocking"))
 	logFile.WithField("mode", stocking).Info("Changed Mode")
 	return nil
 }
@@ -286,7 +293,7 @@ func setInputMode(g *gocui.Gui, v *gocui.View) error {
 func setOutputMode(g *gocui.Gui, v *gocui.View) error {
 	c.SetMode(serving)
 	updatePromptSymbol()
-	logGui.WithField("mode", serving).Info("Changed Mode")
+	logGui.Infof("Changed to %s Mode", aur.Blue("Serving"))
 	logFile.WithField("mode", serving).Info("Changed Mode")
 	return nil
 }

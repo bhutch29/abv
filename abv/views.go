@@ -125,7 +125,6 @@ func (vd *viewDrawer) makeInfoPanel() error {
 		}
 		v.Title = "Stock"
 		v.Wrap = true
-		v.Clear()
 		refreshInventory()
 	}
 
