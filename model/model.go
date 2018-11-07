@@ -44,6 +44,7 @@ abv real,
 ibu real,
 type varchar(255),
 logo varchar(255),
+country varchar(255),
 date integer)
 `)
 	m.db.Exec(`
@@ -71,6 +72,7 @@ type Drink struct {
 	Ibu     int
 	Type    string
 	Logo    string
+	Country string
 	Date    int64
 }
 
@@ -163,7 +165,7 @@ func (m *Model) DeleteDrink(bc string) error {
 func (m *Model) CreateDrink(d Drink) (int, error) {
 	now := time.Now().Unix()
 	res, err := m.db.Exec(
-		"insert into Drinks (barcode, brand, name, abv, ibu, type, logo, date) Values (?, ?, ?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, d.Logo, now)
+		"insert into Drinks (barcode, brand, name, abv, ibu, type, logo, country, date) Values (?, ?, ?, ?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, d.Logo, d.Country, now)
 	if err != nil {
 		return -1, err
 	}
