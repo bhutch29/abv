@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/bhutch29/abv/model"
+	"errors"
 )
 
 // SearchUntappdByName uses the Untappd API to gather a list of Drinks that match the named search
@@ -72,11 +73,11 @@ func queryUntappdByName(name string) (map[string]interface{}, error) {
 func fetchClientCredentials() (clientID, clientSecret string, err error) {
 	clientID = os.Getenv("UntappdID")
 	if clientID == "" {
-		return clientID, clientSecret, fmt.Errorf("UntappdID not supplied by client")
+		return clientID, clientSecret, errors.New("UntappdID not supplied by client")
 	}
 	clientSecret = os.Getenv("UntappdSecret")
 	if clientSecret == "" {
-		return clientID, clientSecret, fmt.Errorf("UntappdSecret not supplied by client")
+		return clientID, clientSecret, errors.New("UntappdSecret not supplied by client")
 	}
 	return clientID, clientSecret, nil
 }

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"log"
 	"os/exec"
+	"errors"
 )
 
 var (
@@ -152,8 +153,8 @@ func parseInput(g *gocui.Gui, v *gocui.View) error {
 }
 
 func handleBarcodeEntry(bc string) {
-	logGui.Info("Scanned barcode: ", bc)
-	logFile.Info("Scanned barcode: ", bc)
+	logGui.Debug("Scanned barcode: ", bc)
+	logFile.Debug("Scanned barcode: ", bc)
 
 	exists, err := c.HandleBarcode(bc)
 	if err != nil {
@@ -270,7 +271,7 @@ func findDrinkFromSelection(line string) (model.Drink, error) {
 			return drink, nil
 		}
 	}
-	return d, fmt.Errorf("Could not parse brand and drink name from selected text: " + line)
+	return d, errors.New("Could not parse brand and drink name from selected text: " + line)
 }
 
 func setInputMode(g *gocui.Gui, v *gocui.View) error {

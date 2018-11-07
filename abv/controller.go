@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/bhutch29/abv/model"
-	"fmt"
+	"errors"
 )
 
 // Mode is an Enum of operating modes
@@ -75,7 +75,7 @@ func (c *ModalController) HandleBarcode(bc string) (bool, error) {
 // NewDrink stores a new drink to the database and increments the drink count
 func (c *ModalController) NewDrink(d model.Drink) error {
 	if c.currentMode != stocking {
-		return fmt.Errorf("NewDrink can only be called from stocking mode")
+		return errors.New("NewDrink can only be called from stocking mode")
 	}
 	if _, err := c.backend.CreateDrink(d); err != nil {
 		return err
