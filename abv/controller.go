@@ -109,7 +109,7 @@ func (c *ModalController) handleDrink(bc string) {
 			return
 		}
 		if count <= 0 {
-			logGui.Warn("That drink was not in the inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
+			logGui.Warn("That drink was not in the inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
 			logFile.Warn("Drink scanned out that was not in the inventory!", drink)
 			return
 		}
