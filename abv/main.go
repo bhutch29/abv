@@ -37,9 +37,9 @@ const (
 )
 
 var keys = []key{
-	{"", gocui.KeyCtrlI, setInputMode, "C-i", "stocking"},
-	{"", gocui.KeyCtrlO, setOutputMode, "C-o", "serving"},
-	{"", gocui.KeyCtrlC, quit, "C-c", "quit"},
+	{"", gocui.KeyCtrlI, setInputMode, "Ctrl-i", "stocking"},
+	{"", gocui.KeyCtrlO, setOutputMode, "Ctrl-o", "serving"},
+	{"", gocui.KeyCtrlC, quit, "Ctrl-c", "quit"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},
 	{search, gocui.KeyCtrlZ, cancelSearch, "C-c", "cancel"},
