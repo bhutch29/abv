@@ -43,6 +43,7 @@ abv real,
 ibu real,
 type varchar(255),
 logo varchar(255),
+country varchar(255),
 date integer)
 `)
 	m.db.Exec(`
@@ -80,6 +81,7 @@ type Drink struct {
 	Type    string
 	Logo    string
 	Date    Date
+	Country string
 }
 
 // DrinkEntry defines quantities of drinks for transactions

@@ -5,9 +5,15 @@ import (
 	"time"
 )
 
-// DeleteDrink removes an entry from the Drinks table using its barcode
-func (m *Model) DeleteDrink(bc string) error {
-	_, err := m.db.Exec("delete from Drinks where barcode = ?", bc)
+// ClearInputTable deletes all stocking records
+func (m *Model) ClearInputTable() error {
+	_, err := m.db.Exec("delete from Input")
+	return err
+}
+
+// ClearOutputTable deletes all serving records
+func (m *Model) ClearOutputTable() error {
+	_, err := m.db.Exec("delete from Output")
 	return err
 }
 
@@ -20,6 +26,12 @@ func (m *Model) CreateDrink(d Drink) (int, error) {
 		return -1, err
 	}
 	return getID(res)
+}
+
+// DeleteDrink removes an entry from the Drinks table using its barcode
+func (m *Model) DeleteDrink(bc string) error {
+	_, err := m.db.Exec("delete from Drinks where barcode = ?", bc)
+	return err
 }
 
 // InputDrinks adds an entry to the Input table, returning the id

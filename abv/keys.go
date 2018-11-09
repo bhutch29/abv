@@ -18,8 +18,7 @@ func generateKeybindString() string {
 	var result string
 	for _, k := range keys {
 		if k.viewname == "" {
-			s := fmt.Sprintf("%s->%s ", aur.Green(k.shortkey), k.shortname)
-			result = result + s
+			result = result + fmt.Sprintf("%s->%s ", aur.Green(k.shortkey), k.shortname)
 		}
 	}
 	return result

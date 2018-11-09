@@ -1,12 +1,17 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/bhutch29/abv/model"
 	"github.com/jroimartin/gocui"
 	"github.com/sirupsen/logrus"
 	"os"
 	"strings"
+	"log"
+	"os/exec"
+	"errors"
+	aur "github.com/logrusorgru/aurora"
 )
 
 var (
@@ -28,14 +33,12 @@ const (
 	search        = "Search"
 	searchSymbol  = "SearchSymbol"
 	searchOutline = "SearchOutline"
-
-	drinkFormat = "%s: %s\n"
 )
 
 var keys = []key{
+	{"", gocui.KeyCtrlI, setInputMode, "C-i", "stocking"},
+	{"", gocui.KeyCtrlO, setOutputMode, "C-o", "serving"},
 	{"", gocui.KeyCtrlC, quit, "C-c", "quit"},
-	{"", gocui.KeyCtrlI, setInputMode, "C-i", "stocking mode"},
-	{"", gocui.KeyCtrlO, setOutputMode, "C-o", "serving mode"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},
 	{search, gocui.KeyCtrlZ, cancelSearch, "C-c", "cancel"},
@@ -47,17 +50,12 @@ var keys = []key{
 	{errorView, gocui.KeyEsc, hideError, "Esc", "close error dialog"},
 }
 
-func cancelSearch(g *gocui.Gui, v *gocui.View) error {
-	togglePopup()
-	logGui.Info("Canceled entering information for new barcode")
-	logFile.Info("Canceled entering information for new barcode")
-	return nil
-}
-
 func main() {
-	//Setup GUI
-	setupGui()
-	defer g.Close()
+	//Create Controller
+	var err error
+	if c, err = New(); err != nil {
+		logFile.Error("Error creating controller: ", err)
+	}
 
 	//Setup loggers
 	f := logrus.TextFormatter{}
@@ -65,6 +63,7 @@ func main() {
 	f.DisableTimestamp = true
 	f.DisableLevelTruncation = true
 	logGui.Formatter = &f
+	logGui.SetLevel(logrus.InfoLevel)
 
 	file, err := os.OpenFile("abv.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err == nil {
@@ -75,13 +74,45 @@ func main() {
 	defer file.Close()
 	logFile.SetLevel(logrus.DebugLevel)
 
-	//Create Controller
-	if c, err = New(); err != nil {
-		logFile.Error("Error creating controller: ", err)
-	}
+	//Command Line flags
+	handleFlags()
+
+	//Setup GUI
+	setupGui()
+	defer g.Close()
 
 	// Start Gui
 	if err := g.MainLoop(); err != nil && err != gocui.ErrQuit {
+		logFile.Fatal(err)
+	}
+}
+
+func handleFlags() {
+	backup := flag.String("backup", "", "Backs up the sqlite database to specified file")
+	reset := flag.Bool("reset", false, "Backs up the database to the working directory and wipes out the Input and Output tables")
+
+	flag.Parse()
+
+	if *backup != "" {
+		backupDatabase(*backup)
+		os.Exit(0)
+	}
+
+	if *reset {
+		backupDatabase("backup.sqlite")
+		if err := c.ClearInputOutputRecords(); err != nil {
+			log.Print("Error clearing Input and Output records" + err.Error())
+			logFile.Fatal(err)
+		}
+		os.Exit(0)
+	}
+}
+
+func backupDatabase(destination string) {
+	log.Print("Backup up database to " + destination)
+	cmd := exec.Command("sqlite3", "abv.sqlite", ".backup " + destination)
+	if err := cmd.Run(); err != nil {
+		log.Print("Failed to backup database: " + err.Error())
 		logFile.Fatal(err)
 	}
 }
@@ -93,11 +124,12 @@ func setupGui() {
 		logFile.Fatal(err)
 	}
 
-	g.SetManagerFunc(layout)
+	vd := viewDrawer{}
+	g.SetManagerFunc(vd.layout)
 	g.Cursor = true
 
 	if err := configureKeys(); err != nil {
-		logFile.Fatalln(err)
+		logFile.Fatal(err)
 	}
 }
 
@@ -111,7 +143,12 @@ func refreshInventory() error {
 	inventory := c.GetInventory()
 	for _, drink := range inventory {
 		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
-		fmt.Fprintf(view, "%-40s%-20s%6d\n", drink.Brand, drink.Name, drink.Quantity)
+		if len(drink.Name) < 30 {
+			fmt.Fprintf(view, "%-35s%-30s%6d\n", drink.Brand, drink.Name, drink.Quantity)
+		} else {
+			fmt.Fprintf(view, "%-35s%-30s%6d\n", drink.Brand, drink.Name[:30], drink.Quantity)
+			fmt.Fprintf(view, "%-35s%-30s%6s\n", "", drink.Name[30:], "")
+		}
 	}
 	return nil
 }
@@ -124,8 +161,8 @@ func parseInput(g *gocui.Gui, v *gocui.View) error {
 }
 
 func handleBarcodeEntry(bc string) {
-	logGui.Info("Scanned barcode: ", bc)
-	logFile.Info("Scanned barcode: ", bc)
+	logGui.Debug("Scanned barcode: ", bc)
+	logFile.Debug("Scanned barcode: ", bc)
 
 	exists, err := c.HandleBarcode(bc)
 	if err != nil {
@@ -167,6 +204,13 @@ func handleSearch(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
+func cancelSearch(g *gocui.Gui, v *gocui.View) error {
+	togglePopup()
+	logGui.Info("Canceled entering information for new barcode")
+	logFile.Info("Canceled entering information for new barcode")
+	return nil
+}
+
 func updatePopup(name string) {
 	v, _ := g.View(popup)
 
@@ -180,7 +224,7 @@ func updatePopup(name string) {
 
 	v.Clear()
 	for _, drink := range drinks {
-		fmt.Fprintf(v, drinkFormat, drink.Brand, drink.Name)
+		fmt.Fprintf(v, "%s: %s\n", drink.Brand, drink.Name)
 	}
 
 	g.SetCurrentView(popup)
@@ -195,8 +239,8 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 	logFile.WithFields(logrus.Fields{
 		"category": "userEntry",
 		"entry":    line,
-	}).Info("User selected a beer")
-	logGui.Info("You selected: " + line)
+	}).Debug("User selected a beer")
+	logGui.Debug("You selected: " + line)
 
 	d, err := findDrinkFromSelection(line)
 	if err != nil {
@@ -207,8 +251,8 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 
 	d.Barcode = c.LastBarcode()
 
-	logGui.Info("Adding new drink", d)
-	logFile.Info("Adding new drink", d)
+	logGui.Debug("Adding new drink", d)
+	logFile.Debug("Adding new drink", d)
 
 	if err = c.NewDrink(d); err != nil {
 		logGui.Error(err)
@@ -235,19 +279,21 @@ func findDrinkFromSelection(line string) (model.Drink, error) {
 			return drink, nil
 		}
 	}
-	return d, fmt.Errorf("Could not parse brand and drink name from selected text: " + line)
+	return d, errors.New("Could not parse brand and drink name from selected text: " + line)
 }
 
 func setInputMode(g *gocui.Gui, v *gocui.View) error {
 	c.SetMode(stocking)
-	logGui.WithField("mode", stocking).Info("Changed Mode")
+	updatePromptSymbol()
+	logGui.Infof("Changed to %s Mode", aur.Red("Stocking"))
 	logFile.WithField("mode", stocking).Info("Changed Mode")
 	return nil
 }
 
 func setOutputMode(g *gocui.Gui, v *gocui.View) error {
 	c.SetMode(serving)
-	logGui.WithField("mode", serving).Info("Changed Mode")
+	updatePromptSymbol()
+	logGui.Infof("Changed to %s Mode", aur.Blue("Serving"))
 	logFile.WithField("mode", serving).Info("Changed Mode")
 	return nil
 }
