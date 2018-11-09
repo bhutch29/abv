@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/jroimartin/gocui"
 	"fmt"
+
+	"github.com/jroimartin/gocui"
 )
 
 var stockDivisor = 2.5
@@ -43,7 +44,7 @@ func (vd *viewDrawer) layout(g *gocui.Gui) (err error) {
 
 func (vd *viewDrawer) makeLogPanel() error {
 	viewHeight := vd.maxY - inputHeight
-	logWidth := float64(vd.maxX) - float64(vd.maxX) / stockDivisor
+	logWidth := float64(vd.maxX) - float64(vd.maxX)/stockDivisor
 
 	x0 := 0
 	x1 := int(logWidth)
@@ -117,7 +118,7 @@ func (vd *viewDrawer) makeSelectOptionsPopup() error {
 
 func (vd *viewDrawer) makeInfoPanel() error {
 	viewHeight := vd.maxY - inputHeight
-	infoStart := float64(vd.maxX) - float64(vd.maxX) / stockDivisor
+	infoStart := float64(vd.maxX) - float64(vd.maxX)/stockDivisor
 
 	if v, err := g.SetView(info, int(infoStart), 0, vd.maxX-2, viewHeight); err != nil {
 		if err != gocui.ErrUnknownView {
@@ -130,7 +131,6 @@ func (vd *viewDrawer) makeInfoPanel() error {
 
 	return nil
 }
-
 
 func (vd *viewDrawer) makePromptPanels() error {
 	promptStartHeight := vd.maxY - inputHeight

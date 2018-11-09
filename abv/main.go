@@ -1,17 +1,18 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
+
 	"github.com/bhutch29/abv/model"
 	"github.com/jroimartin/gocui"
-	"github.com/sirupsen/logrus"
-	"os"
-	"strings"
-	"log"
-	"os/exec"
-	"errors"
 	aur "github.com/logrusorgru/aurora"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -110,7 +111,7 @@ func handleFlags() {
 
 func backupDatabase(destination string) {
 	log.Print("Backup up database to " + destination)
-	cmd := exec.Command("sqlite3", "abv.sqlite", ".backup " + destination)
+	cmd := exec.Command("sqlite3", "abv.sqlite", ".backup "+destination)
 	if err := cmd.Run(); err != nil {
 		log.Print("Failed to backup database: " + err.Error())
 		logFile.Fatal(err)

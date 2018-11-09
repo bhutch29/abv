@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/bhutch29/abv/model"
 	"errors"
+
+	"github.com/bhutch29/abv/model"
 )
 
 // Mode is an Enum of operating modes
