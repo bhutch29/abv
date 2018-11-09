@@ -95,8 +95,8 @@ func (c *ModalController) handleDrink(bc string) {
 	}
 
 	if c.currentMode == stocking {
-		logGui.Info("Drink added to inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
-		logFile.Info("Drink added to inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
+		logGui.Info("Drink added to inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
+		logFile.Info("Drink added to inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
 		if _, err := c.backend.InputDrinks(d); err != nil {
 			logGui.Error(err)
 			logFile.Error(err)
@@ -113,8 +113,8 @@ func (c *ModalController) handleDrink(bc string) {
 			logFile.Warn("Drink scanned out that was not in the inventory!", drink)
 			return
 		}
-		logGui.Info("Drink removed from inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
-		logFile.Info("Drink removed from inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
+		logGui.Info("Drink removed from inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
+		logFile.Info("Drink removed from inventory!\n  Name:  ", drink.Name, ",\n  Brand: ", drink.Brand)
 		c.backend.OutputDrinks(d)
 	}
 }

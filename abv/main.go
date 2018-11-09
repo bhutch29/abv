@@ -42,7 +42,7 @@ var keys = []key{
 	{"", gocui.KeyCtrlC, quit, "Ctrl-c", "quit"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},
-	{search, gocui.KeyCtrlZ, cancelSearch, "C-c", "cancel"},
+	{search, gocui.KeyCtrlZ, cancelSearch, "Ctrl-z", "cancel"},
 	{popup, gocui.KeyArrowUp, popupScrollUp, "Up", "scrollUp"},
 	{popup, gocui.KeyCtrlK, popupScrollUp, "Up", "scrollUp"},
 	{popup, gocui.KeyArrowDown, popupScrollDown, "Down", "scrollDown"},
