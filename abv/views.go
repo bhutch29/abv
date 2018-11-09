@@ -6,7 +6,7 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
-var stockDivisor = 2.5
+const stockDivisor = 2
 
 const (
 	inputHeight    = 4

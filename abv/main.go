@@ -145,10 +145,10 @@ func refreshInventory() error {
 	for _, drink := range inventory {
 		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
 		if len(drink.Name) < 30 {
-			fmt.Fprintf(view, "%-35s%-30s%6d\n", drink.Brand, drink.Name, drink.Quantity)
+			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name)
 		} else {
-			fmt.Fprintf(view, "%-35s%-30s%6d\n", drink.Brand, drink.Name[:30], drink.Quantity)
-			fmt.Fprintf(view, "%-35s%-30s%6s\n", "", drink.Name[30:], "")
+			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name[:30])
+			fmt.Fprintf(view, "%-4d%-35s%-30s\n", "", drink.Name[30:], "")
 		}
 	}
 	return nil
