@@ -285,7 +285,7 @@ func findDrinkFromSelection(line string) (model.Drink, error) {
 func setInputMode(g *gocui.Gui, v *gocui.View) error {
 	c.SetMode(stocking)
 	updatePromptSymbol()
-	logGui.Infof("Changed to %s Mode", aur.Red("Stocking"))
+	logGui.Infof("Changed to %s Mode", aur.Brown("Stocking"))
 	logFile.WithField("mode", stocking).Info("Changed Mode")
 	return nil
 }
@@ -293,7 +293,7 @@ func setInputMode(g *gocui.Gui, v *gocui.View) error {
 func setOutputMode(g *gocui.Gui, v *gocui.View) error {
 	c.SetMode(serving)
 	updatePromptSymbol()
-	logGui.Infof("Changed to %s Mode", aur.Blue("Serving"))
+	logGui.Infof("Changed to %s Mode", aur.Green("Serving"))
 	logFile.WithField("mode", serving).Info("Changed Mode")
 	return nil
 }
