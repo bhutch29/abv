@@ -148,7 +148,7 @@ func refreshInventory() error {
 			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name)
 		} else {
 			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name[:30])
-			fmt.Fprintf(view, "%-4d%-35s%-30s\n", "", drink.Name[30:], "")
+			fmt.Fprintf(view, "%-4s%-35s%-30s\n", "", drink.Name[30:], "")
 		}
 	}
 	return nil
