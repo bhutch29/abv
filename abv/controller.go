@@ -52,8 +52,8 @@ func (c *ModalController) LastBarcode() string {
 func (c *ModalController) GetInventory() []model.StockedDrink {
 	result, err := c.backend.GetInventory()
 	if err != nil {
-		logGui.Error(err)
-		logFile.Error(err)
+		logGui.Error("Error getting current inventory: ", err)
+		logFile.Error("Error getting current inventory: ", err)
 	}
 	return result
 }
@@ -90,16 +90,17 @@ func (c *ModalController) handleDrink(bc string) {
 
 	drink, err := c.backend.GetDrinkByBarcode(d.Barcode)
 	if err != nil {
-		logGui.Error(err)
-		logFile.Error(err)
+		logGui.Error("Error creating drink. Could not get Drink information from barcode: ", err)
+		logFile.Error("Error creating drink. Could not get Drink information from barcode: ", err)
 	}
 
 	if c.currentMode == stocking {
-		logGui.Info("Drink added to inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
-		logFile.Info("Drink added to inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
 		if _, err := c.backend.InputDrinks(d); err != nil {
-			logGui.Error(err)
-			logFile.Error(err)
+			logGui.Error("Could not add drink to inventory: ", err)
+			logFile.Error("Could not add drink to inventory: ", err)
+		} else {
+			logGui.Info("Drink added to inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
+			logFile.Info("Drink added to inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
 		}
 	} else if c.currentMode == serving {
 		count, err := c.backend.GetCountByBarcode(d.Barcode)

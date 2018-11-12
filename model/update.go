@@ -21,7 +21,7 @@ func (m *Model) ClearOutputTable() error {
 func (m *Model) CreateDrink(d Drink) (int, error) {
 	now := time.Now().Unix()
 	res, err := m.db.Exec(
-		"insert into Drinks (barcode, brand, name, abv, ibu, type, logo, date) Values (?, ?, ?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, d.Logo, now)
+	"insert into Drinks (barcode, brand, name, abv, ibu, type, logo, country, date) Values (?, ?, ?, ?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, d.Logo, d.Country, now)
 	if err != nil {
 		return -1, err
 	}
