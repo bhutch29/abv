@@ -1,12 +1,11 @@
 package model
 
 import (
-	"database/sql"
+	"os"
+
 	"github.com/jmoiron/sqlx"
 	// Registers the sqlite3 db driver
 	_ "github.com/mattn/go-sqlite3"
-	"os"
-	"time"
 )
 
 // Model controls all the data flow into and out of the db layer
@@ -63,6 +62,15 @@ date integer)
 `)
 }
 
+// Date is a representation of a Unix time stamp
+type Date int64
+
+// DateRange is an inclusive range of dates
+type DateRange struct {
+	Start Date
+	End   Date
+}
+
 // Drink stores information about an available beverage
 type Drink struct {
 	Barcode string
@@ -72,151 +80,19 @@ type Drink struct {
 	Ibu     int
 	Type    string
 	Logo    string
+	Date    Date
 	Country string
-	Date    int64
 }
 
 // DrinkEntry defines quantities of drinks for transactions
 type DrinkEntry struct {
 	Barcode  string
 	Quantity int
-	Date     int64
+	Date     Date
 }
 
 // StockedDrink is an extension of drink with an additional field for quantity
 type StockedDrink struct {
 	Drink
 	Quantity int
-}
-
-// GetInventory returns every drink with at least one quantity in stock
-func (m *Model) GetInventory() ([]StockedDrink, error) {
-	var result []StockedDrink
-	sql := `
-select A.*,
-case
-  when B.InputQuantity is null then 0
-  when C.OutputQuantity is null then B.InputQuantity
-  else (B.InputQuantity - C.OutputQuantity)
-end quantity
-from Drinks A
-left join (
-  select barcode, sum(quantity) as InputQuantity
-  from Input
-  group by barcode
-)
-B
-on A.Barcode = B.Barcode
-left join (
-  select barcode, sum(quantity) as OutputQuantity
-  from Output
-  group by barcode
-)
-C
-on A.Barcode = C.Barcode
-where quantity > 0
-order by A.Brand
-`
-	err := m.db.Select(&result, sql)
-	return result, err
-}
-
-// GetCountByBarcode returns the total number of currently stocked beers with a specific barcode
-func (m *Model) GetCountByBarcode(bc string) (int, error) {
-	var input, output int
-	if err := m.db.Get(&input, "select case when sum(quantity)is null then 0 else sum(quantity) end quantity from Input where barcode = ?", bc); err != nil {
-		return -1, err
-	}
-	if err := m.db.Get(&output, "select case when sum(quantity) is null then 0 else sum(quantity) end quantity from Output where barcode = ?", bc); err != nil {
-		return -1, err
-	}
-
-	return input - output, nil
-}
-
-// GetDrinkByBarcode returns all stored information about a drink based on its barcode
-func (m *Model) GetDrinkByBarcode(bc string) (Drink, error) {
-	var d Drink
-	err := m.db.Get(&d, "select * from Drinks where barcode = ?", bc)
-	//TODO Check that a value got returned, or at least throws a sql.Err___ if nothing found
-	return d, err
-}
-
-// BarcodeExists checks if a barcode is already in the database
-func (m *Model) BarcodeExists(bc string) (bool, error) {
-	var barcode string
-	err := m.db.Get(&barcode, "select barcode from Drinks where barcode = ? limit 1", bc)
-	if err != nil && err != sql.ErrNoRows {
-		return false, err
-	}
-	if barcode == bc {
-		return true, nil
-	}
-	return false, nil
-}
-
-// DeleteDrink removes an entry from the Drinks table using its barcode
-func (m *Model) DeleteDrink(bc string) error {
-	_, err := m.db.Exec("delete from Drinks where barcode = ?", bc)
-	return err
-}
-
-// CreateDrink adds an entry to the Drinks table, returning the id
-func (m *Model) CreateDrink(d Drink) (int, error) {
-	now := time.Now().Unix()
-	res, err := m.db.Exec(
-		"insert into Drinks (barcode, brand, name, abv, ibu, type, logo, country, date) Values (?, ?, ?, ?, ?, ?, ?, ?, ?)", d.Barcode, d.Brand, d.Name, d.Abv, d.Ibu, d.Type, d.Logo, d.Country, now)
-	if err != nil {
-		return -1, err
-	}
-	return getID(res)
-}
-
-// GetAllStoredDrinks returns every saved Drink row in the database
-func (m *Model) GetAllStoredDrinks() ([]Drink, error) {
-	var drinks []Drink
-	err := m.db.Select(&drinks, "select * from Drinks")
-	return drinks, err
-}
-
-// InputDrinks adds an entry to the Input table, returning the id
-func (m *Model) InputDrinks(d DrinkEntry) (int, error) {
-	now := time.Now().Unix()
-	res, err := m.db.Exec(
-		"insert into Input (barcode, quantity, date) Values (?, ?, ?)", d.Barcode, d.Quantity, now)
-	if err != nil {
-		return -1, err
-	}
-	return getID(res)
-}
-
-// OutputDrinks adds an entry to the Output table, returning the id
-func (m *Model) OutputDrinks(d DrinkEntry) (int, error) {
-	now := time.Now().Unix()
-	res, err := m.db.Exec(
-		"insert into Output (barcode, quantity, date) Values (?, ?, ?)", d.Barcode, d.Quantity, now)
-	if err != nil {
-		return -1, err
-	}
-	return getID(res)
-}
-
-// ClearInputTable deletes all stocking records
-func (m *Model) ClearInputTable() error {
-	_, err := m.db.Exec("delete from Input")
-	return err
-}
-
-// ClearOutputTable deletes all serving records
-func (m *Model) ClearOutputTable() error {
-	_, err := m.db.Exec("delete from Output")
-	return err
-}
-
-func getID(result sql.Result) (int, error) {
-	id, err := result.LastInsertId()
-	if err != nil {
-		return -1, err
-	}
-	return int(id), nil
 }
