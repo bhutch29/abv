@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -9,7 +10,6 @@ import (
 	"os"
 
 	"github.com/bhutch29/abv/model"
-	"errors"
 )
 
 // SearchUntappdByName uses the Untappd API to gather a list of Drinks that match the named search

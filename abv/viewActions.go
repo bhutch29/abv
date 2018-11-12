@@ -35,9 +35,9 @@ func updatePromptSymbol() {
 	v.Clear()
         switch mode := c.GetMode(); mode {
 		case stocking:
-		fmt.Fprintf(v, "%s >>", aur.BgRed("Stocking"))
+		fmt.Fprintf(v, "%s >>", aur.BgBrown("Stocking"))
 	case serving:
-		fmt.Fprintf(v, "%s >>", aur.BgBlue("Serving"))
+		fmt.Fprintf(v, "%s >>", aur.BgGreen("Serving"))
 	}
 
 }

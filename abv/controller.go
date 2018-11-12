@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/bhutch29/abv/model"
 	"errors"
+
+	"github.com/bhutch29/abv/model"
 )
 
 // Mode is an Enum of operating modes
@@ -94,8 +95,8 @@ func (c *ModalController) handleDrink(bc string) {
 	}
 
 	if c.currentMode == stocking {
-		logGui.Info("Drink added to inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
-		logFile.Info("Drink added to inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
+		logGui.Info("Drink added to inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
+		logFile.Info("Drink added to inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
 		if _, err := c.backend.InputDrinks(d); err != nil {
 			logGui.Error(err)
 			logFile.Error(err)
@@ -108,12 +109,12 @@ func (c *ModalController) handleDrink(bc string) {
 			return
 		}
 		if count <= 0 {
-			logGui.Warn("That drink was not in the inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
+			logGui.Warn("That drink was not in the inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
 			logFile.Warn("Drink scanned out that was not in the inventory!", drink)
 			return
 		}
-		logGui.Info("Drink removed from inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
-		logFile.Info("Drink removed from inventory! Name: ", drink.Name, ", Brand: ", drink.Brand)
+		logGui.Info("Drink removed from inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
+		logFile.Info("Drink removed from inventory!\n  Name:  ", drink.Name, ",\n  Brand: ", drink.Brand)
 		c.backend.OutputDrinks(d)
 	}
 }

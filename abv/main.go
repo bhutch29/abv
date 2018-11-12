@@ -1,17 +1,18 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
+	"log"
+	"os"
+	"os/exec"
+	"strings"
+
 	"github.com/bhutch29/abv/model"
 	"github.com/jroimartin/gocui"
-	"github.com/sirupsen/logrus"
-	"os"
-	"strings"
-	"log"
-	"os/exec"
-	"errors"
 	aur "github.com/logrusorgru/aurora"
+	"github.com/sirupsen/logrus"
 )
 
 var (
@@ -36,12 +37,12 @@ const (
 )
 
 var keys = []key{
-	{"", gocui.KeyCtrlI, setInputMode, "C-i", "stocking"},
-	{"", gocui.KeyCtrlO, setOutputMode, "C-o", "serving"},
-	{"", gocui.KeyCtrlC, quit, "C-c", "quit"},
+	{"", gocui.KeyCtrlI, setInputMode, "Ctrl-i", "stocking"},
+	{"", gocui.KeyCtrlO, setOutputMode, "Ctrl-o", "serving"},
+	{"", gocui.KeyCtrlC, quit, "Ctrl-c", "quit"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},
-	{search, gocui.KeyCtrlZ, cancelSearch, "C-c", "cancel"},
+	{search, gocui.KeyCtrlZ, cancelSearch, "Ctrl-z", "cancel"},
 	{popup, gocui.KeyArrowUp, popupScrollUp, "Up", "scrollUp"},
 	{popup, gocui.KeyCtrlK, popupScrollUp, "Up", "scrollUp"},
 	{popup, gocui.KeyArrowDown, popupScrollDown, "Down", "scrollDown"},
@@ -110,7 +111,7 @@ func handleFlags() {
 
 func backupDatabase(destination string) {
 	log.Print("Backup up database to " + destination)
-	cmd := exec.Command("sqlite3", "abv.sqlite", ".backup " + destination)
+	cmd := exec.Command("sqlite3", "abv.sqlite", ".backup "+destination)
 	if err := cmd.Run(); err != nil {
 		log.Print("Failed to backup database: " + err.Error())
 		logFile.Fatal(err)
@@ -144,10 +145,10 @@ func refreshInventory() error {
 	for _, drink := range inventory {
 		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
 		if len(drink.Name) < 30 {
-			fmt.Fprintf(view, "%-35s%-30s%6d\n", drink.Brand, drink.Name, drink.Quantity)
+			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name)
 		} else {
-			fmt.Fprintf(view, "%-35s%-30s%6d\n", drink.Brand, drink.Name[:30], drink.Quantity)
-			fmt.Fprintf(view, "%-35s%-30s%6s\n", "", drink.Name[30:], "")
+			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name[:30])
+			fmt.Fprintf(view, "%-4s%-35s%-30s\n", "", drink.Name[30:], "")
 		}
 	}
 	return nil
@@ -285,7 +286,7 @@ func findDrinkFromSelection(line string) (model.Drink, error) {
 func setInputMode(g *gocui.Gui, v *gocui.View) error {
 	c.SetMode(stocking)
 	updatePromptSymbol()
-	logGui.Infof("Changed to %s Mode", aur.Red("Stocking"))
+	logGui.Infof("Changed to %s Mode", aur.Brown("Stocking"))
 	logFile.WithField("mode", stocking).Info("Changed Mode")
 	return nil
 }
@@ -293,7 +294,7 @@ func setInputMode(g *gocui.Gui, v *gocui.View) error {
 func setOutputMode(g *gocui.Gui, v *gocui.View) error {
 	c.SetMode(serving)
 	updatePromptSymbol()
-	logGui.Infof("Changed to %s Mode", aur.Blue("Serving"))
+	logGui.Infof("Changed to %s Mode", aur.Green("Serving"))
 	logFile.WithField("mode", serving).Info("Changed Mode")
 	return nil
 }
