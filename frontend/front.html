@@ -26,8 +26,15 @@
     {{$drinks := .Drinks}}
 
     {{range $di, $d := $drinks}}
-        <div class="d-flex flex-row p-3 bg-secondary">
-            {{$d.Brand}} {{$d.Name}} {{$d.Abv}} {{$d.Ibu}} {{$d.Country}}
+        <div class="d-flex flex-row p-2 bg-info">
+            <div class="p-1 container"> <img src="{{$d.Logo}}"> </div>
+            <div class="p-1 container"> {{$d.Quantity}} </div>
+            <div class="p-1 container"> {{$d.Brand}} </div>
+            <div class="p-1 container"> {{$d.Name}} </div>
+            <div class="p-1 container"> ABV: {{$d.Abv}} </div>
+            <div class="p-1 container"> IBU: {{$d.Ibu}} </div>
+            <div class="p-1 container"> {{$d.Type}} </div>
+            <div class="p-1 container"> {{$d.Country}} </div>
         </div>
     {{end}}
     </div>
