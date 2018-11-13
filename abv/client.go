@@ -28,14 +28,15 @@ func SearchUntappdByName(name string) ([]model.Drink, error) {
 		m := item.(map[string]interface{})
 		beer := m["beer"].(map[string]interface{})
 		brewery := m["brewery"].(map[string]interface{})
-		var drink = model.Drink{}
-		drink.Name = beer["beer_name"].(string)
-		drink.Brand = brewery["brewery_name"].(string)
-		drink.Abv = beer["beer_abv"].(float64)
-		drink.Ibu = int(beer["beer_ibu"].(float64))
-		drink.Type = beer["beer_style"].(string)
-		drink.Logo = brewery["brewery_label"].(string)
-		drink.Country = brewery["country_name"].(string)
+		drink := model.Drink{
+			Name:    beer["beer_name"].(string),
+			Brand:   brewery["brewery_name"].(string),
+			Abv:     beer["beer_abv"].(float64),
+			Ibu:     int(beer["beer_ibu"].(float64)),
+			Type:    beer["beer_style"].(string),
+			Logo:    brewery["brewery_label"].(string),
+			Country: brewery["country_name"].(string),
+		}
 		drinks = append(drinks, drink)
 	}
 	return drinks, nil

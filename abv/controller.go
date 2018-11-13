@@ -52,8 +52,7 @@ func (c *ModalController) LastBarcode() string {
 func (c *ModalController) GetInventory() []model.StockedDrink {
 	result, err := c.backend.GetInventory()
 	if err != nil {
-		logGui.Error("Error getting current inventory: ", err)
-		logFile.Error("Error getting current inventory: ", err)
+		logAllError("Error getting current inventory: ", err)
 	}
 	return result
 }
@@ -90,32 +89,26 @@ func (c *ModalController) handleDrink(bc string) {
 
 	drink, err := c.backend.GetDrinkByBarcode(d.Barcode)
 	if err != nil {
-		logGui.Error("Error creating drink. Could not get Drink information from barcode: ", err)
-		logFile.Error("Error creating drink. Could not get Drink information from barcode: ", err)
+		logAllError("Error creating drink. Could not get Drink information from barcode: ", err)
 	}
 
 	if c.currentMode == stocking {
 		if _, err := c.backend.InputDrinks(d); err != nil {
-			logGui.Error("Could not add drink to inventory: ", err)
-			logFile.Error("Could not add drink to inventory: ", err)
+			logAllError("Could not add drink to inventory: ", err)
 		} else {
-			logGui.Info("Drink added to inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
-			logFile.Info("Drink added to inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
+			logAllInfo("Drink added to inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
 		}
 	} else if c.currentMode == serving {
 		count, err := c.backend.GetCountByBarcode(d.Barcode)
 		if err != nil {
-			logGui.Error("Could not get count by barcode: ", err)
-			logFile.Error("Could not get count by barcode: ", err)
+			logAllError("Could not get count by barcode: ", err)
 			return
 		}
 		if count <= 0 {
-			logGui.Warn("That drink was not in the inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
-			logFile.Warn("Drink scanned out that was not in the inventory!", drink)
+			logAllWarn("That drink was not in the inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
 			return
 		}
-		logGui.Info("Drink removed from inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
-		logFile.Info("Drink removed from inventory!\n  Name:  ", drink.Name, ",\n  Brand: ", drink.Brand)
+		logAllInfo("Drink removed from inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
 		c.backend.OutputDrinks(d)
 	}
 }

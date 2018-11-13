@@ -33,8 +33,8 @@ func togglePopup() {
 func updatePromptSymbol() {
 	v, _ := g.View(promptSymbol)
 	v.Clear()
-        switch mode := c.GetMode(); mode {
-		case stocking:
+	switch mode := c.GetMode(); mode {
+	case stocking:
 		fmt.Fprintf(v, "%s >>", aur.BgBrown("Stocking"))
 	case serving:
 		fmt.Fprintf(v, "%s >>", aur.BgGreen("Serving"))
@@ -86,8 +86,8 @@ func displayError(e error) error {
 	maxX, maxY := g.Size()
 	x0 := maxX / 6
 	y0 := maxY / 6
-	x1 := 5 * (maxX / 6)
-	y1 := 5 * (maxY / 6)
+	x1 := (5 * maxX) / 6
+	y1 := (5 * maxY) / 6
 
 	if v, err := g.SetView(errorView, x0, y0, x1, y1); err != nil {
 		if err != gocui.ErrUnknownView {
@@ -117,8 +117,7 @@ func hideError(g *gocui.Gui, v *gocui.View) error {
 func popupScrollUp(g *gocui.Gui, v *gocui.View) error {
 	err := moveViewCursorUp(v)
 	if err != nil {
-		logFile.Error(err)
-		logGui.Error(err)
+		logAllError(err)
 	}
 	return nil
 }
@@ -126,8 +125,7 @@ func popupScrollUp(g *gocui.Gui, v *gocui.View) error {
 func popupScrollDown(g *gocui.Gui, v *gocui.View) error {
 	err := moveViewCursorDown(v, false)
 	if err != nil {
-		logFile.Error(err)
-		logGui.Error(err)
+		logAllError(err)
 	}
 	return err
 }
