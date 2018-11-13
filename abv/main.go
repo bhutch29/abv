@@ -21,19 +21,6 @@ var (
 	drinks []model.Drink
 )
 
-const (
-	logView       = "Log"
-	input         = "Input"
-	info          = "Info"
-	popup         = "Popup"
-	prompt        = "Prompt"
-	promptSymbol  = "PromptSymbol"
-	errorView     = "Errors"
-	search        = "Search"
-	searchSymbol  = "SearchSymbol"
-	searchOutline = "SearchOutline"
-)
-
 func main() {
 	// Redirect stderr to log file
 	file := redirectStderr(logFile)
