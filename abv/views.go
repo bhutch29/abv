@@ -6,6 +6,19 @@ import (
 	"github.com/jroimartin/gocui"
 )
 
+const (
+	logView       = "Log"
+	input         = "Input"
+	info          = "Info"
+	popup         = "Popup"
+	prompt        = "Prompt"
+	promptSymbol  = "PromptSymbol"
+	errorView     = "Errors"
+	search        = "Search"
+	searchSymbol  = "SearchSymbol"
+	searchOutline = "SearchOutline"
+)
+
 const stockDivisor = 2
 
 const (

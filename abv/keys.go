@@ -15,6 +15,21 @@ type key struct {
 	shortname string
 }
 
+var keys = []key{
+	{"", gocui.KeyCtrlI, setInputMode, "Ctrl-i", "stocking"},
+	{"", gocui.KeyCtrlO, setOutputMode, "Ctrl-o", "serving"},
+	{"", gocui.KeyCtrlC, quit, "Ctrl-c", "quit"},
+	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
+	{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},
+	{search, gocui.KeyCtrlZ, cancelSearch, "Ctrl-z", "cancel"},
+	{popup, gocui.KeyArrowUp, popupScrollUp, "Up", "scrollUp"},
+	{popup, gocui.KeyCtrlK, popupScrollUp, "Up", "scrollUp"},
+	{popup, gocui.KeyArrowDown, popupScrollDown, "Down", "scrollDown"},
+	{popup, gocui.KeyCtrlJ, popupScrollDown, "Down", "scrollDown"},
+	{popup, gocui.KeyEnter, popupSelectItem, "Enter", "Select"},
+	{errorView, gocui.KeyEsc, hideError, "Esc", "close error dialog"},
+}
+
 func generateKeybindString() string {
 	var result string
 	for _, k := range keys {

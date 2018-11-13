@@ -16,64 +16,21 @@ import (
 )
 
 var (
-	g       *gocui.Gui
-	c       ModalController
-	drinks  []model.Drink
-	logFile = logrus.New()
-	logGui  = logrus.New()
+	g      *gocui.Gui
+	c      ModalController
+	drinks []model.Drink
 )
-
-const (
-	logView       = "Log"
-	input         = "Input"
-	info          = "Info"
-	popup         = "Popup"
-	prompt        = "Prompt"
-	promptSymbol  = "PromptSymbol"
-	errorView     = "Errors"
-	search        = "Search"
-	searchSymbol  = "SearchSymbol"
-	searchOutline = "SearchOutline"
-)
-
-var keys = []key{
-	{"", gocui.KeyCtrlI, setInputMode, "Ctrl-i", "stocking"},
-	{"", gocui.KeyCtrlO, setOutputMode, "Ctrl-o", "serving"},
-	{"", gocui.KeyCtrlC, quit, "Ctrl-c", "quit"},
-	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
-	{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},
-	{search, gocui.KeyCtrlZ, cancelSearch, "Ctrl-z", "cancel"},
-	{popup, gocui.KeyArrowUp, popupScrollUp, "Up", "scrollUp"},
-	{popup, gocui.KeyCtrlK, popupScrollUp, "Up", "scrollUp"},
-	{popup, gocui.KeyArrowDown, popupScrollDown, "Down", "scrollDown"},
-	{popup, gocui.KeyCtrlJ, popupScrollDown, "Down", "scrollDown"},
-	{popup, gocui.KeyEnter, popupSelectItem, "Enter", "Select"},
-	{errorView, gocui.KeyEsc, hideError, "Esc", "close error dialog"},
-}
 
 func main() {
+	// Redirect stderr to log file
+	file := redirectStderr(logFile)
+	defer file.Close()
+
 	//Create Controller
 	var err error
 	if c, err = New(); err != nil {
 		logFile.Error("Error creating controller: ", err)
 	}
-
-	//Setup loggers
-	f := logrus.TextFormatter{}
-	f.ForceColors = true
-	f.DisableTimestamp = true
-	f.DisableLevelTruncation = true
-	logGui.Formatter = &f
-	logGui.SetLevel(logrus.InfoLevel)
-
-	file, err := os.OpenFile("abv.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err == nil {
-		logFile.Out = file
-	} else {
-		logFile.Info("Failed to log to file, using default stderr")
-	}
-	defer file.Close()
-	logFile.SetLevel(logrus.DebugLevel)
 
 	//Command Line flags
 	handleFlags()
@@ -137,8 +94,7 @@ func setupGui() {
 func refreshInventory() error {
 	view, err := g.View(info)
 	if err != nil {
-		logGui.Error(err)
-		logFile.Error(err)
+		logAllError(err)
 	}
 	view.Clear()
 	inventory := c.GetInventory()
@@ -162,13 +118,11 @@ func parseInput(g *gocui.Gui, v *gocui.View) error {
 }
 
 func handleBarcodeEntry(bc string) {
-	logGui.Debug("Scanned barcode: ", bc)
-	logFile.Debug("Scanned barcode: ", bc)
+	logAllDebug("Scanned barcode: ", bc)
 
 	exists, err := c.HandleBarcode(bc)
 	if err != nil {
-		logGui.Error("Failed to search database for barcode", err)
-		logFile.Error("Failed to search database for barcode", err)
+		logAllError("Failed to search database for barcode", err)
 	}
 
 	if !exists {
@@ -184,8 +138,7 @@ func handleNewBarcode(bc string) {
 		return
 	}
 
-	logGui.Info("Barcode not recognized. Please enter drink brand and name.")
-	logFile.Info("Unknown barcode scanned: ", bc)
+	logAllInfo("Barcode not recognized. Please enter drink brand and name.")
 	clearView(popup)
 	togglePopup()
 }
@@ -207,8 +160,7 @@ func handleSearch(g *gocui.Gui, v *gocui.View) error {
 
 func cancelSearch(g *gocui.Gui, v *gocui.View) error {
 	togglePopup()
-	logGui.Info("Canceled entering information for new barcode")
-	logFile.Info("Canceled entering information for new barcode")
+	logAllInfo("Canceled entering information for new barcode")
 	return nil
 }
 
@@ -245,19 +197,16 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 
 	d, err := findDrinkFromSelection(line)
 	if err != nil {
-		logGui.Error(err)
-		logFile.Error(err)
+		logAllError(err)
 		return nil
 	}
 
 	d.Barcode = c.LastBarcode()
 
-	logGui.Debug("Adding new drink", d)
-	logFile.Debug("Adding new drink", d)
+	logAllDebug("Adding new drink", d)
 
 	if err = c.NewDrink(d); err != nil {
-		logGui.Error(err)
-		logFile.Error(err)
+		logAllError(err)
 	}
 
 	refreshInventory()
