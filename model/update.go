@@ -45,6 +45,12 @@ func (m *Model) InputDrinks(d DrinkEntry) (int, error) {
 	return getID(res)
 }
 
+// UndoInputDrinks removes an entry from the Input table by id
+func (m *Model) UndoInputDrinks(id int) error {
+	_, err := m.db.Exec("delete from Input where id = ?", id)
+	return err
+}
+
 // OutputDrinks adds an entry to the Output table, returning the id
 func (m *Model) OutputDrinks(d DrinkEntry) (int, error) {
 	now := time.Now().Unix()
@@ -54,6 +60,12 @@ func (m *Model) OutputDrinks(d DrinkEntry) (int, error) {
 		return -1, err
 	}
 	return getID(res)
+}
+
+// UndoOutputDrinks removes an entry from the Output table by id
+func (m *Model) UndoOutputDrinks(id int) error {
+	_, err := m.db.Exec("delete from Output where id = ?", id)
+	return err
 }
 
 func getID(result sql.Result) (int, error) {
