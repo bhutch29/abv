@@ -12,12 +12,12 @@ type OutputDrinksAction struct {
 }
 
 // NewOutputDrinksAction returns an initialized OutputDrinksAction
-func NewOutputDrinksAction(de model.DrinkEntry) OutputDrinksAction {
+func NewOutputDrinksAction(de model.DrinkEntry) *OutputDrinksAction {
 	o := OutputDrinksAction{}
 	mod, _ := model.New()
 	o.m = mod
 	o.de = de
-	return o
+	return &o
 }
 
 // Do implements the ReversibleAction interface

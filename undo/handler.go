@@ -1,38 +1,39 @@
 package undo
 
-// Handler encapsulates all undo/redo functionality. Use NewHandler() to create an initialized Handler
-type Handler struct {
+// Actor encapsulates all undo/redo functionality. Use NewHandler() to create an initialized Actor
+type Actor struct {
 	lists map[string]*undoList
 }
 
-// NewHandler creates an initialized Handler
-func NewHandler() Handler {
+// NewActor creates an initialized Actor
+func NewActor() Actor {
 	l := make(map[string]*undoList)
-	h := Handler{l}
+	h := Actor{l}
 	return h
 }
 
-// AddAction appends a new action onto the current node and updates the current node. Will destroy any history ahead of the current node.
-func (h *Handler) AddAction(id string , a ReversibleAction) {
+// AddAction performs the action and appends it onto the current node and updates the current node. Will destroy any history ahead of the current node.
+func (h *Actor) AddAction(id string , a ReversibleAction) error {
 	l := h.getList(id)
-	l.addAction(a)
+	err := l.addAction(a)
+	return err
 }
 
 // Undo reverses out the current action and moves the current pointer back one action. If current action is the head, do nothing
-func (h *Handler) Undo(id string , a ReversibleAction) error {
+func (h *Actor) Undo(id string , a ReversibleAction) error {
 	l := h.getList(id)
 	err := l.undo()
 	return err
 }
 
 // Redo moves the current pointer ahead one action and performs it. If current action is the tail, do nothing
-func (h *Handler) Redo(id string, a ReversibleAction) error {
+func (h *Actor) Redo(id string, a ReversibleAction) error {
 	l := h.getList(id)
 	err := l.redo()
 	return err
 }
 
-func (h *Handler) getList(id string) *undoList {
+func (h *Actor) getList(id string) *undoList {
 	if list, exists := h.lists[id]; exists {
 		return list
 	}

@@ -15,10 +15,15 @@ type node struct {
 	next, previous *node
 }
 
-func (l *undoList) addAction(a ReversibleAction) {
+func (l *undoList) addAction(a ReversibleAction) error {
+	err := a.Do()
+	if err != nil {
+		return err
+	}
 	n := node{action: a, previous: l.current}
 	l.current.next = &n;
 	l.current = &n
+	return nil
 }
 
 func (l *undoList) undo() error {

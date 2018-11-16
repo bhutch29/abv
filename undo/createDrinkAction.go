@@ -11,12 +11,12 @@ type CreateDrinkAction struct {
 }
 
 // NewCreateDrinkAction returns an initialized CreateDrinkAction
-func NewCreateDrinkAction(d model.Drink) CreateDrinkAction {
+func NewCreateDrinkAction(d model.Drink) *CreateDrinkAction {
 	c := CreateDrinkAction{}
 	mod, _ := model.New()
 	c.m = mod
 	c.d = d
-	return c
+	return &c
 }
 
 // Do implements the ReversibleAction interface

@@ -6,18 +6,18 @@ import (
 
 // CreateAndInputAction encapsulates adding a new drink to the database and inputting it
 type CreateAndInputAction struct {
-	c CreateDrinkAction
-	i InputDrinksAction
+	c *CreateDrinkAction
+	i *InputDrinksAction
 }
 
 // NewCreateAndInputAction returns an initialized CreateAndInputAction
-func NewCreateAndInputAction(d model.Drink, de model.DrinkEntry) CreateAndInputAction {
+func NewCreateAndInputAction(d model.Drink, de model.DrinkEntry) *CreateAndInputAction {
 	a := CreateAndInputAction{}
 	c := NewCreateDrinkAction(d)
 	i := NewInputDrinksAction(de)
 	a.c = c
 	a.i = i
-	return a
+	return &a
 }
 
 // Do implements the ReversibleAction interface
