@@ -76,6 +76,7 @@ func (c *ModalController) NewDrink(d model.Drink) error {
 	if err := c.actor.AddAction("", a); err != nil {
 		return err
 	}
+	logAllInfo("Drink created and added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
 	return nil
 }
 
@@ -121,7 +122,7 @@ func (c *ModalController) handleDrink(bc string) {
 func (c *ModalController) outputDrinks(de model.DrinkEntry, d model.Drink) {
 	a := undo.NewOutputDrinksAction(de)
 	if err := c.actor.AddAction("", a); err != nil {
-		logAllError("Could not remove drink to inventory: ", err)
+		logAllError("Could not remove drink from inventory: ", err)
 	} else {
 		logAllInfo("Drink removed from inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
 	}
@@ -145,4 +146,15 @@ func (c *ModalController) ClearInputOutputRecords() error {
 		return err
 	}
 	return nil
+}
+
+// Undo reverts the previous action with the given id
+func (c *ModalController) Undo(id string) {
+	acted, err := c.actor.Undo(id)
+	if err != nil {
+		logAllError("Could not undo last action with id = " + id, err)
+	}
+	if acted {
+		logAllInfo("Reverted last action with id = ", id)
+	}
 }

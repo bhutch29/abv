@@ -26,13 +26,15 @@ func (l *undoList) addAction(a ReversibleAction) error {
 	return nil
 }
 
-func (l *undoList) undo() error {
+func (l *undoList) undo() (bool, error) {
 	if isHead(l.current) {
-		return nil
+		return false, nil
 	}
-	err := l.current.action.Undo()
+	if err := l.current.action.Undo(); err != nil {
+		return false, err
+	}
 	l.current = l.current.previous
-	return err
+	return true, nil
 }
 
 func (l *undoList) redo() error {

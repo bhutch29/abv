@@ -252,6 +252,12 @@ func setOutputMode(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
+func undoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
+	c.Undo("")
+	refreshInventory()
+	return nil
+}
+
 func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
 }
