@@ -148,7 +148,7 @@ func (c *ModalController) ClearInputOutputRecords() error {
 	return nil
 }
 
-// Undo reverts the previous action with the given id
+// Undo reverts the previous action with the given id, if any
 func (c *ModalController) Undo(id string) {
 	acted, err := c.actor.Undo(id)
 	if err != nil {
@@ -156,5 +156,16 @@ func (c *ModalController) Undo(id string) {
 	}
 	if acted {
 		logAllInfo("Reverted last action with id = ", id)
+	}
+}
+
+// Redo reruns the previously reverted action with the given id, if any
+func (c *ModalController) Redo(id string) {
+	acted, err := c.actor.Redo(id)
+	if err != nil {
+		logAllError("Could not redo last action with id = " + id, err)
+	}
+	if acted {
+		logAllInfo("Redid last action with id = ", id)
 	}
 }

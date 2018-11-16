@@ -27,10 +27,10 @@ func (h *Actor) Undo(id string) (bool, error) {
 }
 
 // Redo moves the current pointer ahead one action and performs it. If current action is the tail, do nothing
-func (h *Actor) Redo(id string) error {
+func (h *Actor) Redo(id string) (bool, error) {
 	l := h.getList(id)
-	err := l.redo()
-	return err
+	acted, err := l.redo()
+	return acted, err
 }
 
 func (h *Actor) getList(id string) *undoList {

@@ -258,6 +258,12 @@ func undoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
+func redoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
+	c.Redo("")
+	refreshInventory()
+	return nil
+}
+
 func quit(g *gocui.Gui, v *gocui.View) error {
 	return gocui.ErrQuit
 }

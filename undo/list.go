@@ -37,13 +37,15 @@ func (l *undoList) undo() (bool, error) {
 	return true, nil
 }
 
-func (l *undoList) redo() error {
-	if l.current.next != nil {
-		l.current = l.current.next
-		err := l.current.action.Do()
-		return err
+func (l *undoList) redo() (bool, error) {
+	if l.current.next == nil {
+		return false, nil
 	}
-	return nil
+	l.current = l.current.next
+	if err := l.current.action.Do(); err != nil {
+		return false, err
+	}
+	return true, nil
 }
 
 func isHead(n *node) bool {
