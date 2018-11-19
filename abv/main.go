@@ -19,6 +19,8 @@ var (
 	g      *gocui.Gui
 	c      ModalController
 	drinks []model.Drink
+	undoString = "65748392"
+	redoString = "9384756"
 )
 
 func main() {
@@ -112,30 +114,43 @@ func refreshInventory() error {
 
 func parseInput(g *gocui.Gui, v *gocui.View) error {
 	bc := strings.TrimSuffix(v.Buffer(), "\n")
+	clearView(input)
 	if bc == "" {
 		return nil
 	}
-	clearView(input)
-	handleBarcodeEntry(bc)
+
+	id, barcode := parseIDFromBarcode(bc)
+	handleBarcodeEntry(id, barcode)
 	return nil
 }
 
-func handleBarcodeEntry(bc string) {
-	logAllDebug("Scanned barcode: ", bc)
+func  parseIDFromBarcode(bc string) (string, string) {
+	// If the second character is an _, treat the first character as a scanner ID and the rest of the input as a barcode
+	if len(bc) == 1 {
+		return "", bc
+	}
+	if bc[1] == []byte("_")[0] {
+		return string(bc[0]), bc[2:]
+	}
+	return "", bc
+}
 
-	exists, err := c.HandleBarcode(bc)
+func handleBarcodeEntry(id string, bc string) {
+	logAllDebug("Scanned barcode: ", bc, " with ID=", id)
+	exists, err := c.HandleBarcode(id, bc)
 	if err != nil {
 		logAllError("Failed to search database for barcode", err)
+		return
 	}
 
 	if !exists {
-		handleNewBarcode(bc)
+		handleNewBarcode()
 	}
 
 	refreshInventory()
 }
 
-func handleNewBarcode(bc string) {
+func handleNewBarcode() {
 	if c.GetMode() != stocking {
 		logGui.Warn("Barcode not recognized while serving. Drink will not be recorded")
 		return
@@ -205,10 +220,11 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	d.Barcode = c.LastBarcode()
+	id := c.LastID()
 
 	logAllDebug("Adding new drink", d)
 
-	if err = c.NewDrink(d); err != nil {
+	if err = c.NewDrink(id, d); err != nil {
 		logAllError(err)
 	}
 
