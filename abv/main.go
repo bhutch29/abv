@@ -120,7 +120,15 @@ func parseInput(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	id, barcode := parseIDFromBarcode(bc)
-	handleBarcodeEntry(id, barcode)
+	if barcode == undoString {
+		c.Undo(id)
+		refreshInventory()
+	} else if barcode == redoString {
+		c.Redo(id)
+		refreshInventory()
+	} else {
+		handleBarcodeEntry(id, barcode)
+	}
 	return nil
 }
 
