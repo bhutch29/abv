@@ -112,6 +112,9 @@ func refreshInventory() error {
 
 func parseInput(g *gocui.Gui, v *gocui.View) error {
 	bc := strings.TrimSuffix(v.Buffer(), "\n")
+	if bc == "" {
+		return nil
+	}
 	clearView(input)
 	handleBarcodeEntry(bc)
 	return nil
