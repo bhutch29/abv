@@ -18,6 +18,8 @@ type key struct {
 var keys = []key{
 	{"", gocui.KeyCtrlI, setInputMode, "Ctrl-i", "stocking"},
 	{"", gocui.KeyCtrlO, setOutputMode, "Ctrl-o", "serving"},
+	{"", gocui.KeyCtrlZ, undoLastKeyboardAction, "Ctrl-z", "undo"},
+	{"", gocui.KeyCtrlR, redoLastKeyboardAction, "Ctrl-r", "redo"},
 	{"", gocui.KeyCtrlC, quit, "Ctrl-c", "quit"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 	{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},

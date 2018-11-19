@@ -112,6 +112,9 @@ func refreshInventory() error {
 
 func parseInput(g *gocui.Gui, v *gocui.View) error {
 	bc := strings.TrimSuffix(v.Buffer(), "\n")
+	if bc == "" {
+		return nil
+	}
 	clearView(input)
 	handleBarcodeEntry(bc)
 	return nil
@@ -249,6 +252,18 @@ func setOutputMode(g *gocui.Gui, v *gocui.View) error {
 		logGui.Infof("Changed to %s Mode", aur.Green("Serving"))
 		logFile.WithField("mode", serving).Info("Changed Mode")
 	}
+	return nil
+}
+
+func undoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
+	c.Undo("")
+	refreshInventory()
+	return nil
+}
+
+func redoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
+	c.Redo("")
+	refreshInventory()
 	return nil
 }
 

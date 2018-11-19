@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/bhutch29/abv/model"
+	"github.com/bhutch29/abv/undo"
 )
 
 // Mode is an Enum of operating modes
@@ -19,17 +20,24 @@ type ModalController struct {
 	currentMode Mode
 	backend     model.Model
 	lastBarcode string
+	actor       undo.Actor
 }
 
 // New creates a new fully initialized ModalController
 func New() (ModalController, error) {
 	m := ModalController{}
+
 	m.currentMode = serving
+
 	backend, err := model.New()
 	if err != nil {
 		return m, err
 	}
 	m.backend = backend
+
+	a := undo.NewActor()
+	m.actor = a
+
 	return m, nil
 }
 
@@ -57,34 +65,53 @@ func (c *ModalController) GetInventory() []model.StockedDrink {
 	return result
 }
 
-// HandleBarcode inputs/outputs a drink and returns true if the barcode already exists or returns false if the barcode does not exist
-func (c *ModalController) HandleBarcode(bc string) (bool, error) {
-	c.lastBarcode = bc
-	exists, err := c.backend.BarcodeExists(bc)
-	if err != nil {
-		return false, err
-	}
-	if exists {
-		logFile.Info("Known barcode scanned: ", bc)
-		c.handleDrink(bc)
-		return true, nil
-	}
-	return false, nil
-}
-
 // NewDrink stores a new drink to the database and increments the drink count
 func (c *ModalController) NewDrink(d model.Drink) error {
 	if c.currentMode != stocking {
 		return errors.New("NewDrink can only be called from stocking mode")
 	}
-	if _, err := c.backend.CreateDrink(d); err != nil {
+
+	id, barcode := c.parseIDFromBarcode(d.Barcode)
+	logAllDebug("Parsed ID and Barcode:", "ID=" + id, ", Barcode=" + barcode)
+	d.Barcode = barcode
+
+	de := model.DrinkEntry{Barcode: barcode, Quantity: 1} //TODO add quantity handling
+	a := undo.NewCreateAndInputAction(d, de)
+	if err := c.actor.AddAction(id, a); err != nil {
 		return err
 	}
-	c.handleDrink(d.Barcode)
+	logAllInfo("Drink created and added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
 	return nil
 }
 
-func (c *ModalController) handleDrink(bc string) {
+// HandleBarcode inputs/outputs a drink and returns true if the barcode already exists or returns false if the barcode does not exist
+func (c *ModalController) HandleBarcode(bc string) (bool, error) {
+	c.lastBarcode = bc
+	id, barcode := c.parseIDFromBarcode(bc)
+	logAllDebug("Parsed ID and Barcode:", "ID=" + id, ", Barcode=" + barcode)
+	exists, err := c.backend.BarcodeExists(barcode)
+	if err != nil {
+		return false, err
+	}
+	if exists {
+		logFile.Info("Known barcode scanned: ", barcode)
+		c.handleDrink(id, barcode)
+		return true, nil
+	}
+	return false, nil
+}
+
+func (c *ModalController) parseIDFromBarcode(bc string) (string, string) {
+	// If the second character is an _, treat the first character as a scanner ID and the rest of the input as a barcode
+	if len(bc) == 1 {
+		return "", bc
+	}
+	if bc[1] == []byte("_")[0] {
+		return string(bc[0]), bc[2:]
+	}
+	return "", bc
+}
+func (c *ModalController) handleDrink(id string, bc string) {
 	d := model.DrinkEntry{Barcode: bc, Quantity: 1} //TODO add quantity handling
 
 	drink, err := c.backend.GetDrinkByBarcode(d.Barcode)
@@ -93,11 +120,7 @@ func (c *ModalController) handleDrink(bc string) {
 	}
 
 	if c.currentMode == stocking {
-		if _, err := c.backend.InputDrinks(d); err != nil {
-			logAllError("Could not add drink to inventory: ", err)
-		} else {
-			logAllInfo("Drink added to inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
-		}
+		c.inputDrinks(id, d, drink)
 	} else if c.currentMode == serving {
 		count, err := c.backend.GetCountByBarcode(d.Barcode)
 		if err != nil {
@@ -108,8 +131,27 @@ func (c *ModalController) handleDrink(bc string) {
 			logAllWarn("That drink was not in the inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
 			return
 		}
-		logAllInfo("Drink removed from inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
-		c.backend.OutputDrinks(d)
+		c.outputDrinks(id, d, drink)
+	}
+}
+
+func (c *ModalController) outputDrinks(id string, de model.DrinkEntry, d model.Drink) {
+	a := undo.NewOutputDrinksAction(de)
+	logAllDebug("Adding action with id = ", id)
+	if err := c.actor.AddAction(id, a); err != nil {
+		logAllError("Could not remove drink from inventory: ", err)
+	} else {
+		logAllInfo("Drink removed from inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
+	}
+}
+
+func (c *ModalController) inputDrinks(id string, de model.DrinkEntry, d model.Drink) {
+	a := undo.NewInputDrinksAction(de)
+	logAllDebug("Adding action with id = ", id)
+	if err := c.actor.AddAction(id, a); err != nil {
+		logAllError("Could not add drink to inventory: ", err)
+	} else {
+		logAllInfo("Drink added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
 	}
 }
 
@@ -122,4 +164,26 @@ func (c *ModalController) ClearInputOutputRecords() error {
 		return err
 	}
 	return nil
+}
+
+// Undo reverts the previous action with the given id, if any
+func (c *ModalController) Undo(id string) {
+	acted, err := c.actor.Undo(id)
+	if err != nil {
+		logAllError("Could not undo last action with id = " + id, err)
+	}
+	if acted {
+		logAllInfo("Reverted last action with id = ", id)
+	}
+}
+
+// Redo reruns the previously reverted action with the given id, if any
+func (c *ModalController) Redo(id string) {
+	acted, err := c.actor.Redo(id)
+	if err != nil {
+		logAllError("Could not redo last action with id = " + id, err)
+	}
+	if acted {
+		logAllInfo("Redid last action with id = ", id)
+	}
 }
