@@ -12,6 +12,8 @@ var (
 )
 
 func init() {
+	quantity = 1
+
 	//Setup loggers
 	f := logrus.TextFormatter{}
 	f.ForceColors = true

@@ -72,14 +72,14 @@ func (c *ModalController) GetInventory() []model.StockedDrink {
 }
 
 // NewDrink stores a new drink to the database and increments the drink count
-func (c *ModalController) NewDrink(id string, d model.Drink) error {
+func (c *ModalController) NewDrink(id string, d model.Drink, quantity int) error {
 	if c.currentMode != stocking {
 		return errors.New("NewDrink can only be called from stocking mode")
 	}
 
 	logAllDebug("Parsed ID and Barcode:", "ID=" + id, ", Barcode=" + d.Barcode)
 
-	de := model.DrinkEntry{Barcode: d.Barcode, Quantity: 1} //TODO add quantity handling
+	de := model.DrinkEntry{Barcode: d.Barcode, Quantity: quantity} //TODO add quantity handling
 	a := undo.NewCreateAndInputAction(d, de)
 	if err := c.actor.AddAction(id, a); err != nil {
 		return err
@@ -89,7 +89,7 @@ func (c *ModalController) NewDrink(id string, d model.Drink) error {
 }
 
 // HandleBarcode inputs/outputs a drink and returns true if the barcode already exists or returns false if the barcode does not exist
-func (c *ModalController) HandleBarcode(id string, bc string) (bool, error) {
+func (c *ModalController) HandleBarcode(id string, bc string, quantity int) (bool, error) {
 	c.lastBarcode = bc
 	c.lastID = id
 	exists, err := c.backend.BarcodeExists(bc)
@@ -98,14 +98,14 @@ func (c *ModalController) HandleBarcode(id string, bc string) (bool, error) {
 	}
 	if exists {
 		logFile.Info("Known barcode scanned: ", bc)
-		c.handleDrink(id, bc)
+		c.handleDrink(id, bc, quantity)
 		return true, nil
 	}
 	return false, nil
 }
 
-func (c *ModalController) handleDrink(id string, bc string) {
-	d := model.DrinkEntry{Barcode: bc, Quantity: 1} //TODO add quantity handling
+func (c *ModalController) handleDrink(id string, bc string, quantity int) {
+	d := model.DrinkEntry{Barcode: bc, Quantity: quantity} //TODO add quantity handling
 
 	drink, err := c.backend.GetDrinkByBarcode(d.Barcode)
 	if err != nil {

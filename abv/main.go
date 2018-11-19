@@ -19,6 +19,7 @@ var (
 	g      *gocui.Gui
 	c      ModalController
 	drinks []model.Drink
+	quantity int
 	undoString = "65748392"
 	redoString = "9384756"
 )
@@ -145,7 +146,7 @@ func  parseIDFromBarcode(bc string) (string, string) {
 
 func handleBarcodeEntry(id string, bc string) {
 	logAllDebug("Scanned barcode: ", bc, " with ID=", id)
-	exists, err := c.HandleBarcode(id, bc)
+	exists, err := c.HandleBarcode(id, bc, quantity)
 	if err != nil {
 		logAllError("Failed to search database for barcode", err)
 		return
@@ -232,7 +233,7 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 
 	logAllDebug("Adding new drink", d)
 
-	if err = c.NewDrink(id, d); err != nil {
+	if err = c.NewDrink(id, d, quantity); err != nil {
 		logAllError(err)
 	}
 
@@ -288,6 +289,32 @@ func undoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
 func redoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
 	c.Redo("")
 	refreshInventory()
+	return nil
+}
+
+func trySetQuantity(q int) {
+	if q != 1 && c.GetMode() != stocking {
+		logAllInfo("Serving of multiple beers at once is not supported")
+		return
+	}
+	if q != quantity {
+		quantity = q
+		logAllInfo("Quantity of drinks per scan changed to ", quantity)
+	}
+}
+
+func setQuantity1(g *gocui.Gui, v *gocui.View) error {
+	trySetQuantity(1)
+	return nil
+}
+
+func setQuantity6(g *gocui.Gui, v *gocui.View) error {
+	trySetQuantity(6)
+	return nil
+}
+
+func setQuantity12(g *gocui.Gui, v *gocui.View) error {
+	trySetQuantity(12)
 	return nil
 }
 
