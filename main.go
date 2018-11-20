@@ -241,6 +241,7 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	d.Barcode = c.LastBarcode()
+	d.Shorttype = shortenType(d.Type)
 	id := c.LastID()
 
 	logAllDebug("Adding new drink", d)
@@ -252,6 +253,11 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 	refreshInventory()
 
 	return nil
+}
+
+func shortenType(in string) string {
+	split := strings.SplitN(in, " - ", 2)
+	return split[0]
 }
 
 func findDrinkFromSelection(line string) (model.Drink, error) {

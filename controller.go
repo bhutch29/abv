@@ -79,7 +79,7 @@ func (c *ModalController) NewDrink(id string, d model.Drink, quantity int) error
 
 	logAllDebug("Parsed ID and Barcode:", "ID=" + id, ", Barcode=" + d.Barcode)
 
-	de := model.DrinkEntry{Barcode: d.Barcode, Quantity: quantity} //TODO add quantity handling
+	de := model.DrinkEntry{Barcode: d.Barcode, Quantity: quantity}
 	a := undo.NewCreateAndInputAction(d, de)
 	if err := c.actor.AddAction(id, a); err != nil {
 		return err
@@ -105,7 +105,7 @@ func (c *ModalController) HandleBarcode(id string, bc string, quantity int) (boo
 }
 
 func (c *ModalController) handleDrink(id string, bc string, quantity int) {
-	d := model.DrinkEntry{Barcode: bc, Quantity: quantity} //TODO add quantity handling
+	d := model.DrinkEntry{Barcode: bc, Quantity: quantity}
 
 	drink, err := c.backend.GetDrinkByBarcode(d.Barcode)
 	if err != nil {

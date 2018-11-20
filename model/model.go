@@ -42,6 +42,7 @@ name varchar(255),
 abv real,
 ibu real,
 type varchar(255),
+shorttype varchar(255),
 logo varchar(255),
 country varchar(255),
 date integer)
@@ -73,15 +74,16 @@ type DateRange struct {
 
 // Drink stores information about an available beverage
 type Drink struct {
-	Barcode string
-	Brand   string
-	Name    string
-	Abv     float64
-	Ibu     int
-	Type    string
-	Logo    string
-	Date    Date
-	Country string
+	Barcode   string
+	Brand     string
+	Name      string
+	Abv       float64
+	Ibu       int
+	Type      string
+	Shorttype string
+	Logo      string
+	Date      Date
+	Country   string
 }
 
 // DrinkEntry defines quantities of drinks for transactions
