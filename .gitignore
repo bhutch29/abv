@@ -3,6 +3,9 @@
 !/**/
 !*.*
 
+#unignore makefile
+!makefile
+
 *.sqlite
 *.exe
 *.exe~

@@ -22,6 +22,7 @@ var (
 	quantity int
 	undoString = "65748392"
 	redoString = "9384756"
+	version = "undefined"
 )
 
 func main() {
@@ -51,8 +52,14 @@ func main() {
 func handleFlags() {
 	backup := flag.String("backup", "", "Backs up the sqlite database to specified file")
 	reset := flag.Bool("reset", false, "Backs up the database to the working directory and wipes out the Input and Output tables")
+	ver := flag.Bool("version", false, "Prints the version")
 
 	flag.Parse()
+
+	if *ver {
+		fmt.Println(version)
+		os.Exit(0)
+	}
 
 	if *backup != "" {
 		backupDatabase(*backup)
