@@ -53,6 +53,7 @@ func handleFlags() {
 	backup := flag.String("backup", "", "Backs up the sqlite database to specified file")
 	reset := flag.Bool("reset", false, "Backs up the database to the working directory and wipes out the Input and Output tables")
 	ver := flag.Bool("version", false, "Prints the version")
+	verbose := flag.Bool("v", false, "Increases the logging verbosity in the GUI")
 
 	flag.Parse()
 
@@ -73,6 +74,10 @@ func handleFlags() {
 			logFile.Fatal(err)
 		}
 		os.Exit(0)
+	}
+
+	if *verbose {
+		logGui.SetLevel(logrus.DebugLevel)
 	}
 }
 
