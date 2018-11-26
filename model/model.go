@@ -61,12 +61,6 @@ barcode integer,
 quantity integer,
 date integer)
 `)
-	m.db.Exec(`
-create table if not exists BrandNicknames (
-id integer primary key,
-brand varchar(255),
-brandnickname varchar(255))
-`)
 }
 
 // Date is a representation of a Unix time stamp

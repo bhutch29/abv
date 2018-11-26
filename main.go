@@ -16,13 +16,13 @@ import (
 )
 
 var (
-	g      *gocui.Gui
-	c      ModalController
-	drinks []model.Drink
-	quantity int
+	g          *gocui.Gui
+	c          ModalController
+	drinks     []model.Drink
+	quantity   int
 	undoString = "65748392"
 	redoString = "9384756"
-	version = "undefined"
+	version    = "undefined"
 )
 
 func main() {
@@ -116,9 +116,9 @@ func refreshInventory() error {
 	for _, drink := range inventory {
 		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
 		if len(drink.Name) < 30 {
-			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name)
+			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.BrandNick(), drink.Name)
 		} else {
-			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name[:30])
+			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.BrandNick(), drink.Name[:30])
 			fmt.Fprintf(view, "%-4s%-35s%-30s\n", "", drink.Name[30:], "")
 		}
 	}
@@ -145,7 +145,7 @@ func parseInput(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
-func  parseIDFromBarcode(bc string) (string, string) {
+func parseIDFromBarcode(bc string) (string, string) {
 	// If the second character is an _, treat the first character as a scanner ID and the rest of the input as a barcode
 	if len(bc) == 1 {
 		return "", bc
@@ -216,7 +216,7 @@ func updatePopup(name string) {
 
 	v.Clear()
 	for _, drink := range drinks {
-		fmt.Fprintf(v, "%s: %s\n", drink.Brand, drink.Name)
+		fmt.Fprintf(v, "%s: %s\n", drink.BrandNick(), drink.Name)
 	}
 
 	g.SetCurrentView(popup)
@@ -271,7 +271,7 @@ func findDrinkFromSelection(line string) (model.Drink, error) {
 	logFile.Debug("Determined that brand = " + brand + " and name = " + name)
 
 	for _, drink := range drinks {
-		if drink.Brand == brand && drink.Name == name {
+		if drink.BrandNick() == brand && drink.Name == name {
 			return drink, nil
 		}
 	}
