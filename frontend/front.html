@@ -14,14 +14,17 @@
 
     <script type="text/html" id="beer-entry">
         <!-- TODO: Prettify -->
-        <img id="logo" src="{{Logo}}">
-        {{Name}}
-        {{Brand}}
-        ABV:{{Abv}}
-        IBU:{{Ibu}}
-        Type:{{Shorttype}}
-        Country:{{Country}}
-        {{Quantity}}
+        <div class="wrapper">
+        <div class="image">
+        <img src="{{Logo}}">
+        </div>
+        <div id="brand"> {{Brand}} </div>
+        <div id="name"> {{Name}} </div>
+        <div id="abv"> ABV:{{Abv}} </div>
+        <div id="ibu"> IBU:{{Ibu}} </div>
+        <div id="type"> {{Shorttype}} </div>
+        <div id="quantity"> {{Quantity}} </div>
+        </div>
     </script>
 </head>
 <body>
