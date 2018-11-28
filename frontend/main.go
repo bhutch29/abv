@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/bhutch29/abv/model"
 	"github.com/julienschmidt/httprouter"
-	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,19 +12,12 @@ import (
 
 // Page is the backing type for all pages
 type Page struct {
-	MainWindowHTML template.HTML
 }
 
 // FrontPage is the primary view object
 type FrontPage struct {
 	Page
 	Drinks []model.StockedDrink
-}
-
-func newPage() Page {
-	var page Page
-	page.MainWindowHTML = template.HTML(stringFromFile("frontPage.html"))
-	return page
 }
 
 func stringFromFile(path string) string {
@@ -35,11 +27,9 @@ func stringFromFile(path string) string {
 
 func newFrontPage() FrontPage {
 	var frontPage FrontPage
-	frontPage.Page = newPage()
+	frontPage.Page = Page{}
 	return frontPage
 }
-
-var templates = template.Must(template.ParseFiles("front.html"))
 
 func main() {
 	router := httprouter.New()
@@ -64,11 +54,7 @@ func cssHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 }
 
 func frontPageHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	p := newFrontPage()
-	err := getJSON("http://localhost:8081/inventory", &p.Drinks)
-	checkError(err, w)
-	err = templates.ExecuteTemplate(w, "front.html", p)
-	checkError(err, w)
+	http.ServeFile(w, r, "front.html")
 }
 
 var myClient = &http.Client{Timeout: 10 * time.Second}
