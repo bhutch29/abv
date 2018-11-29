@@ -50,14 +50,14 @@ date integer)
 	m.db.Exec(`
 create table if not exists Input (
 id integer primary key,
-barcode integer,
+barcode varchar(255),
 quantity integer,
 date integer)
 `)
 	m.db.Exec(`
 create table if not exists Output (
 id integer primary key,
-barcode integer,
+barcode varchar(255),
 quantity integer,
 date integer)
 `)
