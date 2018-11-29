@@ -8,11 +8,19 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"flag"
+	"fmt"
+	"os"
 )
 
-var m model.Model
+var (
+	m model.Model
+	version = "undefined"
+)
 
 func main() {
+	handleFlags()
+
 	mod, err := model.New()
 	if err != nil {
 		log.Fatal(err)
@@ -26,6 +34,16 @@ func main() {
 
 	corsEnabledHandler := cors.Default().Handler(router)
 	log.Fatal(http.ListenAndServe(":8081", corsEnabledHandler))
+}
+
+func handleFlags(){
+	ver := flag.Bool("version", false, "Prints the version")
+	flag.Parse()
+
+	if *ver {
+		fmt.Println(version)
+		os.Exit(0)
+	}
 }
 
 func healthCheck(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

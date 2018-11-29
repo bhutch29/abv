@@ -8,7 +8,12 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"flag"
+	"fmt"
+	"os"
 )
+
+var version = "undefined"
 
 // Page is the backing type for all pages
 type Page struct {
@@ -32,6 +37,8 @@ func newFrontPage() FrontPage {
 }
 
 func main() {
+	handleFlags()
+
 	router := httprouter.New()
 
 	router.GET("/", frontPageHandler)
@@ -39,6 +46,16 @@ func main() {
 	router.GET("/static/js/*filePath", jsHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+func handleFlags(){
+	ver := flag.Bool("version", false, "Prints the version")
+	flag.Parse()
+
+	if *ver {
+		fmt.Println(version)
+		os.Exit(0)
+	}
 }
 
 func jsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {

@@ -1,13 +1,12 @@
-OUT := abv
 VERSION := ${shell git describe --always --long --dirty}
 PKG := github.com/bhutch29/abv
 
-all: run
+all: install
 
-build:
-	go build -i -v -o ${OUT} -ldflags="-X main.version=${VERSION}" ${PKG}
+install:
+	go install -v -ldflags="-X main.version=${VERSION}" ./...
 
-run: build
-	./${OUT}
+run: install
+	abv
 
-.PHONY: run build
+.PHONY: run install
