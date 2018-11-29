@@ -42,6 +42,9 @@ func main() {
 	router := httprouter.New()
 
 	router.GET("/", frontPageHandler)
+
+	router.ServeFiles("/images/*filepath", http.Dir("images"))
+
 	router.GET("/static/css/*filePath", cssHandler)
 	router.GET("/static/js/*filePath", jsHandler)
 
@@ -61,17 +64,20 @@ func handleFlags(){
 func jsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Add("Content-Type", "application/javascript")
 	path := ps.ByName("filePath")
-	http.ServeFile(w, r, "static/js"+path)
+	//TODO: change hardcoded frontend path?
+	http.ServeFile(w, r, "frontend/static/js"+path)
 }
 
 func cssHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Add("Content-Type", "text/css")
 	path := ps.ByName("filePath")
-	http.ServeFile(w, r, "static/css/"+path)
+	//TODO: change hardcoded frontend path?
+	http.ServeFile(w, r, "frontend/static/css/"+path)
 }
 
 func frontPageHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	http.ServeFile(w, r, "front.html")
+	//TODO: change hardcoded frontend path?
+	http.ServeFile(w, r, "frontend/front.html")
 }
 
 var myClient = &http.Client{Timeout: 10 * time.Second}
