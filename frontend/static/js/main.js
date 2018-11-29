@@ -6,7 +6,7 @@ let beersPerPage = 16;
 
 function changePage(){
     $.getJSON("http://localhost:8081/inventory", function(beers){
-        $("#beer-list").empty()
+        $("#beer-list").empty();
         if (persist.index >= beers.length) {
             persist.index = 0;
         }
@@ -14,8 +14,12 @@ function changePage(){
             if (i == beers.length) {
                 break;
             }
+
+            var url = beers[i].Logo;
+            var file = url.substring(url.lastIndexOf('/') + 1);
+            beers[i].Logo = "/images/" + file;
             var html = Mustache.to_html($('#beer-entry').html(), beers[i]);
-            $('<div class="grid-item"/>').html(html).appendTo('#beer-list')
+            $('<div class="grid-item"/>').html(html).appendTo('#beer-list');
         }
         persist.index += beersPerPage;
     });
