@@ -84,7 +84,7 @@ func (c *ModalController) NewDrink(id string, d model.Drink, quantity int) error
 	if err := c.actor.AddAction(id, a); err != nil {
 		return err
 	}
-	logAllInfo("Drink created and added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.BrandNick())
+	logAllInfo("Drink created and added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
 	return nil
 }
 
@@ -121,7 +121,7 @@ func (c *ModalController) handleDrink(id string, bc string, quantity int) {
 			return
 		}
 		if count <= 0 {
-			logAllWarn("That drink was not in the inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.BrandNick())
+			logAllWarn("That drink was not in the inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
 			return
 		}
 		c.outputDrinks(id, d, drink)
@@ -134,7 +134,7 @@ func (c *ModalController) outputDrinks(id string, de model.DrinkEntry, d model.D
 	if err := c.actor.AddAction(id, a); err != nil {
 		logAllError("Could not remove drink from inventory: ", err)
 	} else {
-		logAllInfo("Drink removed from inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.BrandNick())
+		logAllInfo("Drink removed from inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
 	}
 }
 
@@ -144,7 +144,7 @@ func (c *ModalController) inputDrinks(id string, de model.DrinkEntry, d model.Dr
 	if err := c.actor.AddAction(id, a); err != nil {
 		logAllError("Could not add drink to inventory: ", err)
 	} else {
-		logAllInfo("Drink added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.BrandNick())
+		logAllInfo("Drink added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
 	}
 }
 

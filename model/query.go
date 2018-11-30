@@ -1,6 +1,7 @@
 package model
 
 import "database/sql"
+import "strings"
 
 // BarcodeExists checks if a barcode is already in the database
 func (m *Model) BarcodeExists(bc string) (bool, error) {
@@ -19,7 +20,53 @@ func (m *Model) BarcodeExists(bc string) (bool, error) {
 func (m *Model) GetAllStoredDrinks() ([]Drink, error) {
 	var drinks []Drink
 	err := m.db.Select(&drinks, "select * from Drinks")
+	drinks = m.setDrinksNicknames(drinks)
 	return drinks, err
+}
+
+// TODO: These DrinkNickname methods are pretty awful, lots of repeated code. How to improve?
+func (m *Model) setDrinksNicknames(drinks []Drink) []Drink {
+	brandNicks := m.conf.GetStringMapString("breweryNicknames")
+	beerNicks := m.conf.GetStringMapString("beerNicknames")
+	var result []Drink
+	for _, drink := range drinks {
+		if nick, ok := brandNicks[strings.ToLower(drink.Brand)]; ok {
+			drink.Brand = nick
+		}
+		if nick, ok := beerNicks[strings.ToLower(drink.Name)]; ok {
+			drink.Name = nick
+		}
+		result = append(result, drink)
+	}
+	return result
+}
+
+func (m *Model) setStockedDrinksNicknames(drinks []StockedDrink) []StockedDrink {
+	brandNicks := m.conf.GetStringMapString("breweryNicknames")
+	beerNicks := m.conf.GetStringMapString("beerNicknames")
+	var result []StockedDrink
+	for _, drink := range drinks {
+		if nick, ok := brandNicks[strings.ToLower(drink.Brand)]; ok {
+			drink.Brand = nick
+		}
+		if nick, ok := beerNicks[strings.ToLower(drink.Name)]; ok {
+			drink.Name = nick
+		}
+		result = append(result, drink)
+	}
+	return result
+}
+
+func (m *Model) setDrinkNickname(drink Drink) Drink {
+	brandNicks := m.conf.GetStringMapString("breweryNicknames")
+	beerNicks := m.conf.GetStringMapString("beerNicknames")
+	if nick, ok := brandNicks[strings.ToLower(drink.Brand)]; ok {
+		drink.Brand = nick
+	}
+	if nick, ok := beerNicks[strings.ToLower(drink.Name)]; ok {
+		drink.Name = nick
+	}
+	return drink
 }
 
 // GetCountByBarcode returns the total number of currently stocked beers with a specific barcode
@@ -40,6 +87,7 @@ func (m *Model) GetDrinkByBarcode(bc string) (Drink, error) {
 	var d Drink
 	err := m.db.Get(&d, "select * from Drinks where barcode = ?", bc)
 	//TODO Check that a value got returned, or at least throws a sql.Err___ if nothing found
+	d = m.setDrinkNickname(d)
 	return d, err
 }
 
@@ -73,6 +121,7 @@ where quantity > 0
 order by A.Brand
 `
 	err := m.db.Select(&result, sql)
+	result = m.setStockedDrinksNicknames(result)
 	return result, err
 }
 

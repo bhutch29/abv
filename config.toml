@@ -1,0 +1,15 @@
+# Configuration file for ABV
+
+undoBarcode = 9876543
+redoBarcode = 1234567
+
+[breweryNicknames]
+"Lagunitas Brewing Company" = "Lagunitas"
+"Blue Moon Brewing Company" = "Blue Moon"
+"Deschutes Brewery" = "Deschutes"
+"Einstök Ölgerð" = "Einstök"
+"Sierra Nevada Brewing Co." = "Sierra Nevada"
+
+[beerNicknames]
+"Anchor Steam Beer" = "Anchor Steam"
+"60 Minute IPA" = "60 Minute"
