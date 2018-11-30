@@ -50,7 +50,7 @@ func main() {
 		log.Fatal("Could not get configuration: ", err)
 	}
 	imagePath := conf.GetString("imageCachePath")
-	fontPath := conf.GetString("configPath") + "/fonts"
+	fontPath := conf.GetString("configPath") + "/static/fonts"
 
 	router := httprouter.New()
 
