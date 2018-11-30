@@ -6,8 +6,8 @@ redoBarcode = 1234567
 # Set location to cache brewery images for web menu. Do not use trailing slash. Defaults to ~/.abv/images
 #imageCachePath = /var/temp
 
-# Set location of sqlite file. Do not use trailing slash. Defaults to ~/.abv
-#dbPath = ~/.abv/db
+# Set location of config files. Do not use trailing slash. Defaults to ~/.abv
+#configPath = ~/etc/abv
 
 # Set the web root directory (directory containing the front page html and the static/ folder). Do not use trailing slash. Defaults to /srv/http
 #webRoot = ~/.abv/www

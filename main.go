@@ -28,19 +28,19 @@ var (
 )
 
 func main() {
+	//Get Configuration
+	var err error
+	if conf, err = config.New(); err != nil {
+		log.Fatal("Error getting configuration info: ", err)
+	}
+
 	// Redirect stderr to log file
 	file := redirectStderr(logFile)
 	defer file.Close()
 
 	//Create Controller
-	var err error
 	if c, err = New(); err != nil {
 		logFile.Fatal("Error creating controller: ", err)
-	}
-
-	//Get Configuration
-	if conf, err = config.New(); err != nil {
-		logFile.Fatal("Error getting configuration info: ", err)
 	}
 
 	//Command Line flags
@@ -75,6 +75,7 @@ func handleFlags() {
 	}
 
 	if *reset {
+		//TODO: backup to configPath
 		backupDatabase("backup.sqlite")
 		if err := c.ClearInputOutputRecords(); err != nil {
 			log.Print("Error clearing Input and Output records" + err.Error())

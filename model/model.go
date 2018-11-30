@@ -26,8 +26,8 @@ func New() (Model, error) {
 	}
 	model.conf = conf
 
-	dbPath, _ := homedir.Expand((conf.GetString("dbPath")))
-	file := dbPath + "/abv.sqlite"
+	configPath, _ := homedir.Expand((conf.GetString("configPath")))
+	file := configPath + "/abv.sqlite"
 	if _, err := os.Stat(file); os.IsNotExist(err) {
 		os.Create(file)
 	}
