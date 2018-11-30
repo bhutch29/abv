@@ -11,7 +11,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"path"
+	"github.com/bhutch29/abv/cache"
 )
 
 var (
@@ -57,46 +57,18 @@ func healthCheck(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 func getInventory(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	setHeader(w)
 	drinks, err := m.GetInventory()
-	cacheImages(drinks)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	json.NewEncoder(w).Encode(drinks)
-}
 
-func cacheImages(drinks []model.StockedDrink) {
+	var urls []string
 	for _, drink := range drinks {
-		cacheImageFromURL(drink.Logo)
+		urls = append(urls, drink.Logo)
 	}
-}
 
-func cacheImageFromURL(url string) {
-	file := path.Base(url)
-	if !exists("images/" + file) {
-		response, err := http.Get(url)
-		if err != nil {
-			return
-		}
-		defer response.Body.Close()
+	cache.Images(urls)
 
-		_ = os.MkdirAll("images", os.ModePerm)
-		f, err := os.Create("images/" + file)
-		if err != nil {
-			log.Fatal("Could not create file")
-		}
-		defer f.Close()
-
-		_, _ = io.Copy(f, response.Body)
-	}
-}
-
-func exists(name string) bool {
-	if _, err := os.Stat(name); err != nil {
-		if os.IsNotExist(err) {
-			return false
-		}
-	}
-	return true
+	json.NewEncoder(w).Encode(drinks)
 }
 
 func setHeader(w http.ResponseWriter) {
