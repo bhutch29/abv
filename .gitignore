@@ -6,6 +6,8 @@
 #unignore makefile
 !makefile
 
+images
+
 *.sqlite
 *.exe
 *.exe~

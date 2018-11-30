@@ -5,40 +5,28 @@
     <title>ABV</title>
 
     <link rel="stylesheet"
-          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
-          integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB"
-          crossorigin="anonymous">
-    <link rel="stylesheet"
           type="text/css"
           href="static/css/home.css">
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
-            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-            crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"
-            integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T"
-            crossorigin="anonymous"></script>
-    <!-- <script src="static/js/home.js"></script> -->
+
+    <script src="static/js/jquery-3.3.1.min.js"></script>
+    <script src="static/js/main.js"></script>
+    <script src="static/js/mustache.min.js"></script>
+
+    <script type="text/html" id="beer-entry">
+        <div class="wrapper">
+            <div class="image">
+                <img src="{{Logo}}">
+            </div>
+            <div id="brand"> {{Brand}} </div>
+            <div id="name"> {{Name}} </div>
+            <div id="abv"> ABV:{{Abv}} </div>
+            <div id="ibu"> IBU:{{Ibu}} </div>
+            <div id="type"> {{Shorttype}} </div>
+            <div id="quantity"> {{Quantity}} </div>
+        </div>
+    </script>
 </head>
 <body>
-
-<div id="mainWindow" class="container">
-    <div class="d-flex flex-column">
-    {{$drinks := .Drinks}}
-
-    {{range $di, $d := $drinks}}
-        <div class="d-flex flex-row p-2 bg-info">
-            <div class="p-1 container"> <img src="{{$d.Logo}}"> </div>
-            <div class="p-1 container"> {{$d.Quantity}} </div>
-            <div class="p-1 container"> {{$d.Brand}} </div>
-            <div class="p-1 container"> {{$d.Name}} </div>
-            <div class="p-1 container"> ABV: {{$d.Abv}} </div>
-            <div class="p-1 container"> IBU: {{$d.Ibu}} </div>
-            <div class="p-1 container"> {{$d.Type}} </div>
-            <div class="p-1 container"> {{$d.Country}} </div>
-        </div>
-    {{end}}
-    </div>
-</div>
-
+    <div id="beer-list" class="grid-container" > </div>
 </body>
 </html>

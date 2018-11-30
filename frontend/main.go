@@ -4,28 +4,25 @@ import (
 	"encoding/json"
 	"github.com/bhutch29/abv/model"
 	"github.com/julienschmidt/httprouter"
-	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"time"
+	"flag"
+	"fmt"
+	"os"
 )
+
+var version = "undefined"
 
 // Page is the backing type for all pages
 type Page struct {
-	MainWindowHTML template.HTML
 }
 
 // FrontPage is the primary view object
 type FrontPage struct {
 	Page
 	Drinks []model.StockedDrink
-}
-
-func newPage() Page {
-	var page Page
-	page.MainWindowHTML = template.HTML(stringFromFile("frontPage.html"))
-	return page
 }
 
 func stringFromFile(path string) string {
@@ -35,40 +32,52 @@ func stringFromFile(path string) string {
 
 func newFrontPage() FrontPage {
 	var frontPage FrontPage
-	frontPage.Page = newPage()
+	frontPage.Page = Page{}
 	return frontPage
 }
 
-var templates = template.Must(template.ParseFiles("front.html"))
-
 func main() {
+	handleFlags()
+
 	router := httprouter.New()
 
 	router.GET("/", frontPageHandler)
+
+	router.ServeFiles("/images/*filepath", http.Dir("images"))
+
 	router.GET("/static/css/*filePath", cssHandler)
 	router.GET("/static/js/*filePath", jsHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
+func handleFlags(){
+	ver := flag.Bool("version", false, "Prints the version")
+	flag.Parse()
+
+	if *ver {
+		fmt.Println(version)
+		os.Exit(0)
+	}
+}
+
 func jsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Add("Content-Type", "application/javascript")
 	path := ps.ByName("filePath")
-	http.ServeFile(w, r, "static/js"+path)
+	//TODO: change hardcoded frontend path?
+	http.ServeFile(w, r, "frontend/static/js"+path)
 }
 
 func cssHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Add("Content-Type", "text/css")
 	path := ps.ByName("filePath")
-	http.ServeFile(w, r, "static/css/"+path)
+	//TODO: change hardcoded frontend path?
+	http.ServeFile(w, r, "frontend/static/css/"+path)
 }
 
 func frontPageHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	p := newFrontPage()
-	err := getJSON("http://localhost:8081/inventory", &p.Drinks)
-	checkError(err, w)
-	err = templates.ExecuteTemplate(w, "front.html", p)
-	checkError(err, w)
+	//TODO: change hardcoded frontend path?
+	http.ServeFile(w, r, "frontend/front.html")
 }
 
 var myClient = &http.Client{Timeout: 10 * time.Second}
