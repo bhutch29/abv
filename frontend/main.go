@@ -57,7 +57,7 @@ func main() {
 	router.GET("/", frontPageHandler)
 
 	router.ServeFiles("/images/*filepath", http.Dir(imagePath))
-	router.ServeFiles("static/fonts/*filepath", http.Dir(fontPath))
+	router.ServeFiles("/static/fonts/*filepath", http.Dir(fontPath))
 
 	router.GET("/static/css/*filePath", cssHandler)
 	router.GET("/static/js/*filePath", jsHandler)
