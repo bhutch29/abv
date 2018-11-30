@@ -5,27 +5,33 @@ import (
 	"github.com/mitchellh/go-homedir"
 )
 
-// New returns a copy of a preconfigured Viper configuration helper
+var v *viper.Viper
+
+// New returns a preconfigured Viper configuration helper
 func New() (*viper.Viper, error) {
-	v := viper.New()
-	v.SetConfigName("config")
-	home, err := homedir.Dir()
-	if err != nil {
-		return nil, err
-	}
-	v.AddConfigPath(home + "/.abv/")
-	v.AddConfigPath(".")
+	if v == nil {
+		v = viper.New()
+		v.SetConfigName("config")
+		home, err := homedir.Dir()
+		if err != nil {
+			return nil, err
+		}
+		v.AddConfigPath(home + "/.abv/")
+		v.AddConfigPath(".")
 
-	v.WatchConfig()
+		v.WatchConfig()
 
-	v.SetEnvPrefix("abv")
-	v.BindEnv("untappdId")
-	v.BindEnv("untappdSecret")
+		v.SetEnvPrefix("abv")
+		v.BindEnv("untappdId")
+		v.BindEnv("untappdSecret")
 
-	// v.SetDefault("", "")
+		v.SetDefault("imageCachePath", home + "/.abv/images")
+		v.SetDefault("dbPath", home + "/.abv")
+		v.SetDefault("webRoot", "/srv/http")
 
-	if err = v.ReadInConfig(); err != nil {
-		return nil, err
+		if err = v.ReadInConfig(); err != nil {
+			return nil, err
+		}
 	}
 
 	return v, nil

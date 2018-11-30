@@ -8,6 +8,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/spf13/viper"
 	"github.com/bhutch29/abv/config"
+	"github.com/mitchellh/go-homedir"
 )
 
 // Model controls all the data flow into and out of the db layer
@@ -25,7 +26,8 @@ func New() (Model, error) {
 	}
 	model.conf = conf
 
-	file := "abv.sqlite"
+	dbPath, _ := homedir.Expand((conf.GetString("dbPath")))
+	file := dbPath + "/abv.sqlite"
 	if _, err := os.Stat(file); os.IsNotExist(err) {
 		os.Create(file)
 	}
