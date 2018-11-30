@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"syscall"
 )
 
 // nickname maps formal brewery names to their shortened nicknames
@@ -23,15 +22,7 @@ func (d Drink) BrandNick() string {
 func init() {
 	file, err := os.Open("nicknames.utf8")
 	if err != nil {
-		if err.(*os.PathError).Err != syscall.ERROR_FILE_NOT_FOUND {
-			log.Print(err)
-			return
-		}
-		file, err = os.Open("../nicknames.utf8")
-		if err != nil {
-			log.Print(err)
-			return
-		}
+		return
 	}
 
 	r := csv.NewReader(file)
