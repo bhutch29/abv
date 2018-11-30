@@ -13,6 +13,7 @@ import (
 	"github.com/jroimartin/gocui"
 	aur "github.com/logrusorgru/aurora"
 	"github.com/sirupsen/logrus"
+	"github.com/bhutch29/abv/cache"
 )
 
 var (
@@ -239,6 +240,8 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 		logAllError(err)
 		return nil
 	}
+
+	cache.Image(d.Logo)
 
 	d.Barcode = c.LastBarcode()
 	d.Shorttype = shortenType(d.Type)

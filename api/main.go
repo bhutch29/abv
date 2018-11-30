@@ -61,12 +61,9 @@ func getInventory(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	var urls []string
 	for _, drink := range drinks {
-		urls = append(urls, drink.Logo)
+		cache.Image(drink.Logo)
 	}
-
-	cache.Images(urls)
 
 	json.NewEncoder(w).Encode(drinks)
 }

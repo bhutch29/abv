@@ -8,14 +8,8 @@ import (
 	"io"
 )
 
-// Images queries and saves images from the provided urls if they aren't cached already
-func Images(urls []string) {
-	for _, url := range urls {
-		cacheImageFromURL(url)
-	}
-}
-
-func cacheImageFromURL(url string) {
+// Image queries and saves an image from the provided url if it isn't cached already
+func Image(url string) {
 	file := path.Base(url)
 	if !exists("images/" + file) {
 		response, err := http.Get(url)
