@@ -5,7 +5,7 @@ let timer = 5000;
 let beersPerPage = 16;
 
 function changePage(){
-    $.getJSON("http://localhost:8081/inventory", function(beers){
+    $.getJSON("http://192.168.0.100:8081/inventory", function(beers){
         $("#beer-list").empty();
         if (persist.index >= beers.length) {
             persist.index = 0;
