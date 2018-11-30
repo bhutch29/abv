@@ -14,6 +14,8 @@ import (
 	aur "github.com/logrusorgru/aurora"
 	"github.com/sirupsen/logrus"
 	"github.com/bhutch29/abv/cache"
+	"github.com/spf13/viper"
+	"github.com/bhutch29/abv/config"
 )
 
 var (
@@ -21,8 +23,7 @@ var (
 	c          ModalController
 	drinks     []model.Drink
 	quantity   int
-	undoString = "65748392"
-	redoString = "9384756"
+	conf       *viper.Viper
 	version    = "undefined"
 )
 
@@ -35,6 +36,11 @@ func main() {
 	var err error
 	if c, err = New(); err != nil {
 		logFile.Fatal("Error creating controller: ", err)
+	}
+
+	//Get Configuration
+	if conf, err = config.New(); err != nil {
+		logFile.Fatal("Error getting configuration info: ", err)
 	}
 
 	//Command Line flags
@@ -117,9 +123,9 @@ func refreshInventory() error {
 	for _, drink := range inventory {
 		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
 		if len(drink.Name) < 30 {
-			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.BrandNick(), drink.Name)
+			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name)
 		} else {
-			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.BrandNick(), drink.Name[:30])
+			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name[:30])
 			fmt.Fprintf(view, "%-4s%-35s%-30s\n", "", drink.Name[30:], "")
 		}
 	}
@@ -134,10 +140,12 @@ func parseInput(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	id, barcode := parseIDFromBarcode(bc)
-	if barcode == undoString {
+	undoCode := conf.GetString("undoBarcode")
+	redoCode := conf.GetString("redoBarcode")
+	if barcode == undoCode {
 		c.Undo(id)
 		refreshInventory()
-	} else if barcode == redoString {
+	} else if barcode == redoCode {
 		c.Redo(id)
 		refreshInventory()
 	} else {
@@ -217,7 +225,7 @@ func updatePopup(name string) {
 
 	v.Clear()
 	for _, drink := range drinks {
-		fmt.Fprintf(v, "%s: %s\n", drink.BrandNick(), drink.Name)
+		fmt.Fprintf(v, "%s: %s\n", drink.Brand, drink.Name)
 	}
 
 	g.SetCurrentView(popup)
@@ -274,7 +282,7 @@ func findDrinkFromSelection(line string) (model.Drink, error) {
 	logFile.Debug("Determined that brand = " + brand + " and name = " + name)
 
 	for _, drink := range drinks {
-		if drink.BrandNick() == brand && drink.Name == name {
+		if drink.Brand == brand && drink.Name == name {
 			return drink, nil
 		}
 	}

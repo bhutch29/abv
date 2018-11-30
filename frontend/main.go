@@ -11,9 +11,14 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"github.com/bhutch29/abv/config"
+	"github.com/spf13/viper"
 )
 
-var version = "undefined"
+var (
+	conf *viper.Viper
+	version = "undefined"
+)
 
 // Page is the backing type for all pages
 type Page struct {
@@ -39,11 +44,18 @@ func newFrontPage() FrontPage {
 func main() {
 	handleFlags()
 
+	var err error
+	conf, err = config.New()
+	if err != nil {
+		log.Fatal("Could not get configuration: ", err)
+	}
+	imagePath := conf.GetString("imageCachePath")
+
 	router := httprouter.New()
 
 	router.GET("/", frontPageHandler)
 
-	router.ServeFiles("/images/*filepath", http.Dir("images"))
+	router.ServeFiles("/images/*filepath", http.Dir(imagePath))
 
 	router.GET("/static/css/*filePath", cssHandler)
 	router.GET("/static/js/*filePath", jsHandler)
@@ -64,20 +76,20 @@ func handleFlags(){
 func jsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Add("Content-Type", "application/javascript")
 	path := ps.ByName("filePath")
-	//TODO: change hardcoded frontend path?
-	http.ServeFile(w, r, "frontend/static/js"+path)
+	root := conf.GetString("webRoot")
+	http.ServeFile(w, r, root + "/static/js"+path)
 }
 
 func cssHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Add("Content-Type", "text/css")
 	path := ps.ByName("filePath")
-	//TODO: change hardcoded frontend path?
-	http.ServeFile(w, r, "frontend/static/css/"+path)
+	root := conf.GetString("webRoot")
+	http.ServeFile(w, r, root + "/static/css/"+path)
 }
 
 func frontPageHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	//TODO: change hardcoded frontend path?
-	http.ServeFile(w, r, "frontend/front.html")
+	root := conf.GetString("webRoot")
+	http.ServeFile(w, r, root + "/front.html")
 }
 
 var myClient = &http.Client{Timeout: 10 * time.Second}

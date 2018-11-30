@@ -1,0 +1,24 @@
+# Configuration file for ABV
+
+undoBarcode = 9876543
+redoBarcode = 1234567
+
+# Set location to cache brewery images for web menu. Do not use trailing slash. Defaults to ~/.abv/images
+#imageCachePath = /var/temp
+
+# Set location of sqlite file. Do not use trailing slash. Defaults to ~/.abv
+#dbPath = ~/.abv/db
+
+# Set the web root directory (directory containing the front page html and the static/ folder). Do not use trailing slash. Defaults to /srv/http
+#webRoot = ~/.abv/www
+
+[breweryNicknames]
+"Lagunitas Brewing Company" = "Lagunitas"
+"Blue Moon Brewing Company" = "Blue Moon"
+"Deschutes Brewery" = "Deschutes"
+"Einstök Ölgerð" = "Einstök"
+"Sierra Nevada Brewing Co." = "Sierra Nevada"
+
+[beerNicknames]
+"Anchor Steam Beer" = "Anchor Steam"
+"60 Minute IPA" = "60 Minute"

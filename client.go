@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
 
 	"github.com/bhutch29/abv/model"
 )
@@ -73,11 +72,11 @@ func queryUntappdByName(name string) (map[string]interface{}, error) {
 }
 
 func fetchClientCredentials() (clientID, clientSecret string, err error) {
-	clientID = os.Getenv("UntappdID")
+	clientID = conf.GetString("untappdId")
 	if clientID == "" {
 		return clientID, clientSecret, errors.New("UntappdID not supplied by client")
 	}
-	clientSecret = os.Getenv("UntappdSecret")
+	clientSecret = conf.GetString("untappdSecret")
 	if clientSecret == "" {
 		return clientID, clientSecret, errors.New("UntappdSecret not supplied by client")
 	}

@@ -6,18 +6,28 @@ import (
 	"github.com/jmoiron/sqlx"
 	// Registers the sqlite3 db driver
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/spf13/viper"
+	"github.com/bhutch29/abv/config"
+	"github.com/mitchellh/go-homedir"
 )
 
 // Model controls all the data flow into and out of the db layer
 type Model struct {
 	db *sqlx.DB
+	conf *viper.Viper
 }
 
 // New creates a new fully initialized Model
 func New() (Model, error) {
 	model := Model{}
+	conf, err := config.New()
+	if err != nil {
+		return model, err
+	}
+	model.conf = conf
 
-	file := "abv.sqlite"
+	dbPath, _ := homedir.Expand((conf.GetString("dbPath")))
+	file := dbPath + "/abv.sqlite"
 	if _, err := os.Stat(file); os.IsNotExist(err) {
 		os.Create(file)
 	}
