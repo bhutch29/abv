@@ -34,7 +34,7 @@ func main() {
 	//Create Controller
 	var err error
 	if c, err = New(); err != nil {
-		logFile.Error("Error creating controller: ", err)
+		logFile.Fatal("Error creating controller: ", err)
 	}
 
 	//Command Line flags
