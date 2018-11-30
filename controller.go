@@ -20,7 +20,7 @@ type ModalController struct {
 	currentMode Mode
 	backend     model.Model
 	lastBarcode string
-	lastID string
+	lastID      string
 	actor       undo.Actor
 }
 
@@ -77,14 +77,14 @@ func (c *ModalController) NewDrink(id string, d model.Drink, quantity int) error
 		return errors.New("NewDrink can only be called from stocking mode")
 	}
 
-	logAllDebug("Parsed ID and Barcode:", "ID=" + id, ", Barcode=" + d.Barcode)
+	logAllDebug("Parsed ID and Barcode:", "ID="+id, ", Barcode="+d.Barcode)
 
 	de := model.DrinkEntry{Barcode: d.Barcode, Quantity: quantity}
 	a := undo.NewCreateAndInputAction(d, de)
 	if err := c.actor.AddAction(id, a); err != nil {
 		return err
 	}
-	logAllInfo("Drink created and added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
+	logAllInfo("Drink created and added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.BrandNick())
 	return nil
 }
 
@@ -121,7 +121,7 @@ func (c *ModalController) handleDrink(id string, bc string, quantity int) {
 			return
 		}
 		if count <= 0 {
-			logAllWarn("That drink was not in the inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
+			logAllWarn("That drink was not in the inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.BrandNick())
 			return
 		}
 		c.outputDrinks(id, d, drink)
@@ -134,7 +134,7 @@ func (c *ModalController) outputDrinks(id string, de model.DrinkEntry, d model.D
 	if err := c.actor.AddAction(id, a); err != nil {
 		logAllError("Could not remove drink from inventory: ", err)
 	} else {
-		logAllInfo("Drink removed from inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
+		logAllInfo("Drink removed from inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.BrandNick())
 	}
 }
 
@@ -144,7 +144,7 @@ func (c *ModalController) inputDrinks(id string, de model.DrinkEntry, d model.Dr
 	if err := c.actor.AddAction(id, a); err != nil {
 		logAllError("Could not add drink to inventory: ", err)
 	} else {
-		logAllInfo("Drink added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
+		logAllInfo("Drink added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.BrandNick())
 	}
 }
 
@@ -163,7 +163,7 @@ func (c *ModalController) ClearInputOutputRecords() error {
 func (c *ModalController) Undo(id string) {
 	acted, err := c.actor.Undo(id)
 	if err != nil {
-		logAllError("Could not undo last action with id = " + id, err)
+		logAllError("Could not undo last action with id = "+id, err)
 	}
 	if acted {
 		logAllInfo("Reverted last action with id = ", id)
@@ -174,7 +174,7 @@ func (c *ModalController) Undo(id string) {
 func (c *ModalController) Redo(id string) {
 	acted, err := c.actor.Redo(id)
 	if err != nil {
-		logAllError("Could not redo last action with id = " + id, err)
+		logAllError("Could not redo last action with id = "+id, err)
 	}
 	if acted {
 		logAllInfo("Redid last action with id = ", id)
