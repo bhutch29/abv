@@ -2,20 +2,21 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/bhutch29/abv/model"
-	"github.com/julienschmidt/httprouter"
-	"github.com/rs/cors"
+	"flag"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"flag"
-	"fmt"
 	"os"
+
 	"github.com/bhutch29/abv/cache"
+	"github.com/bhutch29/abv/model"
+	"github.com/julienschmidt/httprouter"
+	"github.com/rs/cors"
 )
 
 var (
-	m model.Model
+	m       model.Model
 	version = "undefined"
 )
 
@@ -37,7 +38,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8081", corsEnabledHandler))
 }
 
-func handleFlags(){
+func handleFlags() {
 	ver := flag.Bool("version", false, "Prints the version")
 	flag.Parse()
 
@@ -62,7 +63,10 @@ func getInventory(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 	}
 
 	for _, drink := range drinks {
-		cache.Image(drink.Logo)
+		err = cache.Image(drink.Logo)
+		if err != nil {
+			log.Println("Failed HTTP request while caching image for drink: ", drink.Brand, " ", drink.Name)
+		}
 	}
 
 	json.NewEncoder(w).Encode(drinks)

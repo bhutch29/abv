@@ -1,31 +1,32 @@
 package cache
 
 import (
-	"path"
+	"io"
+	"log"
 	"net/http"
 	"os"
-	"log"
-	"io"
+	"path"
+
 	"github.com/bhutch29/abv/config"
 )
 
 // Image queries and saves an image from the provided url if it isn't cached already
-func Image(url string) {
+func Image(url string) error {
 	conf, err := config.New()
 	if err != nil {
 		log.Fatal("Could not get configuration: ", err)
 	}
 	imagePath := conf.GetString("imageCachePath")
 
-	file := path.Base(url)
-	if !exists(imagePath + "/" + file) {
+	file := path.Join(imagePath, path.Base(url))
+	if !exists(file) {
 		response, err := http.Get(url)
 		if err != nil {
-			return
+			return err
 		}
 
 		_ = os.MkdirAll(imagePath, os.ModePerm)
-		f, err := os.Create(imagePath + "/" + file)
+		f, err := os.Create(file)
 		if err != nil {
 			log.Fatal("Could not create file: ", err)
 		}
@@ -35,6 +36,7 @@ func Image(url string) {
 		response.Body.Close()
 		f.Close()
 	}
+	return nil
 }
 
 func exists(name string) bool {
