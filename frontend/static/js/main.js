@@ -1,8 +1,8 @@
 let persist = {};
 persist.index = 0;
 
-let timer = 5000;
-let beersPerPage = 16;
+let timer = 12000;
+let beersPerPage = 16; // must also change CSS grid number
 
 function changePage(){
     $.getJSON("http://localhost:8081/inventory", function(beers){

@@ -28,6 +28,7 @@ func (m *Model) GetAllStoredDrinks() ([]Drink, error) {
 func (m *Model) setDrinksNicknames(drinks []Drink) []Drink {
 	brandNicks := m.conf.GetStringMapString("breweryNicknames")
 	beerNicks := m.conf.GetStringMapString("beerNicknames")
+	styleNicks := m.conf.GetStringMapString("styleNicknames")
 	var result []Drink
 	for _, drink := range drinks {
 		if nick, ok := brandNicks[strings.ToLower(drink.Brand)]; ok {
@@ -35,6 +36,10 @@ func (m *Model) setDrinksNicknames(drinks []Drink) []Drink {
 		}
 		if nick, ok := beerNicks[strings.ToLower(drink.Name)]; ok {
 			drink.Name = nick
+		}
+		if nick, ok := styleNicks[strings.ToLower(drink.Type)]; ok {
+			drink.Type = nick
+			drink.Shorttype = nick
 		}
 		result = append(result, drink)
 	}
@@ -44,6 +49,7 @@ func (m *Model) setDrinksNicknames(drinks []Drink) []Drink {
 func (m *Model) setStockedDrinksNicknames(drinks []StockedDrink) []StockedDrink {
 	brandNicks := m.conf.GetStringMapString("breweryNicknames")
 	beerNicks := m.conf.GetStringMapString("beerNicknames")
+	styleNicks := m.conf.GetStringMapString("styleNicknames")
 	var result []StockedDrink
 	for _, drink := range drinks {
 		if nick, ok := brandNicks[strings.ToLower(drink.Brand)]; ok {
@@ -51,6 +57,10 @@ func (m *Model) setStockedDrinksNicknames(drinks []StockedDrink) []StockedDrink 
 		}
 		if nick, ok := beerNicks[strings.ToLower(drink.Name)]; ok {
 			drink.Name = nick
+		}
+		if nick, ok := styleNicks[strings.ToLower(drink.Type)]; ok {
+			drink.Type = nick
+			drink.Shorttype = nick
 		}
 		result = append(result, drink)
 	}
@@ -60,11 +70,16 @@ func (m *Model) setStockedDrinksNicknames(drinks []StockedDrink) []StockedDrink 
 func (m *Model) setDrinkNickname(drink Drink) Drink {
 	brandNicks := m.conf.GetStringMapString("breweryNicknames")
 	beerNicks := m.conf.GetStringMapString("beerNicknames")
+	styleNicks := m.conf.GetStringMapString("styleNicknames")
 	if nick, ok := brandNicks[strings.ToLower(drink.Brand)]; ok {
 		drink.Brand = nick
 	}
 	if nick, ok := beerNicks[strings.ToLower(drink.Name)]; ok {
 		drink.Name = nick
+	}
+	if nick, ok := styleNicks[strings.ToLower(drink.Type)]; ok {
+		drink.Type = nick
+		drink.Shorttype = nick
 	}
 	return drink
 }
