@@ -134,7 +134,12 @@ func (c *ModalController) outputDrinks(id string, de model.DrinkEntry, d model.D
 	if err := c.actor.AddAction(id, a); err != nil {
 		logAllError("Could not remove drink from inventory: ", err)
 	} else {
-		logAllInfo("Drink removed from inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
+		count, err := c.backend.GetCountByBarcode(d.Barcode)
+		if err != nil {
+			logAllError("Could not get count by barcode: ", err)
+			return
+		}
+		logAllInfo("Drink removed from inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand, "\n  Remaining: ", count)
 	}
 }
 
