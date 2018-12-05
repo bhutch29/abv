@@ -50,14 +50,14 @@ func main() {
 		log.Fatal("Could not get configuration: ", err)
 	}
 	imagePath := conf.GetString("imageCachePath")
-	fontPath := conf.GetString("configPath") + "/fonts"
+	fontPath := conf.GetString("configPath") + "/static/fonts"
 
 	router := httprouter.New()
 
 	router.GET("/", frontPageHandler)
 
 	router.ServeFiles("/images/*filepath", http.Dir(imagePath))
-	router.ServeFiles("/fonts/*filepath", http.Dir(fontPath))
+	router.ServeFiles("/static/fonts/*filepath", http.Dir(fontPath))
 
 	router.GET("/static/css/*filePath", cssHandler)
 	router.GET("/static/js/*filePath", jsHandler)
