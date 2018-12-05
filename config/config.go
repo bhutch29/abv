@@ -25,7 +25,6 @@ func New() (*viper.Viper, error) {
 		v.BindEnv("untappdId")
 		v.BindEnv("untappdSecret")
 
-		v.SetDefault("imageCachePath", home + "/.abv/images")
 		v.SetDefault("configPath", home + "/.abv")
 		v.SetDefault("webRoot", "/srv/http")
 

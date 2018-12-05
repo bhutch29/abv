@@ -16,8 +16,8 @@ func Image(url string) error {
 	if err != nil {
 		log.Fatal("Could not get configuration: ", err)
 	}
-	imagePath := conf.GetString("imageCachePath")
 
+	imagePath := path.Join(conf.GetString("webRoot"), "images")
 	file := path.Join(imagePath, path.Base(url))
 	if !exists(file) {
 		response, err := http.Get(url)

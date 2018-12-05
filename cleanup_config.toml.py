@@ -28,9 +28,6 @@ CONFIG_TEMPLATE = """# Configuration file for ABV
 undoBarcode = "{undo}"
 redoBarcode = "{redo}"
 
-# Set location to cache brewery images for web menu. Do not use trailing slash. Defaults to ~/.abv/images
-#imageCachePath = /var/temp
-
 # Set location of config files. Do not use trailing slash. Defaults to ~/.abv
 #configPath = ~/etc/abv
 

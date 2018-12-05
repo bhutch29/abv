@@ -4,9 +4,6 @@
 undoBarcode = "036000374575"
 redoBarcode = "1234567"
 
-# Set location to cache brewery images for web menu. Do not use trailing slash. Defaults to ~/.abv/images
-#imageCachePath = /var/temp
-
 # Set location of config files. Do not use trailing slash. Defaults to ~/.abv
 #configPath = ~/etc/abv
 

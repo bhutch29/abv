@@ -13,6 +13,7 @@ import (
 	"os"
 	"github.com/bhutch29/abv/config"
 	"github.com/spf13/viper"
+	"path"
 )
 
 var (
@@ -49,8 +50,8 @@ func main() {
 	if err != nil {
 		log.Fatal("Could not get configuration: ", err)
 	}
-	imagePath := conf.GetString("imageCachePath")
-	fontPath := conf.GetString("configPath") + "/static/fonts"
+	imagePath := path.Join(conf.GetString("configPath"), "images")
+	fontPath := path.Join(conf.GetString("webRoot"), "static", "fonts")
 
 	router := httprouter.New()
 
