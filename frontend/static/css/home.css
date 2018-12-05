@@ -102,10 +102,18 @@ table, td {
     color: rgba(255, 0, 47, 0.6);
 }
 
+#abv #abv-value {
+    color: rgba(255, 255, 255, 0.6);
+}
+
 #ibu {
     grid-column: 8;
     grid-row: 2;
     color: rgba(255, 0, 47, 0.6);
+}
+
+#ibu #ibu-value {
+    color: rgba(255, 255, 255, 0.6);
 }
 
 #type {
@@ -119,3 +127,11 @@ table, td {
     grid-row: 2;
     color: rgba(255, 0, 47, 0.6);
 }
+#quantity #quantity-value-high {
+    color: rgba(0, 255, 0, 0.6);
+}
+
+#quantity #quantity-value-low {
+    color: rgba(255, 0, 47, 0.6);
+}
+
