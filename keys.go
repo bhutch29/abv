@@ -22,6 +22,7 @@ var keys = []key{
 	{"", gocui.KeyCtrlR, redoLastKeyboardAction, "Ctrl-r", "redo"},
 	{"", gocui.KeyCtrlC, quit, "Ctrl-c", "quit"},
 	{"", gocui.KeyF1, setQuantity1, "F1", "single"},
+	{"", gocui.KeyF4, setQuantity4, "F4", "four-pack"},
 	{"", gocui.KeyF6, setQuantity6, "F6", "six-pack"},
 	{"", gocui.KeyF12, setQuantity12, "F12", "twelve-pack"},
 	{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},

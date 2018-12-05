@@ -341,6 +341,11 @@ func setQuantity1(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
+func setQuantity4(g *gocui.Gui, v *gocui.View) error {
+	trySetQuantity(4)
+	return nil
+}
+
 func setQuantity6(g *gocui.Gui, v *gocui.View) error {
 	trySetQuantity(6)
 	return nil
