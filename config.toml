@@ -1,0 +1,62 @@
+# Configuration file for ABV
+
+# Barcodes should be strings, because leading zeros are not allowed
+undoBarcode = "036000374575"
+redoBarcode = "1234567"
+
+# Set location to cache brewery images for web menu. Do not use trailing slash. Defaults to ~/.abv/images
+#imageCachePath = /var/temp
+
+# Set location of config files. Do not use trailing slash. Defaults to ~/.abv
+#configPath = ~/etc/abv
+
+# Set the web root directory (directory containing the front page html and the static/ folder). Do not use trailing slash. Defaults to /srv/http
+#webRoot = ~/.abv/www
+
+[breweryNicknames]
+"10 Barrel Brewing Co."                    = "10 Barrel"
+"101 North Brewing Company"                = "101 North"
+"Abbaye Notre-Dame de Saint-Rémy"          = "Trappist Abbey of Rochefort"
+"Ace Cider (The California Cider Company)" = "Ace Cider"
+"AleSmith Brewing Company"                 = "AleSmith"
+"Anderson Valley Brewing Company"          = "Anderson Valley"
+"Ballast Point Brewing Company"            = "Ballast Point"
+"Bayerische Staatsbrauerei Weihenstephan"  = "Weihenstephaner"
+"Blue Moon Brewing Company"                = "Blue Moon"
+"Deschutes Brewery"                        = "Deschutes"
+"Dogfish Head Craft Brewery"               = "Dogfish Head"
+"Dust Bowl Brewing Company"                = "Dust Bowl"
+"Eel River Brewing Company"                = "Eel River"
+"Einstök Ölgerð"                           = "Einstök"
+"Epic Brewing Co. (Utah, Colorado)"        = "Epic Brewing"
+"Firestone Walker Brewing Company"         = "Firestone Walker"
+"HenHouse Brewing Company"                 = "HenHouse"
+"Jacob Leinenkugel Brewing Company"        = "Jacob Leinenkugel"
+"Kona Brewing Company"                     = "Kona"
+"Lagunitas Brewing Company"                = "Lagunitas"
+"Mother Earth Brewing Company"             = "Mother Earth"
+"New Belgium Brewing Company"              = "New Belgium"
+"North Coast Brewing Company"              = "North Coast"
+"Sierra Nevada Brewing Co."                = "Sierra Nevada"
+"Sudwerk Brewing Co."                      = "Sudwerk"
+
+[beerNicknames]
+"60 Minute IPA"                        = "60 Minute"
+"Ace - Dry Apple Craft Cider"          = "Dry Apple Craft Cider"
+"Aloha Sculpin Hazy IPA"               = "Aloha Sculpin"
+"Anchor Steam Beer"                    = "Anchor Steam"
+"Barney Flats Oatmeal Stout"           = "Barney Flats"
+"Black Butte Porter"                   = "Black Butte"
+"Fresh Squeezed IPA"                   = "Fresh Squeezed"
+"Hefeweizen Bavarian Wheat"            = "Bavarian Wheat"
+"Heroine IPA"                          = "Heroine"
+"Hop Henge Imperial IPA (2018)"        = "Hop Henge"
+"Monk's Café Flemish Sour Ale"         = "Monk's Café"
+"Organic California Blonde Ale"        = "California Blonde Ale"
+"Oude Geuze (Vieille)"                 = "Oude Geuze"
+"Sin-Tax Imperial Peanut Butter Stout" = "Sin-Tax Peanut Butter Stout"
+"Space Dust IPA"                       = "Space Dust"
+"Stone Enjoy By 01.01.19 Brut IPA"     = "Enjoy By"
+"Tart 'N Juicy Sour IPA"               = "Tart 'N Juicy"
+"Weihenstephaner Hefeweissbier"        = "Weihenstephaner"
+"Wildcide Hard Cider"                  = "Wildcide"

@@ -1,1 +1,22 @@
+#Ignore files without extensions
+*
+!/**/
+!*.*
+
+#unignore makefile
+!makefile
+
+images
+
 *.sqlite
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+*.log
+
+.idea
