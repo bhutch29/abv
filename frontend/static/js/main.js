@@ -5,7 +5,7 @@ let timer = 5000;
 let beersPerPage = 16;
 
 function changePage(){
-    $.getJSON("http://192.168.0.100:8081/inventory", function(beers){
+    $.getJSON("http://localhost:8081/inventory", function(beers){
         $("#beer-list").empty();
         if (persist.index >= beers.length) {
             persist.index = 0;
@@ -18,6 +18,7 @@ function changePage(){
             var url = beers[i].Logo;
             var file = url.substring(url.lastIndexOf('/') + 1);
             beers[i].Logo = "/images/" + file;
+            //TODO: Add id="quantity-value-high" or id="quantity-value-low" to all .quantity-view based on quantity
             var html = Mustache.to_html($('#beer-entry').html(), beers[i]);
             $('<div class="grid-item"/>').html(html).appendTo('#beer-list');
         }
