@@ -1,11 +1,11 @@
 let persist = {};
 persist.index = 0;
 
-let timer = 5000;
-let beersPerPage = 16;
+let timer = 12000;
+let beersPerPage = 16; // must also change CSS grid number
 
 function changePage(){
-    $.getJSON("http://192.168.0.100:8081/inventory", function(beers){
+    $.getJSON("http://localhost:8081/inventory", function(beers){
         $("#beer-list").empty();
         if (persist.index >= beers.length) {
             persist.index = 0;
