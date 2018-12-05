@@ -60,3 +60,7 @@ redoBarcode = "1234567"
 "Tart 'N Juicy Sour IPA"               = "Tart 'N Juicy"
 "Weihenstephaner Hefeweissbier"        = "Weihenstephaner"
 "Wildcide Hard Cider"                  = "Wildcide"
+
+[styleNicknames]
+"Saison / Farmhouse Ale"                 = "Farmhouse Ale"
+"Shandy / Radler"                        = "Shandy"
