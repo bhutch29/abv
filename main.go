@@ -9,22 +9,22 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/bhutch29/abv/cache"
+	"github.com/bhutch29/abv/config"
 	"github.com/bhutch29/abv/model"
 	"github.com/jroimartin/gocui"
 	aur "github.com/logrusorgru/aurora"
 	"github.com/sirupsen/logrus"
-	"github.com/bhutch29/abv/cache"
 	"github.com/spf13/viper"
-	"github.com/bhutch29/abv/config"
 )
 
 var (
-	g          *gocui.Gui
-	c          ModalController
-	drinks     []model.Drink
-	quantity   int
-	conf       *viper.Viper
-	version    = "undefined"
+	g        *gocui.Gui
+	c        ModalController
+	drinks   []model.Drink
+	quantity int
+	conf     *viper.Viper
+	version  = "undefined"
 )
 
 func main() {
@@ -250,7 +250,10 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 		return nil
 	}
 
-	cache.Image(d.Logo)
+	err = cache.Image(d.Logo)
+	if err != nil {
+		logAllError("Failed HTTP request while caching image for drink: ", d.Brand, " ", d.Name)
+	}
 
 	d.Barcode = c.LastBarcode()
 	d.Shorttype = shortenType(d.Type)
