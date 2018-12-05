@@ -148,7 +148,7 @@ func (vd *viewDrawer) makeInfoPanel() error {
 func (vd *viewDrawer) makePromptPanels() error {
 	promptStartHeight := vd.maxY - inputHeight
 	promptDividerHeight := vd.maxY - (inputHeight / 2)
-	promptString := generateKeybindString()
+	promptString := generateKeybindString(quantity)
 
 	if v, err := g.SetView(prompt, 0, promptStartHeight, vd.maxX, promptDividerHeight); err != nil {
 		if err != gocui.ErrUnknownView {

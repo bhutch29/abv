@@ -27,6 +27,22 @@ var (
 	version  = "undefined"
 )
 
+func init() {
+	quantity = 1
+
+	initializekeys()
+
+	//Setup loggers
+	f := logrus.TextFormatter{}
+	f.ForceColors = true
+	f.DisableTimestamp = true
+	f.DisableLevelTruncation = true
+	logGui.Formatter = &f
+	logGui.SetLevel(logrus.InfoLevel)
+	logFile.SetLevel(logrus.DebugLevel)
+}
+
+
 func main() {
 	//Get Configuration
 	var err error
@@ -306,6 +322,7 @@ func setInputMode(g *gocui.Gui, v *gocui.View) error {
 func setOutputMode(g *gocui.Gui, v *gocui.View) error {
 	if m := c.GetMode(); m != serving {
 		c.SetMode(serving)
+		setQuantity1(g, v)
 		updatePromptSymbol()
 		logGui.Infof("Changed to %s Mode", aur.Green("Serving"))
 		logFile.WithField("mode", serving).Info("Changed Mode")
@@ -333,6 +350,10 @@ func trySetQuantity(q int) {
 	if q != quantity {
 		quantity = q
 		logAllInfo("Quantity of drinks per scan changed to ", quantity)
+
+		v, _ := g.View(prompt)
+		v.Clear()
+		fmt.Fprintf(v, generateKeybindString(q))
 	}
 }
 

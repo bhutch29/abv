@@ -5,6 +5,8 @@ import (
 
 	"github.com/jroimartin/gocui"
 	aur "github.com/logrusorgru/aurora"
+	"strings"
+	"strconv"
 )
 
 type key struct {
@@ -15,7 +17,10 @@ type key struct {
 	shortname string
 }
 
-var keys = []key{
+var keys []key
+
+func initializekeys() {
+	keys= []key{
 	{"", gocui.KeyCtrlI, setInputMode, "Ctrl-i", "stocking"},
 	{"", gocui.KeyCtrlO, setOutputMode, "Ctrl-o", "serving"},
 	{"", gocui.KeyCtrlZ, undoLastKeyboardAction, "Ctrl-z", "undo"},
@@ -34,16 +39,29 @@ var keys = []key{
 	{popup, gocui.KeyCtrlJ, popupScrollDown, "Down", "scrollDown"},
 	{popup, gocui.KeyEnter, popupSelectItem, "Enter", "Select"},
 	{errorView, gocui.KeyEsc, hideError, "Esc", "close error dialog"},
+	}
 }
 
-func generateKeybindString() string {
+func generateKeybindString(quantity int) string {
 	var result string
 	for _, k := range keys {
 		if k.viewname == "" {
-			result = result + fmt.Sprintf("%s->%s ", aur.BgGray(aur.Black(k.shortkey)), k.shortname)
+			if getKeyQuantity(k.shortkey) == quantity {
+				result = result + fmt.Sprintf("%s->%s ", aur.BgBlue(aur.Black(k.shortkey)), k.shortname)
+			} else {
+				result = result + fmt.Sprintf("%s->%s ", aur.BgGray(aur.Black(k.shortkey)), k.shortname)
+			}
 		}
 	}
 	return result
+}
+
+func getKeyQuantity(shortkey string) int {
+	res, err := strconv.Atoi(strings.TrimPrefix(shortkey, "F"))
+	if err != nil {
+		return -1
+	}
+	return res
 }
 
 func configureKeys() error {
