@@ -106,9 +106,20 @@ func (m *Model) GetDrinkByBarcode(bc string) (Drink, error) {
 	return d, err
 }
 
-// GetInventory returns every drink with at least one quantity in stock
+// GetInventory returns every drink with at least one quantity in stock, sorted by Type
 func (m *Model) GetInventory() ([]StockedDrink, error) {
+	return m.GetInventorySorted("Shorttype")
+}
+
+// GetInventorySorted returns every drink with at least one quantity in stock, sorted by the provided Field
+func (m *Model) GetInventorySorted(sortField string) ([]StockedDrink, error) {
 	var result []StockedDrink
+	var orderBy string
+	if sortField == "Quantity" {
+		orderBy = "quantity desc"
+	} else {
+		orderBy = "A." + sortField
+	}
 	sql := `
 select A.*,
   case
@@ -133,8 +144,8 @@ left join (
 on A.Barcode = C.Barcode
 
 where quantity > 0
-order by A.Brand
-`
+order by ` + orderBy
+
 	err := m.db.Select(&result, sql)
 	result = m.setStockedDrinksNicknames(result)
 	return result, err

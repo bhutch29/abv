@@ -18,7 +18,7 @@ function changePage(){
             var url = beers[i].Logo;
             var file = url.substring(url.lastIndexOf('/') + 1);
             beers[i].Logo = "/images/" + file;
-            //TODO: Add id="quantity-value-high" or id="quantity-value-low" to all .quantity-view based on quantity
+            //TODO: Add id="quantity-value-high" or id="quantity-value-low" to all #quantity-view based on quantity
             var html = Mustache.to_html($('#beer-entry').html(), beers[i]);
             $('<div class="grid-item"/>').html(html).appendTo('#beer-list');
         }
