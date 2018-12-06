@@ -342,6 +342,18 @@ func redoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
+func scrollInventoryUp(g *gocui.Gui, v *gocui.View) error {
+	vi, _ := g.View(info)
+	scrollView(vi, 1)
+	return nil
+}
+
+func scrollInventoryDown(g *gocui.Gui, v *gocui.View) error {
+	vi, _ := g.View(info)
+	scrollView(vi, -1)
+	return nil
+}
+
 func trySetQuantity(q int) {
 	if q != 1 && c.GetMode() != stocking {
 		logAllInfo("Serving of multiple beers at once is not supported")

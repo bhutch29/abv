@@ -25,6 +25,8 @@ func initializekeys() {
 	{"", gocui.KeyCtrlO, setOutputMode, "Ctrl-o", "serving"},
 	{"", gocui.KeyCtrlZ, undoLastKeyboardAction, "Ctrl-z", "undo"},
 	{"", gocui.KeyCtrlR, redoLastKeyboardAction, "Ctrl-r", "redo"},
+	{"", gocui.KeyArrowUp, scrollInventoryUp, "Up", "scroll up"},
+	{"", gocui.KeyArrowDown, scrollInventoryDown, "Down", "scroll down"},
 	{"", gocui.KeyCtrlC, quit, "Ctrl-c", "quit"},
 	{"", gocui.KeyF1, setQuantity1, "F1", "single"},
 	{"", gocui.KeyF4, setQuantity4, "F4", "four-pack"},
