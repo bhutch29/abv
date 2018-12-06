@@ -27,6 +27,7 @@ func New() (*viper.Viper, error) {
 
 		v.SetDefault("configPath", home + "/.abv")
 		v.SetDefault("webRoot", "/srv/http")
+		v.SetDefault("apiUrl", "localhost")
 
 		if err = v.ReadInConfig(); err != nil {
 			return nil, err

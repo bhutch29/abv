@@ -5,7 +5,7 @@ let timer = 12000;
 let beersPerPage = 16; // must also change CSS grid number
 
 function changePage(){
-    $.getJSON("http://localhost:8081/inventory", function(beers){
+    $.getJSON("http://" + window.apiUrl + ":8081/inventory", function(beers){
         $("#beer-list").empty();
         if (persist.index >= beers.length) {
             persist.index = 0;

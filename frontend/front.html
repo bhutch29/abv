@@ -11,19 +11,14 @@
     <script src="static/js/main.js"></script>
     <script src="static/js/mustache.min.js"></script>
 
-    <script type="text/html" id="beer-entry">
-        <div class="wrapper">
-            <div class="image">
-                <img src="{{Logo}}">
-            </div>
-            <div id="brand"> {{Brand}} </div>
-            <div id="name"> {{Name}} </div>
-            <div id="abv"> ABV:<span id="abv-value">{{Abv}}</span> </div>
-            <div id="ibu"> IBU:<span id="ibu-value">{{Ibu}}</span> </div>
-            <div id="type"> {{Shorttype}} </div>
-            <div id="quantity"> QTY:<span class="quantity-view">{{Quantity}}</span> </div>
-        </div>
+    <script>
+     $(function(){
+         $("#beer-entry").load("static/html/beerEntry.html"); 
+     });
     </script>
+
+    <script type="text/html" id="beer-entry"></script>
+    <script> window.apiUrl = {{.}} </script>
 </head>
 <body>
     <div id="beer-list" class="grid-container" > </div>

@@ -10,6 +10,9 @@ redoBarcode = "1234567"
 # Set the web root directory (directory containing the front page html and the static/ folder). Do not use trailing slash. Defaults to /srv/http
 #webRoot = ~/.abv/www
 
+# Set the URL/IP Address of the abv API. Defaults to localhost
+#apiUrl = "192.168.0.100"
+
 [breweryNicknames]
 "10 Barrel Brewing Co."                    = "10 Barrel"
 "101 North Brewing Company"                = "101 North"
