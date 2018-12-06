@@ -84,7 +84,7 @@ func (c *ModalController) NewDrink(id string, d model.Drink, quantity int) error
 	if err := c.actor.AddAction(id, a); err != nil {
 		return err
 	}
-	logAllInfo("Drink created and added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
+	logAllInfo("Drink created and added to inventory!\n  #:     ", quantity, "\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
 	return nil
 }
 
