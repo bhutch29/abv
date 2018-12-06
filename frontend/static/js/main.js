@@ -18,9 +18,18 @@ function changePage(){
             var url = beers[i].Logo;
             var file = url.substring(url.lastIndexOf('/') + 1);
             beers[i].Logo = "/images/" + file;
-            //TODO: Add id="quantity-value-high" or id="quantity-value-low" to all #quantity-view based on quantity
             var html = Mustache.to_html($('#beer-entry').html(), beers[i]);
             $('<div class="grid-item"/>').html(html).appendTo('#beer-list');
+
+            // var q = "quantity-value-high";
+            // if (beers[i].Quantity < 3) {
+            //     q = "quantity-value-low";
+            // }
+            // $(".quantity-view").last().attr("id", q);
+
+            if (beers[i].Quantity < 3) {
+                $(".grid-item").last().attr("id", "quantity-low")
+            }
         }
         let timer = defaultTimer;
         let mostBeersOnPage = beers.length - persist.index;
