@@ -42,7 +42,6 @@ func init() {
 	logFile.SetLevel(logrus.DebugLevel)
 }
 
-
 func main() {
 	//Get Configuration
 	var err error
@@ -344,13 +343,13 @@ func redoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
 
 func scrollInventoryUp(g *gocui.Gui, v *gocui.View) error {
 	vi, _ := g.View(info)
-	scrollView(vi, 1)
+	scrollView(vi, -1)
 	return nil
 }
 
 func scrollInventoryDown(g *gocui.Gui, v *gocui.View) error {
 	vi, _ := g.View(info)
-	scrollView(vi, -1)
+	scrollView(vi, 1)
 	return nil
 }
 
