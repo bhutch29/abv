@@ -135,7 +135,7 @@ func refreshInventory() error {
 		logAllError(err)
 	}
 	view.Clear()
-	inventory := c.GetInventory()
+	inventory := c.GetInventorySorted([]string{"brand, name"})
 	for _, drink := range inventory {
 		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
 		if len(drink.Name) < 30 {
