@@ -31,8 +31,6 @@ func (m *Model) setDrinksNicknames(drinks []Drink) []Drink {
 	styleNicks := m.conf.GetStringMapString("styleNicknames")
 	var result []Drink
 	for _, drink := range drinks {
-		drink.Brand = shortenBrand(drink.Brand)
-
 		if nick, ok := brandNicks[strings.ToLower(drink.Brand)]; ok {
 			drink.Brand = nick
 		}
@@ -42,6 +40,9 @@ func (m *Model) setDrinksNicknames(drinks []Drink) []Drink {
 		if nick, ok := styleNicks[strings.ToLower(drink.Shorttype)]; ok {
 			drink.Shorttype = nick
 		}
+
+		drink.Brand = shortenBrand(drink.Brand)
+
 		result = append(result, drink)
 	}
 	return result
@@ -53,8 +54,6 @@ func (m *Model) setStockedDrinksNicknames(drinks []StockedDrink) []StockedDrink 
 	styleNicks := m.conf.GetStringMapString("styleNicknames")
 	var result []StockedDrink
 	for _, drink := range drinks {
-		drink.Brand = shortenBrand(drink.Brand)
-
 		if nick, ok := brandNicks[strings.ToLower(drink.Brand)]; ok {
 			drink.Brand = nick
 		}
@@ -64,14 +63,15 @@ func (m *Model) setStockedDrinksNicknames(drinks []StockedDrink) []StockedDrink 
 		if nick, ok := styleNicks[strings.ToLower(drink.Shorttype)]; ok {
 			drink.Shorttype = nick
 		}
+
+		drink.Brand = shortenBrand(drink.Brand)
+
 		result = append(result, drink)
 	}
 	return result
 }
 
 func (m *Model) setDrinkNickname(drink Drink) Drink {
-	drink.Brand = shortenBrand(drink.Brand)
-
 	brandNicks := m.conf.GetStringMapString("breweryNicknames")
 	beerNicks := m.conf.GetStringMapString("beerNicknames")
 	styleNicks := m.conf.GetStringMapString("styleNicknames")
@@ -84,20 +84,23 @@ func (m *Model) setDrinkNickname(drink Drink) Drink {
 	if nick, ok := styleNicks[strings.ToLower(drink.Shorttype)]; ok {
 		drink.Shorttype = nick
 	}
+
+	drink.Brand = shortenBrand(drink.Brand)
+
 	return drink
 }
 
 func shortenBrand(in string) string {
 	endings := []string{
 		"Brewing Company",
-		"Brewing",
-		"Brewery",
 		"Brewing Co.",
 		"Brewing Co",
+		"Brewing",
+		"Brewery",
 	}
 	for _, ending := range endings {
 		if strings.HasSuffix(in, ending) {
-			return strings.TrimSuffix(in, ending)
+			return strings.TrimSpace(strings.TrimSuffix(in, ending))
 		}
 	}
 	return in
