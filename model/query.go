@@ -3,6 +3,7 @@ package model
 import "database/sql"
 import "strings"
 import "sort"
+import "log"
 
 // BarcodeExists checks if a barcode is already in the database
 func (m *Model) BarcodeExists(bc string) (bool, error) {
@@ -182,6 +183,8 @@ func (m *Model) sortByFields(drinks []StockedDrink, sortFields []string) []Stock
 				result = drinks[i].Brand < drinks[j].Brand
 			case "name":
 				result = drinks[i].Name < drinks[j].Name
+			default:
+				log.Fatal(sortFields, drinks)
 			}
 			return result
 		})
