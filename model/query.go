@@ -2,6 +2,7 @@ package model
 
 import "database/sql"
 import "strings"
+import "sort"
 
 // BarcodeExists checks if a barcode is already in the database
 func (m *Model) BarcodeExists(bc string) (bool, error) {
@@ -136,19 +137,7 @@ func (m *Model) GetInventory() ([]StockedDrink, error) {
 // GetInventorySorted returns every drink with at least one quantity in stock, sorted by the provided Fields
 func (m *Model) GetInventorySorted(sortFields []string) ([]StockedDrink, error) {
 	var result []StockedDrink
-	var orderBy string
-	for i, sortField := range sortFields {
-		var s string
-		if sortField == "quantity" {
-			s = "quantity desc"
-		} else {
-			s = "A." + sortField
-		}
-		if i != 0 {
-			orderBy += ", "
-		}
-		orderBy += s
-	}
+
 	sql := `
 select A.*,
   case
@@ -172,12 +161,32 @@ left join (
 ) as C
 on A.Barcode = C.Barcode
 
-where quantity > 0
-order by ` + orderBy
+where quantity > 0`
 
 	err := m.db.Select(&result, sql)
 	result = m.setStockedDrinksNicknames(result)
+	result = m.sortByFields(result, sortFields)
 	return result, err
+}
+
+func (m *Model) sortByFields(drinks []StockedDrink, sortFields []string) []StockedDrink {
+	for index := len(sortFields) - 1; index >= 0; index-- {
+		sort.SliceStable(drinks, func(i, j int) bool {
+			var result bool
+			switch sortFields[index] {
+			case "quantity":
+				result = drinks[i].Quantity < drinks[j].Quantity
+			case "shorttype":
+				result = drinks[i].Shorttype < drinks[j].Shorttype
+			case "brand":
+				result = drinks[i].Brand < drinks[j].Brand
+			case "name":
+				result = drinks[i].Name < drinks[j].Name
+			}
+			return result
+		})
+	}
+	return drinks
 }
 
 // GetInputWithinDateRange returns every drink inputted within a date range, inclusive
