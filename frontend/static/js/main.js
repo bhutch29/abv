@@ -1,7 +1,7 @@
 let persist = {};
 persist.index = 0;
 
-let defaultTimer = 12000;
+let defaultTimer = 15000;
 let beersPerPage = 16; // must also change CSS grid number
 
 function changePage(){
@@ -21,21 +21,15 @@ function changePage(){
             var html = Mustache.to_html($('#beer-entry').html(), beers[i]);
             $('<div class="grid-item"/>').html(html).appendTo('#beer-list');
 
-            // var q = "quantity-value-high";
-            // if (beers[i].Quantity < 3) {
-            //     q = "quantity-value-low";
-            // }
-            // $(".quantity-view").last().attr("id", q);
-
             if (beers[i].Quantity < 3) {
-                $(".grid-item").last().attr("id", "quantity-low")
+                $(".grid-item").last().attr("id", "quantity-low");
             }
         }
         let timer = defaultTimer;
         let mostBeersOnPage = beers.length - persist.index;
         if (mostBeersOnPage < beersPerPage) {
             let ratio = beersPerPage / mostBeersOnPage;
-            timer = defaultTimer / ((ratio + 1) / 4);
+            timer = defaultTimer / ((ratio + 6) / 7);
         }
         persist.index += beersPerPage;
         setTimeout(changePage, timer);
