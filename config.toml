@@ -62,5 +62,10 @@ redoBarcode = "1234567"
 "Wildcide Hard Cider"                  = "Wildcide"
 
 [styleNicknames]
-"Saison / Farmhouse Ale" = "Farmhouse Ale"
-"Shandy / Radler"        = "Shandy"
+"American Wild Ale"         = "Sour"
+"Belgian Strong Dark Ale"   = "Belgian Dark"
+"Belgian Strong Golden Ale" = "Belgian Golden"
+"Pumpkin / Yam Beer"        = "Pumpkin Beer"
+"Saison / Farmhouse Ale"    = "Farmhouse Ale"
+"Shandy / Radler"           = "Shandy"
+"Spiced / Herbed Beer"      = "Spiced Beer"
