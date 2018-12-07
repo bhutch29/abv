@@ -8,16 +8,22 @@ import (
 	"path"
 
 	"github.com/bhutch29/abv/config"
+	"github.com/spf13/viper"
 )
 
-// Image queries and saves an image from the provided url if it isn't cached already
-func Image(url string) error {
-	conf, err := config.New()
+var conf *viper.Viper
+
+func init() {
+	var err error
+	conf, err = config.New()
 	if err != nil {
 		log.Fatal("Could not get configuration: ", err)
 	}
-	imagePath := conf.GetString("imageCachePath")
+}
 
+// Image queries and saves an image from the provided url if it isn't cached already
+func Image(url string) error {
+	imagePath := path.Join(conf.GetString("configPath"), "images")
 	file := path.Join(imagePath, path.Base(url))
 	if !exists(file) {
 		response, err := http.Get(url)
@@ -31,7 +37,9 @@ func Image(url string) error {
 			log.Fatal("Could not create file: ", err)
 		}
 
-		_, _ = io.Copy(f, response.Body)
+		if _, err = io.Copy(f, response.Body); err != nil {
+			return err
+		}
 
 		response.Body.Close()
 		f.Close()

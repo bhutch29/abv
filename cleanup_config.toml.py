@@ -14,7 +14,7 @@ Example: Overwrite config.toml in working directory
   (Windows)   python cleanup_config.toml.py --dir=%CD%
   (Unix-like) python cleanup_config.toml.py --dir=$PWD
 """
-import os.path as path
+import os
 import sys
 
 from argparse import ArgumentParser, RawTextHelpFormatter
@@ -22,29 +22,9 @@ from os.path import expanduser, realpath
 
 import toml
 
-CONFIG_TEMPLATE = """# Configuration file for ABV
-
-# Barcodes should be strings, because leading zeros are not allowed
-undoBarcode = "{undo}"
-redoBarcode = "{redo}"
-
-# Set location to cache brewery images for web menu. Do not use trailing slash. Defaults to ~/.abv/images
-#imageCachePath = /var/temp
-
-# Set location of config files. Do not use trailing slash. Defaults to ~/.abv
-#configPath = ~/etc/abv
-
-# Set the web root directory (directory containing the front page html and the static/ folder). Do not use trailing slash. Defaults to /srv/http
-#webRoot = ~/.abv/www
-
-{breweries}
-
-{beers}
-"""
-
 
 def fullpath(*args):
-    return realpath(path.join(*args))
+    return realpath(os.path.join(*args))
 
 
 def parsed_args():
@@ -67,40 +47,56 @@ def parsed_args():
     return args
 
 
-def unpack_table(toml, name):
+def unpack_table(lines):
+    table_toml = toml.loads(''.join(lines))
+    name = list(table_toml)[0]
     # Format table title
     title = '[{name}]\n'.format(name=name)
     # Define a whitespace insertion method based on the longest key
-    longest = max([len(key) for key in toml[name]])
+    longest = max([len(key) for key in table_toml[name]])
     def align(str_):
         return ' '*(longest-len(str_)+1)
     # Lexicographically sort and whitespace-align table items
-    table = sorted(toml[name].items(), key=lambda x: x[0])
+    table = sorted(table_toml[name].items(), key=lambda x: x[0])
     line = '"{key}"{ws}= "{val}"'
     items = '\n'.join([line.format(key=key, ws=align(key), val=val) for key, val in table])
-    return title + items
+    return title + items + '\n\n'
 
 
-def toml_from_file(filepath):
-    try:
-        parsed_toml = toml.load(filepath)
-    except FileNotFoundError:
-        sys.exit('File not found: {}'.format(filepath))
-    return parsed_toml
+def parse_toml(lines):
+    final = []
+    inside_table = False
+    for line in lines:
+        if line.strip().startswith('#'):
+            if not inside_table:
+                final.append(line)
+            continue
+        elif line.strip().startswith('['):
+            if inside_table:
+                final.append(unpack_table(table_lines))
+            inside_table = True
+            table_lines = [line]
+            continue
+        elif line.strip().startswith('"') and inside_table:
+            table_lines.append(line)
+            continue
+        elif line.strip() == '':
+            if not inside_table:
+                final.append(line)
+            continue
+        else:
+            inside_table = False
+            final.append(line)
+    if inside_table:
+        final.append(unpack_table(table_lines))
+    text = ''.join(final)
+    return text.strip() + '\n'
 
 
 def clean_config(filepath):
-    parsed_toml = toml_from_file(filepath)
-    # Unpack known config settings
-    undo = parsed_toml['undoBarcode']
-    redo = parsed_toml['redoBarcode']
-    breweries = unpack_table(parsed_toml, 'breweryNicknames')
-    beers = unpack_table(parsed_toml, 'beerNicknames')
-    # Insert into config template
-    text = CONFIG_TEMPLATE.format(undo=undo,
-                                  redo=redo,
-                                  breweries=breweries,
-                                  beers=beers)
+    with open(filepath, mode='r', encoding='utf8') as file_:
+        lines = file_.readlines()
+    text = parse_toml(lines)
     return text
 
 

@@ -13,11 +13,14 @@ import (
 	"os"
 	"github.com/bhutch29/abv/config"
 	"github.com/spf13/viper"
+	"path"
+	"html/template"
 )
 
 var (
 	conf *viper.Viper
 	version = "undefined"
+	tmpl *template.Template
 )
 
 // Page is the backing type for all pages
@@ -49,8 +52,11 @@ func main() {
 	if err != nil {
 		log.Fatal("Could not get configuration: ", err)
 	}
-	imagePath := conf.GetString("imageCachePath")
-	fontPath := conf.GetString("configPath") + "/static/fonts"
+	imagePath := path.Join(conf.GetString("configPath"), "images")
+	webRoot := conf.GetString("webRoot")
+	fontPath := path.Join(webRoot, "static", "fonts")
+
+	tmpl = template.Must(template.ParseFiles(webRoot + "/front.html"))
 
 	router := httprouter.New()
 
@@ -61,6 +67,7 @@ func main() {
 
 	router.GET("/static/css/*filePath", cssHandler)
 	router.GET("/static/js/*filePath", jsHandler)
+	router.GET("/static/html/*filePath", htmlHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
@@ -89,9 +96,16 @@ func cssHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	http.ServeFile(w, r, root + "/static/css/"+path)
 }
 
-func frontPageHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+func htmlHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	w.Header().Add("Content-Type", "text/html")
+	path := ps.ByName("filePath")
 	root := conf.GetString("webRoot")
-	http.ServeFile(w, r, root + "/front.html")
+	http.ServeFile(w, r, root + "/static/html/"+path)
+}
+
+func frontPageHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	apiURL := conf.GetString("apiUrl")
+	tmpl.Execute(w, apiURL)
 }
 
 var myClient = &http.Client{Timeout: 10 * time.Second}

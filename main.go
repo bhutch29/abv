@@ -27,6 +27,21 @@ var (
 	version  = "undefined"
 )
 
+func init() {
+	quantity = 1
+
+	initializekeys()
+
+	//Setup loggers
+	f := logrus.TextFormatter{}
+	f.ForceColors = true
+	f.DisableTimestamp = true
+	f.DisableLevelTruncation = true
+	logGui.Formatter = &f
+	logGui.SetLevel(logrus.InfoLevel)
+	logFile.SetLevel(logrus.DebugLevel)
+}
+
 func main() {
 	//Get Configuration
 	var err error
@@ -120,7 +135,7 @@ func refreshInventory() error {
 		logAllError(err)
 	}
 	view.Clear()
-	inventory := c.GetInventory()
+	inventory := c.GetInventorySorted([]string{"brand", "name"})
 	for _, drink := range inventory {
 		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
 		if len(drink.Name) < 30 {
@@ -306,6 +321,7 @@ func setInputMode(g *gocui.Gui, v *gocui.View) error {
 func setOutputMode(g *gocui.Gui, v *gocui.View) error {
 	if m := c.GetMode(); m != serving {
 		c.SetMode(serving)
+		setQuantity1(g, v)
 		updatePromptSymbol()
 		logGui.Infof("Changed to %s Mode", aur.Green("Serving"))
 		logFile.WithField("mode", serving).Info("Changed Mode")
@@ -325,6 +341,18 @@ func redoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
+func scrollInventoryUp(g *gocui.Gui, v *gocui.View) error {
+	vi, _ := g.View(info)
+	scrollView(vi, -1)
+	return nil
+}
+
+func scrollInventoryDown(g *gocui.Gui, v *gocui.View) error {
+	vi, _ := g.View(info)
+	scrollView(vi, 1)
+	return nil
+}
+
 func trySetQuantity(q int) {
 	if q != 1 && c.GetMode() != stocking {
 		logAllInfo("Serving of multiple beers at once is not supported")
@@ -333,11 +361,20 @@ func trySetQuantity(q int) {
 	if q != quantity {
 		quantity = q
 		logAllInfo("Quantity of drinks per scan changed to ", quantity)
+
+		v, _ := g.View(prompt)
+		v.Clear()
+		fmt.Fprintf(v, generateKeybindString(q))
 	}
 }
 
 func setQuantity1(g *gocui.Gui, v *gocui.View) error {
 	trySetQuantity(1)
+	return nil
+}
+
+func setQuantity4(g *gocui.Gui, v *gocui.View) error {
+	trySetQuantity(4)
 	return nil
 }
 

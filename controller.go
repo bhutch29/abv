@@ -62,9 +62,18 @@ func (c *ModalController) LastID() string {
 	return c.lastID
 }
 
-// GetInventory returns the currently stocked inventory
+// GetInventory returns the currently stocked inventory with default sorting
 func (c *ModalController) GetInventory() []model.StockedDrink {
 	result, err := c.backend.GetInventory()
+	if err != nil {
+		logAllError("Error getting current inventory: ", err)
+	}
+	return result
+}
+
+// GetInventorySorted returns the currently stocked inventory sorted by the provided fields
+func (c *ModalController) GetInventorySorted(sortFields []string) []model.StockedDrink {
+	result, err := c.backend.GetInventorySorted(sortFields)
 	if err != nil {
 		logAllError("Error getting current inventory: ", err)
 	}
@@ -84,7 +93,7 @@ func (c *ModalController) NewDrink(id string, d model.Drink, quantity int) error
 	if err := c.actor.AddAction(id, a); err != nil {
 		return err
 	}
-	logAllInfo("Drink created and added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
+	logAllInfo("Drink created and added to inventory!\n  #:     ", quantity, "\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
 	return nil
 }
 
@@ -134,7 +143,12 @@ func (c *ModalController) outputDrinks(id string, de model.DrinkEntry, d model.D
 	if err := c.actor.AddAction(id, a); err != nil {
 		logAllError("Could not remove drink from inventory: ", err)
 	} else {
-		logAllInfo("Drink removed from inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
+		count, err := c.backend.GetCountByBarcode(d.Barcode)
+		if err != nil {
+			logAllError("Could not get count by barcode: ", err)
+			return
+		}
+		logAllInfo("Drink removed from inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand, "\n  Remaining: ", count)
 	}
 }
 
@@ -144,7 +158,7 @@ func (c *ModalController) inputDrinks(id string, de model.DrinkEntry, d model.Dr
 	if err := c.actor.AddAction(id, a); err != nil {
 		logAllError("Could not add drink to inventory: ", err)
 	} else {
-		logAllInfo("Drink added to inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
+		logAllInfo("Drink added to inventory!\n  #:     ", quantity, "\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
 	}
 }
 

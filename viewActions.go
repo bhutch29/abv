@@ -204,6 +204,23 @@ func resetViewCursor(v *gocui.View) error {
 	return nil
 }
 
+func scrollView(v *gocui.View, dy int) error {
+	if v != nil {
+		v.Autoscroll = false
+		ox, oy := v.Origin()
+		_, height := v.Size()
+		if dy > 0 {
+			if l, _ := v.Line(height); l == "" {
+				return nil
+			}
+		}
+		if err := v.SetOrigin(ox, oy+dy); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func setTitle(view string, title string) {
 	v, _ := g.View(view)
 	v.Title = title
