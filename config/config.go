@@ -33,7 +33,7 @@ func newViper() (*viper.Viper, error) {
 	v.BindEnv("untappdSecret")
 
 	v.SetDefault("configPath", path.Join(home, ".abv"))
-	v.SetDefault("webRoot", path.Join("srv", "http"))
+	v.SetDefault("webRoot", path.Join("/srv", "http"))
 	v.SetDefault("apiUrl", "localhost")
 
 	if err = v.ReadInConfig(); err != nil {
