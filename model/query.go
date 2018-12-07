@@ -108,17 +108,24 @@ func (m *Model) GetDrinkByBarcode(bc string) (Drink, error) {
 
 // GetInventory returns every drink with at least one quantity in stock, sorted by Type
 func (m *Model) GetInventory() ([]StockedDrink, error) {
-	return m.GetInventorySorted("Shorttype")
+	return m.GetInventorySorted([]string{"shorttype", "brand", "name"})
 }
 
-// GetInventorySorted returns every drink with at least one quantity in stock, sorted by the provided Field
-func (m *Model) GetInventorySorted(sortField string) ([]StockedDrink, error) {
+// GetInventorySorted returns every drink with at least one quantity in stock, sorted by the provided Fields
+func (m *Model) GetInventorySorted(sortFields []string) ([]StockedDrink, error) {
 	var result []StockedDrink
 	var orderBy string
-	if sortField == "Quantity" {
-		orderBy = "quantity desc"
-	} else {
-		orderBy = "A." + sortField
+	for i, sortField := range sortFields {
+		var s string
+		if sortField == "quantity" {
+			s = "quantity desc"
+		} else {
+			s = "A." + sortField
+		}
+		if i != 0 {
+			orderBy += ", "
+		}
+		orderBy += s
 	}
 	sql := `
 select A.*,
