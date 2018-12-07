@@ -31,14 +31,15 @@ func (m *Model) setDrinksNicknames(drinks []Drink) []Drink {
 	styleNicks := m.conf.GetStringMapString("styleNicknames")
 	var result []Drink
 	for _, drink := range drinks {
+		drink.Brand = shortenBrand(drink.Brand)
+
 		if nick, ok := brandNicks[strings.ToLower(drink.Brand)]; ok {
 			drink.Brand = nick
 		}
 		if nick, ok := beerNicks[strings.ToLower(drink.Name)]; ok {
 			drink.Name = nick
 		}
-		if nick, ok := styleNicks[strings.ToLower(drink.Type)]; ok {
-			drink.Type = nick
+		if nick, ok := styleNicks[strings.ToLower(drink.Shorttype)]; ok {
 			drink.Shorttype = nick
 		}
 		result = append(result, drink)
@@ -52,14 +53,15 @@ func (m *Model) setStockedDrinksNicknames(drinks []StockedDrink) []StockedDrink 
 	styleNicks := m.conf.GetStringMapString("styleNicknames")
 	var result []StockedDrink
 	for _, drink := range drinks {
+		drink.Brand = shortenBrand(drink.Brand)
+
 		if nick, ok := brandNicks[strings.ToLower(drink.Brand)]; ok {
 			drink.Brand = nick
 		}
 		if nick, ok := beerNicks[strings.ToLower(drink.Name)]; ok {
 			drink.Name = nick
 		}
-		if nick, ok := styleNicks[strings.ToLower(drink.Type)]; ok {
-			drink.Type = nick
+		if nick, ok := styleNicks[strings.ToLower(drink.Shorttype)]; ok {
 			drink.Shorttype = nick
 		}
 		result = append(result, drink)
@@ -68,6 +70,8 @@ func (m *Model) setStockedDrinksNicknames(drinks []StockedDrink) []StockedDrink 
 }
 
 func (m *Model) setDrinkNickname(drink Drink) Drink {
+	drink.Brand = shortenBrand(drink.Brand)
+
 	brandNicks := m.conf.GetStringMapString("breweryNicknames")
 	beerNicks := m.conf.GetStringMapString("beerNicknames")
 	styleNicks := m.conf.GetStringMapString("styleNicknames")
@@ -77,11 +81,26 @@ func (m *Model) setDrinkNickname(drink Drink) Drink {
 	if nick, ok := beerNicks[strings.ToLower(drink.Name)]; ok {
 		drink.Name = nick
 	}
-	if nick, ok := styleNicks[strings.ToLower(drink.Type)]; ok {
-		drink.Type = nick
+	if nick, ok := styleNicks[strings.ToLower(drink.Shorttype)]; ok {
 		drink.Shorttype = nick
 	}
 	return drink
+}
+
+func shortenBrand(in string) string {
+	endings := []string{
+		"Brewing Company",
+		"Brewing",
+		"Brewery",
+		"Brewing Co.",
+		"Brewing Co",
+	}
+	for _, ending := range endings {
+		if strings.HasSuffix(in, ending) {
+			return strings.TrimSuffix(in, ending)
+		}
+	}
+	return in
 }
 
 // GetCountByBarcode returns the total number of currently stocked beers with a specific barcode
