@@ -25,14 +25,20 @@ function changePage(){
                 $(".grid-item").last().attr("id", "quantity-low");
             }
         }
-        let timer = defaultTimer;
-        let mostBeersOnPage = beers.length - persist.index;
-        if (mostBeersOnPage < beersPerPage) {
-            let ratio = beersPerPage / mostBeersOnPage;
-            timer = defaultTimer / ((ratio + 6) / 7);
+
+        if (beers.length <= beersPerPage) {
+            setTimeout(changePage, 200);
+        } else {
+            let timer = defaultTimer;
+            let mostBeersOnPage = beers.length - persist.index;
+            if (mostBeersOnPage < beersPerPage) {
+                let ratio = beersPerPage / mostBeersOnPage;
+                timer = defaultTimer / ((ratio + 6) / 7);
+            }
+            persist.index += beersPerPage;
+            setTimeout(changePage, timer);
         }
-        persist.index += beersPerPage;
-        setTimeout(changePage, timer);
+
     });
 };
 
