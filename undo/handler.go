@@ -1,6 +1,6 @@
 package undo
 
-// Actor encapsulates all undo/redo functionality. Use NewHandler() to create an initialized Actor
+// Actor encapsulates all undo/redo functionality. Use NewActor() to create an initialized Actor
 type Actor struct {
 	lists map[string]*undoList
 }
