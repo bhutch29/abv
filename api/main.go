@@ -13,6 +13,7 @@ import (
 	"github.com/bhutch29/abv/model"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
+	"net/url"
 )
 
 var (
@@ -33,7 +34,7 @@ func main() {
 
 	router.GET("/health", healthCheck)
 	router.GET("/inventory", getInventory)
-	router.GET("/inventory/sorted/:sortField", getInventorySorted)
+	router.GET("/inventory/sorted/:sortFields", getInventorySorted)
 
 	corsEnabledHandler := cors.Default().Handler(router)
 	log.Fatal(http.ListenAndServe(":8081", corsEnabledHandler))
@@ -62,7 +63,11 @@ func getInventory(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 }
 
 func getInventorySorted(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	drinks, err := m.GetInventorySorted(ps.ByName("sortField"))
+	res, err := url.ParseQuery(ps.ByName("sortFields"))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	drinks, err := m.GetInventorySorted(res["sortBy"])
 	encodeDrinks(drinks, err, w)
 }
 

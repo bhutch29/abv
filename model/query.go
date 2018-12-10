@@ -2,6 +2,8 @@ package model
 
 import "database/sql"
 import "strings"
+import "sort"
+import "log"
 
 // BarcodeExists checks if a barcode is already in the database
 func (m *Model) BarcodeExists(bc string) (bool, error) {
@@ -37,10 +39,12 @@ func (m *Model) setDrinksNicknames(drinks []Drink) []Drink {
 		if nick, ok := beerNicks[strings.ToLower(drink.Name)]; ok {
 			drink.Name = nick
 		}
-		if nick, ok := styleNicks[strings.ToLower(drink.Type)]; ok {
-			drink.Type = nick
+		if nick, ok := styleNicks[strings.ToLower(drink.Shorttype)]; ok {
 			drink.Shorttype = nick
 		}
+
+		drink.Brand = shortenBrand(drink.Brand)
+
 		result = append(result, drink)
 	}
 	return result
@@ -58,10 +62,12 @@ func (m *Model) setStockedDrinksNicknames(drinks []StockedDrink) []StockedDrink 
 		if nick, ok := beerNicks[strings.ToLower(drink.Name)]; ok {
 			drink.Name = nick
 		}
-		if nick, ok := styleNicks[strings.ToLower(drink.Type)]; ok {
-			drink.Type = nick
+		if nick, ok := styleNicks[strings.ToLower(drink.Shorttype)]; ok {
 			drink.Shorttype = nick
 		}
+
+		drink.Brand = shortenBrand(drink.Brand)
+
 		result = append(result, drink)
 	}
 	return result
@@ -77,11 +83,29 @@ func (m *Model) setDrinkNickname(drink Drink) Drink {
 	if nick, ok := beerNicks[strings.ToLower(drink.Name)]; ok {
 		drink.Name = nick
 	}
-	if nick, ok := styleNicks[strings.ToLower(drink.Type)]; ok {
-		drink.Type = nick
+	if nick, ok := styleNicks[strings.ToLower(drink.Shorttype)]; ok {
 		drink.Shorttype = nick
 	}
+
+	drink.Brand = shortenBrand(drink.Brand)
+
 	return drink
+}
+
+func shortenBrand(in string) string {
+	endings := []string{
+		"Brewing Company",
+		"Brewing Co.",
+		"Brewing Co",
+		"Brewing",
+		"Brewery",
+	}
+	for _, ending := range endings {
+		if strings.HasSuffix(in, ending) {
+			return strings.TrimSpace(strings.TrimSuffix(in, ending))
+		}
+	}
+	return in
 }
 
 // GetCountByBarcode returns the total number of currently stocked beers with a specific barcode
@@ -108,18 +132,13 @@ func (m *Model) GetDrinkByBarcode(bc string) (Drink, error) {
 
 // GetInventory returns every drink with at least one quantity in stock, sorted by Type
 func (m *Model) GetInventory() ([]StockedDrink, error) {
-	return m.GetInventorySorted("Shorttype")
+	return m.GetInventorySorted([]string{"shorttype", "brand", "name"})
 }
 
-// GetInventorySorted returns every drink with at least one quantity in stock, sorted by the provided Field
-func (m *Model) GetInventorySorted(sortField string) ([]StockedDrink, error) {
+// GetInventorySorted returns every drink with at least one quantity in stock, sorted by the provided Fields
+func (m *Model) GetInventorySorted(sortFields []string) ([]StockedDrink, error) {
 	var result []StockedDrink
-	var orderBy string
-	if sortField == "Quantity" {
-		orderBy = "quantity desc"
-	} else {
-		orderBy = "A." + sortField
-	}
+
 	sql := `
 select A.*,
   case
@@ -143,12 +162,34 @@ left join (
 ) as C
 on A.Barcode = C.Barcode
 
-where quantity > 0
-order by ` + orderBy
+where quantity > 0`
 
 	err := m.db.Select(&result, sql)
 	result = m.setStockedDrinksNicknames(result)
+	result = m.sortByFields(result, sortFields)
 	return result, err
+}
+
+func (m *Model) sortByFields(drinks []StockedDrink, sortFields []string) []StockedDrink {
+	for index := len(sortFields) - 1; index >= 0; index-- {
+		sort.SliceStable(drinks, func(i, j int) bool {
+			var result bool
+			switch sortFields[index] {
+			case "quantity":
+				result = drinks[i].Quantity < drinks[j].Quantity
+			case "shorttype":
+				result = drinks[i].Shorttype < drinks[j].Shorttype
+			case "brand":
+				result = drinks[i].Brand < drinks[j].Brand
+			case "name":
+				result = drinks[i].Name < drinks[j].Name
+			default:
+				log.Fatal(sortFields, drinks)
+			}
+			return result
+		})
+	}
+	return drinks
 }
 
 // GetInputWithinDateRange returns every drink inputted within a date range, inclusive

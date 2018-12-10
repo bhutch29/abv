@@ -62,9 +62,18 @@ func (c *ModalController) LastID() string {
 	return c.lastID
 }
 
-// GetInventory returns the currently stocked inventory
+// GetInventory returns the currently stocked inventory with default sorting
 func (c *ModalController) GetInventory() []model.StockedDrink {
 	result, err := c.backend.GetInventory()
+	if err != nil {
+		logAllError("Error getting current inventory: ", err)
+	}
+	return result
+}
+
+// GetInventorySorted returns the currently stocked inventory sorted by the provided fields
+func (c *ModalController) GetInventorySorted(sortFields []string) []model.StockedDrink {
+	result, err := c.backend.GetInventorySorted(sortFields)
 	if err != nil {
 		logAllError("Error getting current inventory: ", err)
 	}
@@ -171,7 +180,7 @@ func (c *ModalController) Undo(id string) {
 		logAllError("Could not undo last action with id = "+id, err)
 	}
 	if acted {
-		logAllInfo("Reverted last action with id = ", id)
+		logAllInfo("Reverted last action" + c.prettyID(id))
 	}
 }
 
@@ -182,6 +191,13 @@ func (c *ModalController) Redo(id string) {
 		logAllError("Could not redo last action with id = "+id, err)
 	}
 	if acted {
-		logAllInfo("Redid last action with id = ", id)
+		logAllInfo("Redid last action" + c.prettyID(id))
 	}
+}
+
+func (c *ModalController) prettyID(id string) string {
+	if id == "" {
+		return ""
+	}
+	return " with id = " + id
 }

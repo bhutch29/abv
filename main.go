@@ -42,7 +42,6 @@ func init() {
 	logFile.SetLevel(logrus.DebugLevel)
 }
 
-
 func main() {
 	//Get Configuration
 	var err error
@@ -136,7 +135,7 @@ func refreshInventory() error {
 		logAllError(err)
 	}
 	view.Clear()
-	inventory := c.GetInventory()
+	inventory := c.GetInventorySorted([]string{"brand", "name"})
 	for _, drink := range inventory {
 		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
 		if len(drink.Name) < 30 {
@@ -344,13 +343,13 @@ func redoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
 
 func scrollInventoryUp(g *gocui.Gui, v *gocui.View) error {
 	vi, _ := g.View(info)
-	scrollView(vi, 1)
+	scrollView(vi, -1)
 	return nil
 }
 
 func scrollInventoryDown(g *gocui.Gui, v *gocui.View) error {
 	vi, _ := g.View(info)
-	scrollView(vi, -1)
+	scrollView(vi, 1)
 	return nil
 }
 
