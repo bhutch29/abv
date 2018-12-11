@@ -15,3 +15,19 @@ An ID and Secret are needed to communicate with the Untappd API. These are not i
 ## Deployment
 
 An SQLite database is the heart of the ABV application. The ABV gui can be used to create and update the database. The API application depends on this database but can be run separately as needed. The Frontend application is used to present the HTML5 Menu, and depends on the API to be running.
+
+### Docker
+
+Docker containers are uploaded to Docker Hub with the names ``bhutch29/abv_api` and `bhutch29/abv_frontend`. They can be started with the following commands:
+
+`docker run -p 8081:8081 bhutch29/abv_api`
+
+`docker run -p 80:8080 bhutch29/abv_frontend`
+
+Don't forget the `-d` option to start the containers detached from the terminal.
+
+There is also a docker-compose.yml file in the repository root director. The only **prerequisite** for the docker-compose file is that the abv.sqlite database already exist in your ~/.abv directory. This can be accomplished by simply starting the abv application. Then you can launch the above containers using:
+
+`docker-compose up`
+
+Again, don't forget the `-d` option for starting detached!

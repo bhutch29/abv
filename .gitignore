@@ -3,8 +3,9 @@
 !/**/
 !*.*
 
-#unignore makefile
+#unignore makefile and Dockerfil
 !makefile
+!Dockerfile
 
 images
 
