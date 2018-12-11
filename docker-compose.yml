@@ -1,0 +1,15 @@
+version: '3'
+services:
+  api:
+    image: bhutch29/abv_api
+    ports:
+      - 8081:8081
+    volumes:
+      - ~/.abv/abv.sqlite:/home/appuser/.abv/abv.sqlite
+      - ~/.abv/images:/home/appuser/.abv/images
+  frontend:
+    image: bhutch29/abv_frontend
+    ports:
+      - 80:8080
+    volumes:
+      - ~/.abv/images:/home/appuser/.abv/images

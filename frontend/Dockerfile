@@ -49,5 +49,4 @@ COPY --from=builder /srv/http /srv/http
 
 EXPOSE 8080
 
-# Run the hello binary.
 ENTRYPOINT ["/go/bin/frontend"]

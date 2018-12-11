@@ -43,5 +43,4 @@ ADD --chown=appuser config.toml /home/appuser/.abv/
 
 EXPOSE 8081
 
-# Run the hello binary.
 ENTRYPOINT ["/go/bin/api"]
