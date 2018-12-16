@@ -130,6 +130,49 @@ func (m *Model) GetDrinkByBarcode(bc string) (Drink, error) {
 	return d, err
 }
 
+// GetInventoryTotalQuantity returns the total number of beer bottles in stock
+func (m *Model) GetInventoryTotalQuantity()(int, error) {
+	var result int
+	sql := "select (select sum(quantity) from Input) - (select sum(quantity) from Output)"
+	err := m.db.Get(&result, sql)
+	return result, err
+}
+
+// GetInventoryTotalVariety returns the total number of beer varieties in stock
+func (m *Model) GetInventoryTotalVariety()(int, error) {
+	var result int
+
+	sql := `
+select count(barcode) from (
+  select A.*,
+    case
+      when B.InputQuantity is null then 0
+      when C.OutputQuantity is null then B.InputQuantity
+      else (B.InputQuantity - C.OutputQuantity)
+    end as quantity
+  from Drinks as A
+
+  left join (
+    select barcode, sum(quantity) as InputQuantity
+    from Input
+    group by barcode
+  ) as B
+  on A.Barcode = B.Barcode
+
+  left join (
+    select barcode, sum(quantity) as OutputQuantity
+    from Output
+    group by barcode
+  ) as C
+  on A.Barcode = C.Barcode
+
+  where quantity > 0
+)`
+
+	err := m.db.Get(&result, sql)
+	return result, err
+}
+
 // GetInventory returns every drink with at least one quantity in stock, sorted by Type
 func (m *Model) GetInventory() ([]StockedDrink, error) {
 	return m.GetInventorySorted([]string{"shorttype", "brand", "name"})
