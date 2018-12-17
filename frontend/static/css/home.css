@@ -3,19 +3,23 @@
     margin: 0;
 }
 
-table, td {
-    border: 1px solid
+.top-container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-flow: column;
 }
 
 .grid-container {
+    flex: 1 1 auto;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(8, 1fr);
     grid-auto-flow: column;
     background-color: rgba(0,0,0,1);
     padding: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
 }
 
 /* bowlby-one-sc-regular - latin */
@@ -131,8 +135,21 @@ table, td {
     margin-right: 5px;
     color: rgba(255, 0, 47, 0.6);
 }
+
 #quantity #quantity-value {
     color: rgba(255, 255, 255, 0.6);
+}
+
+.footer {
+    flex: 0 1 40px;
+    display: table;
+    width: 100%;
+    background-color: black;
+    color: rgba(255,255,255,.8);
+}
+
+.footer-column {
+    display: table-cell;
 }
 
 

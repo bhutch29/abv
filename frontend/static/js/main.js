@@ -5,6 +5,14 @@ let defaultTimer = 15000;
 let beersPerPage = 16; // must also change CSS grid number
 
 function changePage(){
+    $.getJSON("http://" + window.apiUrl + ":8081/inventory/quantity", function(quantity){
+        $('#quantity-view').html("Total Quantity: " + quantity);
+    });
+
+    $.getJSON("http://" + window.apiUrl + ":8081/inventory/variety", function(variety){
+        $('#variety-view').html("Total Varieties: " + variety);
+    });
+
     $.getJSON("http://" + window.apiUrl + ":8081/inventory", function(beers){
         $("#beer-list").empty();
         if (persist.index >= beers.length) {
@@ -42,6 +50,16 @@ function changePage(){
     });
 };
 
+function startClock() {
+    $('#clock').html(new Date().toLocaleTimeString());
+    setTimeout(startClock, 1000);
+};
+
 $(document).ready( //registers event last
     $(document).ready(changePage)
 );
+
+$(document).ready( //registers event last
+    $(document).ready(startClock)
+);
+
