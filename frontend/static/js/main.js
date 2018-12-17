@@ -6,11 +6,11 @@ let beersPerPage = 16; // must also change CSS grid number
 
 function changePage(){
     $.getJSON("http://" + window.apiUrl + ":8081/inventory/quantity", function(quantity){
-        $('#quantity-view').html("Total Quantity: " + quantity);
+        $('#quantity-view').html(quantity + " beers left");
     });
 
     $.getJSON("http://" + window.apiUrl + ":8081/inventory/variety", function(variety){
-        $('#variety-view').html("Total Varieties: " + variety);
+        $('#variety-view').html(variety + " varieties to choose from");
     });
 
     $.getJSON("http://" + window.apiUrl + ":8081/inventory", function(beers){
