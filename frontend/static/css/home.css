@@ -141,15 +141,35 @@
 }
 
 .footer {
-    flex: 0 1 40px;
-    display: table;
+    flex: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(1, 1fr);
     width: 100%;
     background-color: black;
+    font-family: 'Oswald', sans-serif;
     color: rgba(255,255,255,.8);
 }
 
 .footer-column {
     display: table-cell;
+    
 }
 
+#quantity-view{
+    grid-column: 1;
+    grid-row: 1;
+    text-align: left;
+}
 
+#variety-view{
+    grid-column: 2;
+    grid-row: 1;
+    text-align: center;
+}
+
+#clock{
+    grid-column: 3;
+    grid-row: 1;
+    text-align: right;
+}
