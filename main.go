@@ -231,6 +231,12 @@ func cancelSearch(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
+func cancelPopup(g *gocui.Gui, v *gocui.View) error {
+	togglePopup()
+	logAllInfo("Canceled selecting beer from list")
+	return nil
+}
+
 func updatePopup(name string) {
 	v, _ := g.View(popup)
 
