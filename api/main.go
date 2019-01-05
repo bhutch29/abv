@@ -34,6 +34,8 @@ func main() {
 
 	router.GET("/health", healthCheck)
 	router.GET("/inventory", getInventory)
+	router.GET("/inventory/quantity", getInventoryQuantity)
+	router.GET("/inventory/variety", getInventoryVariety)
 	router.GET("/inventory/sorted/:sortFields", getInventorySorted)
 
 	corsEnabledHandler := cors.Default().Handler(router)
@@ -62,6 +64,16 @@ func getInventory(w http.ResponseWriter, r *http.Request, ps httprouter.Params) 
 	encodeDrinks(drinks, err, w)
 }
 
+func getInventoryQuantity(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	q, err := m.GetInventoryTotalQuantity()
+	encodeValue(q, err, w)
+}
+
+func getInventoryVariety(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	q, err := m.GetInventoryTotalVariety()
+	encodeValue(q, err, w)
+}
+
 func getInventorySorted(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	res, err := url.ParseQuery(ps.ByName("sortFields"))
 	if err != nil {
@@ -69,6 +81,14 @@ func getInventorySorted(w http.ResponseWriter, r *http.Request, ps httprouter.Pa
 	}
 	drinks, err := m.GetInventorySorted(res["sortBy"])
 	encodeDrinks(drinks, err, w)
+}
+
+func encodeValue(val interface{}, err error, w http.ResponseWriter) {
+	setHeader(w)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	json.NewEncoder(w).Encode(val)
 }
 
 func encodeDrinks(drinks []model.StockedDrink, err error, w http.ResponseWriter) {

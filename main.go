@@ -136,6 +136,9 @@ func refreshInventory() error {
 	}
 	view.Clear()
 	inventory := c.GetInventorySorted([]string{"brand", "name"})
+	total := c.GetInventoryTotalQuantity()
+	variety := c.GetInventoryTotalVariety()
+	fmt.Fprintf(view, "Total Beers: %d      Total Varieties: %d\n\n", total, variety)
 	for _, drink := range inventory {
 		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
 		if len(drink.Name) < 30 {
@@ -225,6 +228,12 @@ func handleSearch(g *gocui.Gui, v *gocui.View) error {
 func cancelSearch(g *gocui.Gui, v *gocui.View) error {
 	togglePopup()
 	logAllInfo("Canceled entering information for new barcode")
+	return nil
+}
+
+func cancelPopup(g *gocui.Gui, v *gocui.View) error {
+	togglePopup()
+	logAllInfo("Canceled selecting beer from list")
 	return nil
 }
 

@@ -5,6 +5,14 @@ let defaultTimer = 15000;
 let beersPerPage = 16; // must also change CSS grid number
 
 function changePage(){
+    $.getJSON("http://" + window.apiUrl + ":8081/inventory/quantity", function(quantity){
+        $('#quantity-view').html(quantity + " beers left");
+    });
+
+    $.getJSON("http://" + window.apiUrl + ":8081/inventory/variety", function(variety){
+        $('#variety-view').html(variety + " varieties to choose from");
+    });
+
     $.getJSON("http://" + window.apiUrl + ":8081/inventory", function(beers){
         $("#beer-list").empty();
         if (persist.index >= beers.length) {
@@ -25,17 +33,33 @@ function changePage(){
                 $(".grid-item").last().attr("id", "quantity-low");
             }
         }
-        let timer = defaultTimer;
-        let mostBeersOnPage = beers.length - persist.index;
-        if (mostBeersOnPage < beersPerPage) {
-            let ratio = beersPerPage / mostBeersOnPage;
-            timer = defaultTimer / ((ratio + 6) / 7);
+
+        if (beers.length <= beersPerPage) {
+            setTimeout(changePage, 200);
+        } else {
+            let timer = defaultTimer;
+            let mostBeersOnPage = beers.length - persist.index;
+            if (mostBeersOnPage < beersPerPage) {
+                let ratio = beersPerPage / mostBeersOnPage;
+                timer = defaultTimer / ((ratio + 6) / 7);
+            }
+            persist.index += beersPerPage;
+            setTimeout(changePage, timer);
         }
-        persist.index += beersPerPage;
-        setTimeout(changePage, timer);
+
     });
+};
+
+function startClock() {
+    $('#clock').html(new Date().toLocaleTimeString());
+    setTimeout(startClock, 1000);
 };
 
 $(document).ready( //registers event last
     $(document).ready(changePage)
 );
+
+$(document).ready( //registers event last
+    $(document).ready(startClock)
+);
+

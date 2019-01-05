@@ -180,7 +180,7 @@ func (c *ModalController) Undo(id string) {
 		logAllError("Could not undo last action with id = "+id, err)
 	}
 	if acted {
-		logAllInfo("Reverted last action with id = ", id)
+		logAllInfo("Reverted last action" + c.prettyID(id))
 	}
 }
 
@@ -191,6 +191,31 @@ func (c *ModalController) Redo(id string) {
 		logAllError("Could not redo last action with id = "+id, err)
 	}
 	if acted {
-		logAllInfo("Redid last action with id = ", id)
+		logAllInfo("Redid last action" + c.prettyID(id))
 	}
+}
+
+func (c *ModalController) prettyID(id string) string {
+	if id == "" {
+		return ""
+	}
+	return " with id = " + id
+}
+
+// GetInventoryTotalQuantity returns the total number of beer bottles in stock
+func (c *ModalController) GetInventoryTotalQuantity() int {
+	q, err := c.backend.GetInventoryTotalQuantity()
+	if err != nil {
+		logAllError("Could not get total inventory count", err)
+	}
+	return q
+}
+
+// GetInventoryTotalVariety returns the total number of beer varieties in stock
+func (c *ModalController) GetInventoryTotalVariety()int {
+	q, err := c.backend.GetInventoryTotalVariety()
+	if err != nil {
+		logAllError("Could not get total inventory variety count", err)
+	}
+	return q
 }
