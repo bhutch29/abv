@@ -35,6 +35,7 @@ func initializekeys() {
 		{input, gocui.KeyEnter, parseInput, "Enter", "confirm"},
 		{search, gocui.KeyEnter, handleSearch, "Enter", "confirm"},
 		{search, gocui.KeyCtrlZ, cancelSearch, "Ctrl-z", "cancel"},
+		{popup, gocui.KeyCtrlZ, cancelPopup, "Ctrl-z", "cancel"},
 		{popup, gocui.KeyArrowUp, popupScrollUp, "Up", "scrollUp"},
 		{popup, gocui.KeyCtrlK, popupScrollUp, "Up", "scrollUp"},
 		{popup, gocui.KeyArrowDown, popupScrollDown, "Down", "scrollDown"},

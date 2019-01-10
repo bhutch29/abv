@@ -133,7 +133,21 @@ func (m *Model) GetDrinkByBarcode(bc string) (Drink, error) {
 // GetInventoryTotalQuantity returns the total number of beer bottles in stock
 func (m *Model) GetInventoryTotalQuantity()(int, error) {
 	var result int
-	sql := "select (select sum(quantity) from Input) - (select sum(quantity) from Output)"
+	sql := `
+select (
+  select case
+    when sum(quantity) is null then 0
+    else sum(quantity)
+  end
+  from Input
+) - (
+  select case
+    when sum(quantity) is null then 0
+    else sum(quantity)
+  end
+  from Output
+)
+`
 	err := m.db.Get(&result, sql)
 	return result, err
 }
