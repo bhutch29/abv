@@ -11,7 +11,7 @@ redoBarcode = "1234567"
 #webRoot = ~/.abv/www
 
 # Set the URL/IP Address of the abv API. Defaults to localhost
-#apiUrl = "192.168.0.100"
+apiUrl = "192.168.0.100"
 
 [breweryNicknames]
 "Abbaye Notre-Dame de Saint-Rémy"          = "Trappist Abbey of Rochefort"
@@ -24,6 +24,8 @@ redoBarcode = "1234567"
 "Mikkeller Brewing San Diego"              = "Mikkeller"
 
 [beerNicknames]
+"Kujo Cold Brew Coffee Porter"           = "Kujo Cold Brew Coffee"
+"Voodoo Ranger Juicy Haze IPA"           = "Voodoo Ranger Juicy Haze"
 "60 Minute IPA"                          = "60 Minute"
 "A Little Sumpin' Sumpin' Ale"           = "Little Sumpin' Sumpin'"
 "Ace - Dry Apple Craft Cider"            = "Dry Apple"
@@ -55,9 +57,11 @@ redoBarcode = "1234567"
 "Tart 'N Juicy Sour IPA"                 = "Tart 'N Juicy"
 "Weihenstephaner Hefeweissbier"          = "Weihenstephaner"
 "Wildcide Hard Cider"                    = "Wildcide"
+"Hofbräu Münchner Weisse / Münchner Kindl / Hefe Weizen" = "Hofbräu Hefeweizen"
 
 [styleNicknames]
 "American Wild Ale"         = "Sour"
+"Scotch Ale / Wee Heavy"    = "Scotch Ale"
 "Belgian Strong Dark Ale"   = "Belgian Dark"
 "Belgian Strong Golden Ale" = "Belgian Golden"
 "Pumpkin / Yam Beer"        = "Pumpkin Beer"
