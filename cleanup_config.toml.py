@@ -16,6 +16,7 @@ Example: Overwrite config.toml in working directory
 """
 import os
 import sys
+import unicodedata
 
 from argparse import ArgumentParser, RawTextHelpFormatter
 from os.path import expanduser, realpath
@@ -97,6 +98,7 @@ def clean_config(filepath):
     with open(filepath, mode='r', encoding='utf8') as file_:
         lines = file_.readlines()
     text = parse_toml(lines)
+    text = unicodedata.normalize('NFC', text)
     return text
 
 
