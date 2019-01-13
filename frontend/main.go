@@ -57,7 +57,8 @@ func main() {
 	webRoot := conf.GetString("webRoot")
 	fontPath := path.Join(webRoot, "static", "fonts")
 
-	tmpl = template.Must(template.ParseFiles(webRoot + "/front.html"))
+	frontHTML := path.Join(webRoot, "front.html")
+	tmpl = template.Must(template.ParseFiles(frontHTML))
 
 	router := httprouter.New()
 
@@ -85,23 +86,26 @@ func handleFlags() {
 
 func jsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Add("Content-Type", "application/javascript")
-	path := ps.ByName("filePath")
+	filePath := ps.ByName("filePath")
 	root := conf.GetString("webRoot")
-	http.ServeFile(w, r, root+"/static/js"+path)
+	fullPath := path.Join(root, "static", "js", filePath)
+	http.ServeFile(w, r, fullPath)
 }
 
 func cssHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Add("Content-Type", "text/css")
-	path := ps.ByName("filePath")
+	filePath := ps.ByName("filePath")
 	root := conf.GetString("webRoot")
-	http.ServeFile(w, r, root+"/static/css/"+path)
+	fullPath := path.Join(root, "static", "css", filePath)
+	http.ServeFile(w, r, fullPath)
 }
 
 func htmlHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Add("Content-Type", "text/html")
-	path := ps.ByName("filePath")
+	filePath := ps.ByName("filePath")
 	root := conf.GetString("webRoot")
-	http.ServeFile(w, r, root+"/static/html/"+path)
+	fullPath := path.Join(root, "static", "html", filePath)
+	http.ServeFile(w, r, fullPath)
 }
 
 func frontPageHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
