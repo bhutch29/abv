@@ -143,7 +143,7 @@
 .footer {
     flex: auto;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(1, 1fr);
     width: 100%;
     background-color: black;
@@ -168,8 +168,14 @@
     text-align: center;
 }
 
-#clock{
+#page-number-view{
     grid-column: 3;
+    grid-row: 1;
+    text-align: center;
+}
+
+#clock{
+    grid-column: 4;
     grid-row: 1;
     text-align: right;
 }

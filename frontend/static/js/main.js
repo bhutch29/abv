@@ -23,32 +23,58 @@ function changePage(){
                 break;
             }
 
-            var url = beers[i].Logo;
-            var file = url.substring(url.lastIndexOf('/') + 1);
-            beers[i].Logo = "/images/" + file;
-            var html = Mustache.to_html($('#beer-entry').html(), beers[i]);
-            $('<div class="grid-item"/>').html(html).appendTo('#beer-list');
-
-            if (beers[i].Quantity < 3) {
-                $(".grid-item").last().attr("id", "quantity-low");
-            }
+            setImagePath(beers[i]);
+            createBeerEntry(beers[i]);
+            setLowQuantityIndication(beers[i]);
         }
 
-        if (beers.length <= beersPerPage) {
-            setTimeout(changePage, 200);
-        } else {
-            let timer = defaultTimer;
-            let mostBeersOnPage = beers.length - persist.index;
-            if (mostBeersOnPage < beersPerPage) {
-                let ratio = beersPerPage / mostBeersOnPage;
-                timer = defaultTimer / ((ratio + 6) / 7);
-            }
-            persist.index += beersPerPage;
-            setTimeout(changePage, timer);
-        }
-
+        setPageNumber(beers.length);
+        setPageTimeout(beers.length);
+        persist.index += beersPerPage;
     });
 };
+
+function setImagePath(beer) {
+    var url = beer.Logo;
+    var file = url.substring(url.lastIndexOf('/') + 1);
+    beer.Logo = "/images/" + file;
+}
+
+function createBeerEntry(beer) {
+    var html = Mustache.to_html($('#beer-entry').html(), beer);
+    $('<div class="grid-item"/>').html(html).appendTo('#beer-list');
+}
+
+function setLowQuantityIndication(beer) {
+    if (beer.Quantity < 3) {
+        $(".grid-item").last().attr("id", "quantity-low");
+    }
+}
+
+function setPageNumber(numBeers) {
+    var numPages = Math.ceil(numBeers/beersPerPage);
+    var currentPage = Math.ceil((persist.index + 1) / beersPerPage);
+    $('#page-number-view').html("Page " + currentPage + "/" + numPages);
+}
+
+function setPageTimeout(numBeers) {
+        if (numBeers <= beersPerPage) { //Only 1 page
+            setTimeout(changePage, 200);
+        } else {
+            timer = calcPageTimer(numBeers);
+            setTimeout(changePage, timer);
+        }
+}
+
+function calcPageTimer(numBeers) {
+    let timer = defaultTimer;
+    let mostBeersOnPage = numBeers - persist.index;
+    if (mostBeersOnPage < beersPerPage) {
+        let ratio = beersPerPage / mostBeersOnPage;
+        timer = defaultTimer / ((ratio + 6) / 7);
+    }
+    return timer;
+}
 
 function startClock() {
     $('#clock').html(new Date().toLocaleTimeString());
