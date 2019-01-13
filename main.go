@@ -156,11 +156,11 @@ func refreshInventory() error {
 		visualLen := len(nfcRunes)
 		if visualLen < 30 {
 			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name)
-		} else {
-			const wsPad = "                                       " // strings.Repeat(" ", 39)
-			fmt.Fprintf(view, "%-4d%-35s%-30s...\n", drink.Quantity, drink.Brand, string(nfcRunes[:30]))
-			fmt.Fprintf(view, "%s...%s\n", wsPad, string(nfcRunes[30:]))
+			continue
 		}
+		const wsPad = "                                       " // strings.Repeat(" ", 39)
+		fmt.Fprintf(view, "%-4d%-35s%-30s...\n", drink.Quantity, drink.Brand, string(nfcRunes[:30]))
+		fmt.Fprintf(view, "%s...%s\n", wsPad, string(nfcRunes[30:]))
 	}
 	return nil
 }
