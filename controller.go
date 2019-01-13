@@ -177,10 +177,13 @@ func (c *ModalController) Undo(id string) {
 	acted, err := c.actor.Undo(id)
 	if err != nil {
 		logAllError("Could not undo last action with id = "+id, err)
+		return
 	}
-	if acted {
-		logAllInfo("Reverted last action" + c.prettyID(id))
+	if !acted {
+		logAllInfo("No actions to undo with id = " + id)
+		return
 	}
+	logAllInfo("Reverted last action" + c.prettyID(id))
 }
 
 // Redo reruns the previously reverted action with the given id, if any
@@ -188,10 +191,13 @@ func (c *ModalController) Redo(id string) {
 	acted, err := c.actor.Redo(id)
 	if err != nil {
 		logAllError("Could not redo last action with id = "+id, err)
+		return
 	}
-	if acted {
-		logAllInfo("Redid last action" + c.prettyID(id))
+	if !acted {
+		logAllInfo("No actions to redo with id = " + id)
+		return
 	}
+	logAllInfo("Redid last action" + c.prettyID(id))
 }
 
 func (c *ModalController) prettyID(id string) string {
