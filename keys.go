@@ -75,6 +75,5 @@ func configureKeys() error {
 			return err
 		}
 	}
-
 	return nil
 }

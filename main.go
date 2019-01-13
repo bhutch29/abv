@@ -58,8 +58,10 @@ func main() {
 	}
 
 	// Redirect stderr to log file
-	file := redirectStderr(logFile)
-	defer file.Close()
+	file := stderrDest(logFile)
+	if file != nil {
+		defer file.Close()
+	}
 
 	//Create Controller
 	if c, err = New(); err != nil {
