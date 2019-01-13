@@ -64,16 +64,19 @@ func (vd *viewDrawer) makeLogPanel() error {
 	y0 := 0
 	y1 := viewHeight
 
-	if v, err := g.SetView(logView, x0, y0, x1, y1); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
-		v.Wrap = true
-		v.Title = "Log"
-		v.Autoscroll = true
-		logGui.Out = v
+	v, err := g.SetView(logView, x0, y0, x1, y1)
+	switch err {
+	case nil:
+		return nil
+	case gocui.ErrUnknownView:
+		// view uninitialized
+	default:
+		return err
 	}
-
+	v.Wrap = true
+	v.Title = "Log"
+	v.Autoscroll = true
+	logGui.Out = v
 	return nil
 }
 
