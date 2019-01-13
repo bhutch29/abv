@@ -223,10 +223,11 @@ func handleNewBarcode() {
 func handleSearch(g *gocui.Gui, v *gocui.View) error {
 	text := v.Buffer()
 
-	logFile.WithFields(logrus.Fields{
+	fields := logrus.Fields{
 		"category": "userEntry",
 		"entry":    text,
-	}).Info("User searched for a drink")
+	}
+	logFile.WithFields(fields).Info("User searched for a drink")
 
 	setTitle(searchOutline, "")
 	clearView(search)
@@ -272,10 +273,11 @@ func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 	togglePopup()
 	resetViewCursor(v)
 
-	logFile.WithFields(logrus.Fields{
+	fields := logrus.Fields{
 		"category": "userEntry",
 		"entry":    line,
-	}).Debug("User selected a beer")
+	}
+	logFile.WithFields(fields).Debug("User selected a beer")
 	logGui.Debug("You selected: " + line)
 
 	d, err := findDrinkFromSelection(line)
