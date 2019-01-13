@@ -38,7 +38,6 @@ func New() (ModalController, error) {
 
 	a := undo.NewActor()
 	m.actor = a
-
 	return m, nil
 }
 
@@ -212,7 +211,7 @@ func (c *ModalController) GetInventoryTotalQuantity() int {
 }
 
 // GetInventoryTotalVariety returns the total number of beer varieties in stock
-func (c *ModalController) GetInventoryTotalVariety()int {
+func (c *ModalController) GetInventoryTotalVariety() int {
 	q, err := c.backend.GetInventoryTotalVariety()
 	if err != nil {
 		logAllError("Could not get total inventory variety count", err)
