@@ -141,14 +141,14 @@ func (c *ModalController) outputDrinks(id string, de model.DrinkEntry, d model.D
 	logAllDebug("Adding action with id = ", id)
 	if err := c.actor.AddAction(id, a); err != nil {
 		logAllError("Could not remove drink from inventory: ", err)
-	} else {
-		count, err := c.backend.GetCountByBarcode(d.Barcode)
-		if err != nil {
-			logAllError("Could not get count by barcode: ", err)
-			return
-		}
-		logAllInfo("Drink removed from inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand, "\n  Remaining: ", count)
+		return
 	}
+	count, err := c.backend.GetCountByBarcode(d.Barcode)
+	if err != nil {
+		logAllError("Could not get count by barcode: ", err)
+		return
+	}
+	logAllInfo("Drink removed from inventory!\n  Name:  ", d.Name, "\n  Brand: ", d.Brand, "\n  Remaining: ", count)
 }
 
 func (c *ModalController) inputDrinks(id string, de model.DrinkEntry, d model.Drink) {
