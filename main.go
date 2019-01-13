@@ -381,14 +381,15 @@ func trySetQuantity(q int) {
 		logAllInfo("Serving of multiple beers at once is not supported")
 		return
 	}
-	if q != quantity {
-		quantity = q
-		logAllInfo("Quantity of drinks per scan changed to ", quantity)
-
-		v, _ := g.View(prompt)
-		v.Clear()
-		fmt.Fprintf(v, generateKeybindString(q))
+	if q == quantity {
+		return
 	}
+	quantity = q
+	logAllInfo("Quantity of drinks per scan changed to ", quantity)
+
+	v, _ := g.View(prompt)
+	v.Clear()
+	fmt.Fprintf(v, generateKeybindString(q))
 }
 
 func setQuantity1(g *gocui.Gui, v *gocui.View) error {
