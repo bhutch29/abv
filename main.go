@@ -9,8 +9,6 @@ import (
 	"os/exec"
 	"strings"
 
-	"golang.org/x/crypto/ssh/terminal"
-	"golang.org/x/text/unicode/norm"
 	"github.com/bhutch29/abv/cache"
 	"github.com/bhutch29/abv/config"
 	"github.com/bhutch29/abv/model"
@@ -18,6 +16,8 @@ import (
 	aur "github.com/logrusorgru/aurora"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/text/unicode/norm"
 )
 
 var (
@@ -156,7 +156,6 @@ func refreshInventory() error {
 			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name)
 		} else {
 			const wsPad = "                                       " // strings.Repeat(" ", 39)
-			fmt.Printf("Hello, %8s\n", "pad")
 			fmt.Fprintf(view, "%-4d%-35s%-30s...\n", drink.Quantity, drink.Brand, string(nfcRunes[:30]))
 			fmt.Fprintf(view, "%s...%s\n", wsPad, string(nfcRunes[30:]))
 		}
