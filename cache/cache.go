@@ -25,25 +25,26 @@ func init() {
 func Image(url string) error {
 	imagePath := path.Join(conf.GetString("configPath"), "images")
 	file := path.Join(imagePath, path.Base(url))
-	if !exists(file) {
-		response, err := http.Get(url)
-		if err != nil {
-			return err
-		}
-
-		_ = os.MkdirAll(imagePath, os.ModePerm)
-		f, err := os.Create(file)
-		if err != nil {
-			log.Fatal("Could not create file: ", err)
-		}
-
-		if _, err = io.Copy(f, response.Body); err != nil {
-			return err
-		}
-
-		response.Body.Close()
-		f.Close()
+	if exists(file) {
+		return nil
 	}
+	response, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+
+	_ = os.MkdirAll(imagePath, os.ModePerm)
+	f, err := os.Create(file)
+	if err != nil {
+		log.Fatal("Could not create file: ", err)
+	}
+
+	if _, err = io.Copy(f, response.Body); err != nil {
+		return err
+	}
+
+	response.Body.Close()
+	f.Close()
 	return nil
 }
 
