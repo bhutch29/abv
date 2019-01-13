@@ -122,18 +122,18 @@ func (c *ModalController) handleDrink(id string, bc string, quantity int) {
 
 	if c.currentMode == stocking {
 		c.inputDrinks(id, d, drink)
-	} else if c.currentMode == serving {
-		count, err := c.backend.GetCountByBarcode(d.Barcode)
-		if err != nil {
-			logAllError("Could not get count by barcode: ", err)
-			return
-		}
-		if count <= 0 {
-			logAllWarn("That drink was not in the inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
-			return
-		}
-		c.outputDrinks(id, d, drink)
+		return
 	}
+	count, err := c.backend.GetCountByBarcode(d.Barcode)
+	if err != nil {
+		logAllError("Could not get count by barcode: ", err)
+		return
+	}
+	if count <= 0 {
+		logAllWarn("That drink was not in the inventory!\n  Name:  ", drink.Name, "\n  Brand: ", drink.Brand)
+		return
+	}
+	c.outputDrinks(id, d, drink)
 }
 
 func (c *ModalController) outputDrinks(id string, de model.DrinkEntry, d model.Drink) {
