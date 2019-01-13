@@ -156,9 +156,9 @@ func (c *ModalController) inputDrinks(id string, de model.DrinkEntry, d model.Dr
 	logAllDebug("Adding action with id = ", id)
 	if err := c.actor.AddAction(id, a); err != nil {
 		logAllError("Could not add drink to inventory: ", err)
-	} else {
-		logAllInfo("Drink added to inventory!\n  #:     ", quantity, "\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
+		return
 	}
+	logAllInfo("Drink added to inventory!\n  #:     ", quantity, "\n  Name:  ", d.Name, "\n  Brand: ", d.Brand)
 }
 
 // ClearInputOutputRecords wipes out all stocking and serving records
