@@ -49,13 +49,14 @@ func initializekeys() {
 func generateKeybindString(quantity int) string {
 	var result string
 	for _, k := range keys {
-		if k.viewname == "" || k.viewname == input {
-			if getKeyQuantity(k.shortkey) == quantity {
-				result = result + fmt.Sprintf("%s->%s ", aur.BgBlue(aur.Black(k.shortkey)), k.shortname)
-			} else {
-				result = result + fmt.Sprintf("%s->%s ", aur.BgGray(aur.Black(k.shortkey)), k.shortname)
-			}
+		if k.viewname != "" && k.viewname != input {
+			continue
 		}
+		if getKeyQuantity(k.shortkey) == quantity {
+			result = result + fmt.Sprintf("%s->%s ", aur.BgBlue(aur.Black(k.shortkey)), k.shortname)
+			continue
+		}
+		result = result + fmt.Sprintf("%s->%s ", aur.BgGray(aur.Black(k.shortkey)), k.shortname)
 	}
 	return result
 }
