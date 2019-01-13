@@ -9,6 +9,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"golang.org/x/text/unicode/norm"
+
 	"github.com/bhutch29/abv/cache"
 	"github.com/bhutch29/abv/config"
 	"github.com/bhutch29/abv/model"
@@ -141,11 +143,16 @@ func refreshInventory() error {
 	fmt.Fprintf(view, "Total Beers: %d      Total Varieties: %d\n\n", total, variety)
 	for _, drink := range inventory {
 		//TODO: Make this more robust to handle arbitrary length Brand and Name strings
-		if len(drink.Name) < 30 {
+		nfcBytes := norm.NFC.Bytes([]byte(drink.Name))
+		nfcRunes := []rune(string(nfcBytes))
+		visualLen := len(nfcRunes)
+		if visualLen < 30 {
 			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name)
 		} else {
-			fmt.Fprintf(view, "%-4d%-35s%-30s\n", drink.Quantity, drink.Brand, drink.Name[:30])
-			fmt.Fprintf(view, "%-4s%-35s%-30s\n", "", drink.Name[30:], "")
+			const wsPad = "                                       " // strings.Repeat(" ", 39)
+			fmt.Printf("Hello, %8s\n", "pad")
+			fmt.Fprintf(view, "%-4d%-35s%-30s...\n", drink.Quantity, drink.Brand, string(nfcRunes[:30]))
+			fmt.Fprintf(view, "%s...%s\n", wsPad, string(nfcRunes[30:]))
 		}
 	}
 	return nil
