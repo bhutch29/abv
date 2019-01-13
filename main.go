@@ -173,17 +173,16 @@ func parseInput(g *gocui.Gui, v *gocui.View) error {
 	}
 
 	id, barcode := parseIDFromBarcode(bc)
-	undoCode := conf.GetString("undoBarcode")
-	redoCode := conf.GetString("redoBarcode")
-	if barcode == undoCode {
+	switch barcode {
+	case conf.GetString("undoBarcode"):
 		c.Undo(id)
-		refreshInventory()
-	} else if barcode == redoCode {
+	case conf.GetString("redoBarcode"):
 		c.Redo(id)
-		refreshInventory()
-	} else {
+	default:
 		handleBarcodeEntry(id, barcode)
+		return nil
 	}
+	refreshInventory()
 	return nil
 }
 
