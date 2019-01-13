@@ -85,26 +85,28 @@ func displayError(e error) error {
 	maxX, maxY := g.Size()
 	x0 := maxX / 6
 	y0 := maxY / 6
-	x1 := (5 * maxX) / 6
-	y1 := (5 * maxY) / 6
+	x1 := maxX - x0
+	y1 := maxY - y0
 
-	if v, err := g.SetView(errorView, x0, y0, x1, y1); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
-
-		v.Title = "ERROR"
-		v.Frame = true
-		v.Wrap = true
-		v.Autoscroll = true
-		v.BgColor = gocui.ColorRed
-		v.FgColor = gocui.ColorWhite
-
-		v.Clear()
-		fmt.Fprintln(v, e.Error())
-		g.SetCurrentView(v.Name())
+	v, err := g.SetView(errorView, x0, y0, x1, y1)
+	switch err {
+	case nil:
+		return nil
+	case gocui.ErrUnknownView:
+		// view uninitialized
+	default:
+		return err
 	}
+	v.Title = "ERROR"
+	v.Frame = true
+	v.Wrap = true
+	v.Autoscroll = true
+	v.BgColor = gocui.ColorRed
+	v.FgColor = gocui.ColorWhite
 
+	v.Clear()
+	fmt.Fprintln(v, e.Error())
+	g.SetCurrentView(v.Name())
 	return nil
 }
 
