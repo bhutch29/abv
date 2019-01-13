@@ -38,11 +38,10 @@ func updatePromptSymbol() {
 	case serving:
 		fmt.Fprintf(v, "%s >>", aur.BgGreen("Serving"))
 	}
-
 }
 
 func clearView(view string) {
-	g.Update(func(g *gocui.Gui) error {
+	f := func(g *gocui.Gui) error {
 		v, err := g.View(view)
 		if err != nil {
 			return err
@@ -52,7 +51,8 @@ func clearView(view string) {
 		v.MoveCursor(-x, -y, true)
 
 		return nil
-	})
+	}
+	g.Update(f)
 }
 
 func promptEditor(v *gocui.View, key gocui.Key, ch rune, mod gocui.Modifier) {
