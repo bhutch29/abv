@@ -104,12 +104,12 @@ func (c *ModalController) HandleBarcode(id string, bc string, quantity int) (boo
 	if err != nil {
 		return false, err
 	}
-	if exists {
-		logFile.Info("Known barcode scanned: ", bc)
-		c.handleDrink(id, bc, quantity)
-		return true, nil
+	if !exists {
+		return false, nil
 	}
-	return false, nil
+	logFile.Info("Known barcode scanned: ", bc)
+	c.handleDrink(id, bc, quantity)
+	return true, nil
 }
 
 func (c *ModalController) handleDrink(id string, bc string, quantity int) {
