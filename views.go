@@ -84,8 +84,8 @@ func (vd *viewDrawer) makeSelectOptionsPopup() error {
 	w := vd.maxX / 2
 	h := vd.maxY / 4
 
-	x0 := (vd.maxX / 2) - (w / 2)
-	y0 := (vd.maxY / 2) - (h / 2)
+	x0 := (vd.maxX - w) / 2
+	y0 := (vd.maxY - h) / 2
 	x1 := x0 + w
 	y1 := y0 + h
 
@@ -136,15 +136,18 @@ func (vd *viewDrawer) makeInfoPanel() error {
 	viewHeight := vd.maxY - inputHeight
 	infoStart := float64(vd.maxX) - float64(vd.maxX)/stockDivisor
 
-	if v, err := g.SetView(info, int(infoStart), 0, vd.maxX-2, viewHeight); err != nil {
-		if err != gocui.ErrUnknownView {
-			return err
-		}
-		v.Title = "Stock"
-		v.Wrap = true
-		refreshInventory()
+	v, err := g.SetView(info, int(infoStart), 0, vd.maxX-2, viewHeight)
+	switch err {
+	case nil:
+		return nil
+	case gocui.ErrUnknownView:
+		// view uninitialized
+	default:
+		return err
 	}
-
+	v.Title = "Stock"
+	v.Wrap = true
+	refreshInventory()
 	return nil
 }
 
