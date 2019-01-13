@@ -9,8 +9,8 @@ import (
 	"os/exec"
 	"strings"
 
+	"golang.org/x/crypto/ssh/terminal"
 	"golang.org/x/text/unicode/norm"
-
 	"github.com/bhutch29/abv/cache"
 	"github.com/bhutch29/abv/config"
 	"github.com/bhutch29/abv/model"
@@ -45,8 +45,14 @@ func init() {
 }
 
 func main() {
+	// Save the state of terminal, so we can restore it after a panic
+	fd := int(os.Stdout.Fd())
+	oldState, err := terminal.GetState(fd)
+	if err == nil {
+		defer terminal.Restore(fd, oldState)
+	}
+
 	//Get Configuration
-	var err error
 	if conf, err = config.New(); err != nil {
 		log.Fatal("Error getting configuration info: ", err)
 	}
