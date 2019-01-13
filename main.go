@@ -188,13 +188,10 @@ func parseInput(g *gocui.Gui, v *gocui.View) error {
 
 func parseIDFromBarcode(bc string) (string, string) {
 	// If the second character is an _, treat the first character as a scanner ID and the rest of the input as a barcode
-	if len(bc) == 1 {
+	if len(bc) == 1 || bc[1] != []byte("_")[0] {
 		return "", bc
 	}
-	if bc[1] == []byte("_")[0] {
-		return string(bc[0]), bc[2:]
-	}
-	return "", bc
+	return string(bc[0]), bc[2:]
 }
 
 func handleBarcodeEntry(id string, bc string) {
