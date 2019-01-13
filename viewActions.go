@@ -11,23 +11,22 @@ import (
 var popupDisplayed = false
 
 func togglePopup() {
-	if !popupDisplayed {
+	popupDisplayed = !popupDisplayed
+	if popupDisplayed {
 		g.SetViewOnTop(popup)
 		g.SetViewOnTop(searchOutline)
 		g.SetViewOnTop(searchSymbol)
 		g.SetViewOnTop(search)
 		g.SetCurrentView(search)
 		setTitle(searchOutline, "Enter brewery and beer name...")
-	} else {
-		setTitle(popup, "")
-		g.SetViewOnBottom(popup)
-		g.SetViewOnBottom(searchSymbol)
-		g.SetViewOnBottom(searchOutline)
-		g.SetViewOnBottom(search)
-		g.SetCurrentView(input)
+		return
 	}
-
-	popupDisplayed = !popupDisplayed
+	setTitle(popup, "")
+	g.SetViewOnBottom(popup)
+	g.SetViewOnBottom(searchSymbol)
+	g.SetViewOnBottom(searchOutline)
+	g.SetViewOnBottom(search)
+	g.SetCurrentView(input)
 }
 
 func updatePromptSymbol() {
