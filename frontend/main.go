@@ -2,25 +2,26 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/bhutch29/abv/model"
-	"github.com/julienschmidt/httprouter"
+	"flag"
+	"fmt"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
-	"flag"
-	"fmt"
 	"os"
-	"github.com/bhutch29/abv/config"
-	"github.com/spf13/viper"
 	"path"
-	"html/template"
+	"time"
+
+	"github.com/bhutch29/abv/config"
+	"github.com/bhutch29/abv/model"
+	"github.com/julienschmidt/httprouter"
+	"github.com/spf13/viper"
 )
 
 var (
-	conf *viper.Viper
+	conf    *viper.Viper
 	version = "undefined"
-	tmpl *template.Template
+	tmpl    *template.Template
 )
 
 // Page is the backing type for all pages
@@ -56,7 +57,8 @@ func main() {
 	webRoot := conf.GetString("webRoot")
 	fontPath := path.Join(webRoot, "static", "fonts")
 
-	tmpl = template.Must(template.ParseFiles(webRoot + "/front.html"))
+	frontHTML := path.Join(webRoot, "front.html")
+	tmpl = template.Must(template.ParseFiles(frontHTML))
 
 	router := httprouter.New()
 
@@ -72,7 +74,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
 
-func handleFlags(){
+func handleFlags() {
 	ver := flag.Bool("version", false, "Prints the version")
 	flag.Parse()
 
@@ -84,23 +86,26 @@ func handleFlags(){
 
 func jsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Add("Content-Type", "application/javascript")
-	path := ps.ByName("filePath")
+	filePath := ps.ByName("filePath")
 	root := conf.GetString("webRoot")
-	http.ServeFile(w, r, root + "/static/js"+path)
+	fullPath := path.Join(root, "static", "js", filePath)
+	http.ServeFile(w, r, fullPath)
 }
 
 func cssHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Add("Content-Type", "text/css")
-	path := ps.ByName("filePath")
+	filePath := ps.ByName("filePath")
 	root := conf.GetString("webRoot")
-	http.ServeFile(w, r, root + "/static/css/"+path)
+	fullPath := path.Join(root, "static", "css", filePath)
+	http.ServeFile(w, r, fullPath)
 }
 
 func htmlHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	w.Header().Add("Content-Type", "text/html")
-	path := ps.ByName("filePath")
+	filePath := ps.ByName("filePath")
 	root := conf.GetString("webRoot")
-	http.ServeFile(w, r, root + "/static/html/"+path)
+	fullPath := path.Join(root, "static", "html", filePath)
+	http.ServeFile(w, r, fullPath)
 }
 
 func frontPageHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
