@@ -22,8 +22,11 @@ apiUrl = "192.168.0.100"
 "Epic Brewing Co. (Utah, Colorado)"        = "Epic"
 "Kirin Brewery Company"                    = "Kirin"
 "Mikkeller Brewing San Diego"              = "Mikkeller"
+"Crooked Stave Artisan Beer Project"       = "Crooked Stave"
 
 [beerNicknames]
+"KYLA Ginger Tangerine Kombucha"         = "Ginger Tangerine Kombucha"
+"Funk N Delicious Belgian Style Blueberry Sour Ale" = "Funk N Delicious Blueberry"
 "60 Minute IPA"                          = "60 Minute"
 "A Little Sumpin' Sumpin' Ale"           = "Little Sumpin' Sumpin'"
 "Ace - Dry Apple Craft Cider"            = "Dry Apple"
