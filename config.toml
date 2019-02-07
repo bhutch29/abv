@@ -59,8 +59,10 @@ apiUrl = "192.168.0.100"
 "Stone Farking Wheaton W00tstout (2015)"                 = "W00tstout"
 "Tart 'N Juicy Sour IPA"                                 = "Tart 'N Juicy"
 "Voodoo Ranger Juicy Haze IPA"                           = "Voodoo Ranger Juicy Haze"
-"Weihenstephaner Hefeweissbier"                          = "Weihenstephaner"
+"Weihenstephaner Hefeweissbier"                          = "Hefeweissbier"
+"Weihenstephaner Original"                               = "Original"
 "Wildcide Hard Cider"                                    = "Wildcide"
+"So Happens It's Tuesday with Coffee (2018)"             = "So Happens Its Tuesday"
 
 [styleNicknames]
 "American Wild Ale"         = "Sour"
