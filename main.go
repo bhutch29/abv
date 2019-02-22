@@ -262,7 +262,7 @@ func updatePopup(name string) {
 
 	v.Clear()
 	for _, drink := range drinks {
-		fmt.Fprintf(v, "%s: %s\n", drink.Brand, drink.Name)
+		fmt.Fprintf(v, "%s:: %s\n", drink.Brand, drink.Name)
 	}
 
 	g.SetCurrentView(popup)
@@ -315,7 +315,7 @@ func findDrinkFromSelection(line string) (model.Drink, error) {
 	logFile.Debug("Finding drink from selected text: ", line)
 	var d model.Drink
 
-	s := strings.Split(line, ":")
+	s := strings.Split(line, "::")
 	brand := s[0]
 	name := strings.TrimSpace(s[1])
 
