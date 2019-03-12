@@ -4,6 +4,7 @@ persist.index = 0;
 let defaultTimer = 15000;
 let beersPerPage = 16; // must also change CSS grid number
 
+
 function changePage(){
     $.getJSON("http://" + window.apiUrl + ":8081/inventory/quantity", function(quantity){
         $('#quantity-view').html(quantity + " beers left");
@@ -27,11 +28,11 @@ function changePage(){
             createBeerEntry(beers[i]);
             setLowQuantityIndication(beers[i]);
         }
-
         setPageNumber(beers.length);
         setPageTimeout(beers.length);
         persist.index += beersPerPage;
     });
+    
 };
 
 function setImagePath(beer) {
@@ -54,15 +55,25 @@ function setLowQuantityIndication(beer) {
 function setPageNumber(numBeers) {
     var numPages = Math.ceil(numBeers/beersPerPage);
     var currentPage = Math.ceil((persist.index + 1) / beersPerPage);
-    $('#page-number-view').html("Page " + currentPage + "/" + numPages);
+    $('#page-number-view').html(currentPage + "/" + numPages);
 }
 
 function setPageTimeout(numBeers) {
         if (numBeers <= beersPerPage) { //Only 1 page
             setTimeout(changePage, 200);
+            document.documentElement.style.setProperty("--animation-time", "0s");
+
         } else {
             timer = calcPageTimer(numBeers);
             setTimeout(changePage, timer);
+
+            //Have to delete and replace element to restart animation
+            var element = $('svg circle');
+            var copy = element.clone(true);
+            element.before(copy);
+            $('svg circle:last').remove();
+
+            document.documentElement.style.setProperty("--animation-time", timer + "ms");
         }
 }
 
@@ -79,6 +90,7 @@ function calcPageTimer(numBeers) {
 function startClock() {
     $('#clock').html(new Date().toLocaleTimeString());
     setTimeout(startClock, 1000);
+    
 };
 
 $(document).ready( //registers event last
