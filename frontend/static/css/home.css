@@ -3,6 +3,10 @@
     margin: 0;
 }
 
+:root {
+    --animation-time: 15s;
+  }
+
 .top-container {
     width: 100vw;
     height: 100vh;
@@ -19,7 +23,6 @@
     background-color: rgba(0,0,0,1);
     padding: 0;
     width: 100%;
-    height: 100%;
 }
 
 /* bowlby-one-sc-regular - latin */
@@ -148,12 +151,14 @@
     width: 100%;
     background-color: black;
     font-family: 'Oswald', sans-serif;
+    font-size: 20px;
     color: rgba(255,255,255,.8);
 }
 
 .footer-column {
-    display: table-cell;
-    
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #quantity-view{
@@ -168,12 +173,52 @@
     text-align: center;
 }
 
+
 #page-number-view{
     grid-column: 3;
     grid-row: 1;
     text-align: center;
 }
 
+#countdown {
+    grid-column: 3;
+    grid-row: 1;
+    position: relative;
+    margin: auto;
+    /*margin-top: 100px;*/
+    height: 40px;
+    width: 40px;
+    text-align: center;
+  }
+
+  svg {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    transform: rotateY(-180deg) rotateZ(-90deg);
+  }
+  
+  svg circle {
+    stroke-dasharray: 113px;
+    stroke-dashoffset: 0px;
+    stroke-linecap: round;
+    stroke-width: 2px;
+    stroke: white;
+    fill: none;
+    animation: countdown var(--animation-time) linear infinite forwards;
+  }
+  
+  @keyframes countdown {
+    from {
+      stroke-dashoffset: 0px;
+    }
+    to {
+      stroke-dashoffset: 113px;
+    }
+  }
+  
 #clock{
     grid-column: 4;
     grid-row: 1;
