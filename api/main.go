@@ -9,11 +9,13 @@ import (
 	"net/http"
 	"os"
 
+	"net/url"
+
 	"github.com/bhutch29/abv/cache"
 	"github.com/bhutch29/abv/model"
 	"github.com/julienschmidt/httprouter"
 	"github.com/rs/cors"
-	"net/url"
+	"golang.org/x/text/unicode/norm"
 )
 
 var (
@@ -61,7 +63,24 @@ func healthCheck(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 
 func getInventory(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 	drinks, err := m.GetInventory()
+	drinks = abbreviate(drinks)
 	encodeDrinks(drinks, err, w)
+}
+
+func abbreviate(drinksIn []model.StockedDrink) (drinksOut []model.StockedDrink) {
+	const DrinkLenMax = 28
+	for _, drink := range drinksIn {
+		nfcBytes := norm.NFC.Bytes([]byte(drink.Name))
+		nfcRunes := []rune(string(nfcBytes))
+		visualLen := len(nfcRunes)
+		if visualLen <= DrinkLenMax {
+			drinksOut = append(drinksOut, drink)
+			continue
+		}
+		drink.Drink.Name = string(nfcRunes[:DrinkLenMax])
+		drinksOut = append(drinksOut, drink)
+	}
+	return drinksOut
 }
 
 func getInventoryQuantity(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
