@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/bhutch29/abv/model"
 )
@@ -28,17 +29,22 @@ func SearchUntappdByName(name string) ([]model.Drink, error) {
 		beer := m["beer"].(map[string]interface{})
 		brewery := m["brewery"].(map[string]interface{})
 		drink := model.Drink{
-			Name:    beer["beer_name"].(string),
-			Brand:   brewery["brewery_name"].(string),
+			Name:    trimWS(beer["beer_name"].(string)),
+			Brand:   trimWS(brewery["brewery_name"].(string)),
 			Abv:     beer["beer_abv"].(float64),
 			Ibu:     int(beer["beer_ibu"].(float64)),
-			Type:    beer["beer_style"].(string),
-			Logo:    brewery["brewery_label"].(string),
-			Country: brewery["country_name"].(string),
+			Type:    trimWS(beer["beer_style"].(string)),
+			Logo:    trimWS(brewery["brewery_label"].(string)),
+			Country: trimWS(brewery["country_name"].(string)),
 		}
 		drinks = append(drinks, drink)
 	}
 	return drinks, nil
+}
+
+func trimWS(s string) string {
+	const CutSet = " \f\t\n\r\v\x85\xA0" // TODO: also consider whitespace characters outside of the Latin-1 space
+	return strings.Trim(s, CutSet)
 }
 
 func queryUntappdByName(name string) (map[string]interface{}, error) {
