@@ -6,6 +6,12 @@ ABV is a very simple POS system for beverages with no capacity for handling paym
 
 ABV is also *free as in speech* under the [MIT license](LICENSE), so feel free to use it as a baseline for your own projects!
 
+## Usage
+
+### Scanning a new beer
+
+![Scanning New Barcode](https://i.imgur.com/lvWCeCnb.gif)
+
 ## 🔧 Configuration
 
 ABV expects a file named config.toml to exist in the ~/.abv directory. An example config file is kept updated in the root of the project repository.
