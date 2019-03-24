@@ -10,7 +10,7 @@ ABV is also *free as in speech* under the [MIT license](LICENSE), so feel free t
 
 ### Scanning a new beer
 
-![Scanning New Barcode](docs/vids/newbarcode.mp4)
+![Scanning New Barcode](https://i.imgur.com/0uDI5yOb.gif)
 
 ## 🔧 Configuration
 
