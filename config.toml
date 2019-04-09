@@ -5,10 +5,10 @@ undoBarcode = "036000374575"
 redoBarcode = "1234567"
 
 # Set location of config files. Do not use trailing slash. Defaults to ~/.abv
-#configPath = ~/etc/abv
+#configPath = "~/etc/abv"
 
 # Set the web root directory (directory containing the front page html and the static/ folder). Do not use trailing slash. Defaults to /srv/http
-#webRoot = ~/.abv/www
+#webRoot = "~/.abv/www"
 
 # Set the URL/IP Address of the abv API. Defaults to localhost
 apiUrl = "192.168.0.100"
