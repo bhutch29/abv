@@ -70,7 +70,7 @@
     display: grid;
     height: 100%;
     width: 100%;
-    grid-template-columns: repeat(9, 1fr);
+    grid-template-columns: repeat(8, 1fr);
     /*grid-template-columns: repeat(90 1fr);*/
     grid-template-rows: repeat(2, 1fr);
     /*grid-template-rows: repeat(30, 1fr);*/
@@ -139,7 +139,7 @@
 }
 
 #ibu {
-    justify-self: end;
+    justify-self: center;
     Align-self: end;
   /*  grid-column: 81/91;
     grid-row: 21/31;*/
