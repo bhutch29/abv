@@ -271,6 +271,11 @@ func updatePopup(name string) {
 
 func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
 	line, err := getViewLine(v)
+	if err != nil {
+		logAllError(err)
+		return nil
+	}
+
 	togglePopup()
 	resetViewCursor(v)
 
