@@ -167,10 +167,8 @@ func (c *ModalController) ClearInputOutputRecords() error {
 	if err := c.backend.ClearInputTable(); err != nil {
 		return err
 	}
-	if err := c.backend.ClearOutputTable(); err != nil {
-		return err
-	}
-	return nil
+	err := c.backend.ClearOutputTable()
+	return err
 }
 
 // Undo reverts the previous action with the given id, if any
