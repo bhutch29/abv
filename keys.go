@@ -51,11 +51,10 @@ func generateKeybindString(quantity int) string {
 	for _, k := range keys {
 		if k.viewname == "" || k.viewname == input {
 			if getKeyQuantity(k.shortkey) == quantity {
-				result = result + fmt.Sprintf("%s->%s ", aur.BgBlue(aur.Black(k.shortkey)), k.shortname)
-			} else {
-				const GrayLevel = 12
-				result = result + fmt.Sprintf("%s->%s ", aur.BgGray(GrayLevel, aur.Black(k.shortkey)), k.shortname)
+				result += fmt.Sprintf("%s->%s ", aur.BgBlue(aur.Black(k.shortkey)), k.shortname)
+				continue
 			}
+			result += fmt.Sprintf("%s->%s ", aur.BgWhite(aur.Black(k.shortkey)), k.shortname)
 		}
 	}
 	return result
@@ -71,10 +70,10 @@ func getKeyQuantity(shortkey string) int {
 
 func configureKeys() error {
 	for _, key := range keys {
-		if err := g.SetKeybinding(key.viewname, key.key, gocui.ModNone, key.handler); err != nil {
+		err := g.SetKeybinding(key.viewname, key.key, gocui.ModNone, key.handler)
+		if err != nil {
 			return err
 		}
 	}
-
 	return nil
 }
