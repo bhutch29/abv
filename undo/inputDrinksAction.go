@@ -8,7 +8,7 @@ import (
 type InputDrinksAction struct {
 	id int
 	de model.DrinkEntry
-	m model.Model
+	m  model.Model
 }
 
 // NewInputDrinksAction returns an initialized InputDrinksAction
