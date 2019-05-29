@@ -13,7 +13,7 @@ func NewActor() Actor {
 }
 
 // AddAction performs the action and appends it onto the current node and updates the current node. Will destroy any history ahead of the current node.
-func (h *Actor) AddAction(id string , a ReversibleAction) error {
+func (h *Actor) AddAction(id string, a ReversibleAction) error {
 	l := h.getList(id)
 	err := l.addAction(a)
 	return err

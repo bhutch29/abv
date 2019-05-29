@@ -131,7 +131,7 @@ func (m *Model) GetDrinkByBarcode(bc string) (Drink, error) {
 }
 
 // GetInventoryTotalQuantity returns the total number of beer bottles in stock
-func (m *Model) GetInventoryTotalQuantity()(int, error) {
+func (m *Model) GetInventoryTotalQuantity() (int, error) {
 	var result int
 	sql := `
 select (
@@ -153,7 +153,7 @@ select (
 }
 
 // GetInventoryTotalVariety returns the total number of beer varieties in stock
-func (m *Model) GetInventoryTotalVariety()(int, error) {
+func (m *Model) GetInventoryTotalVariety() (int, error) {
 	var result int
 
 	sql := `

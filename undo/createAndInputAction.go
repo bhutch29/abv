@@ -21,17 +21,23 @@ func NewCreateAndInputAction(d model.Drink, de model.DrinkEntry) *CreateAndInput
 }
 
 // Do implements the ReversibleAction interface
-func (a *CreateAndInputAction) Do() error {
-	var err error
+func (a *CreateAndInputAction) Do() (err error) {
 	err = a.c.Do()
+	if err != nil {
+		return err
+	}
+
 	err = a.i.Do()
 	return err
 }
 
 // Undo implements the ReversibleAction interface
-func (a *CreateAndInputAction) Undo() error {
-	var err error
+func (a *CreateAndInputAction) Undo() (err error) {
 	err = a.i.Undo()
+	if err != nil {
+		return err
+	}
+
 	err = a.c.Undo()
 	return err
 }

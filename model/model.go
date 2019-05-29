@@ -5,15 +5,15 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	// Registers the sqlite3 db driver
-	_ "github.com/mattn/go-sqlite3"
-	"github.com/spf13/viper"
 	"github.com/bhutch29/abv/config"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/mitchellh/go-homedir"
+	"github.com/spf13/viper"
 )
 
 // Model controls all the data flow into and out of the db layer
 type Model struct {
-	db *sqlx.DB
+	db   *sqlx.DB
 	conf *viper.Viper
 }
 

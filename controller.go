@@ -167,10 +167,8 @@ func (c *ModalController) ClearInputOutputRecords() error {
 	if err := c.backend.ClearInputTable(); err != nil {
 		return err
 	}
-	if err := c.backend.ClearOutputTable(); err != nil {
-		return err
-	}
-	return nil
+	err := c.backend.ClearOutputTable()
+	return err
 }
 
 // Undo reverts the previous action with the given id, if any
@@ -212,7 +210,7 @@ func (c *ModalController) GetInventoryTotalQuantity() int {
 }
 
 // GetInventoryTotalVariety returns the total number of beer varieties in stock
-func (c *ModalController) GetInventoryTotalVariety()int {
+func (c *ModalController) GetInventoryTotalVariety() int {
 	q, err := c.backend.GetInventoryTotalVariety()
 	if err != nil {
 		logAllError("Could not get total inventory variety count", err)

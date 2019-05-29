@@ -12,7 +12,7 @@ var (
 )
 
 func redirectStderr(logger *logrus.Logger) (file *os.File) {
-	file, err := os.OpenFile(conf.GetString("configPath") + "/abv.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	file, err := os.OpenFile(conf.GetString("configPath")+"/abv.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err == nil {
 		logger.Out = file
 	} else {

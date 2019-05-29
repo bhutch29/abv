@@ -69,12 +69,17 @@ func queryUntappdByName(name string) (map[string]interface{}, error) {
 
 	defer resp.Body.Close()
 	body, err := ioutil.ReadAll(resp.Body)
-	json.Unmarshal(body, &result)
-	err = validateUntappdResponse(result)
 	if err != nil {
 		return result, err
 	}
-	return result, nil
+
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return result, err
+	}
+
+	err = validateUntappdResponse(result)
+	return result, err
 }
 
 func fetchClientCredentials() (clientID, clientSecret string, err error) {

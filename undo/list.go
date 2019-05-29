@@ -11,7 +11,7 @@ func newUndoList() undoList {
 }
 
 type node struct {
-	action ReversibleAction
+	action         ReversibleAction
 	next, previous *node
 }
 
@@ -21,7 +21,7 @@ func (l *undoList) addAction(a ReversibleAction) error {
 		return err
 	}
 	n := node{action: a, previous: l.current}
-	l.current.next = &n;
+	l.current.next = &n
 	l.current = &n
 	return nil
 }

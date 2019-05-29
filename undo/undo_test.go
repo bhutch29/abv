@@ -1,8 +1,8 @@
 package undo
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
 func TestAddAction(t *testing.T) {
@@ -40,7 +40,7 @@ func TestMultipleUndoLists(t *testing.T) {
 	checkResult(d2.Calls, []string{"Do"}, t)
 }
 
-func checkResult(have []string, want []string, t *testing.T,) {
+func checkResult(have []string, want []string, t *testing.T) {
 	if !reflect.DeepEqual(have, want) {
 		t.Errorf("wanted calls %v got %v", want, have)
 	}
