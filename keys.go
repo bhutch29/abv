@@ -3,10 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/jroimartin/gocui"
-	aur "github.com/logrusorgru/aurora"
 	"strconv"
 	"strings"
+
+	"github.com/jroimartin/gocui"
+	aur "github.com/logrusorgru/aurora"
 )
 
 type key struct {
@@ -48,11 +49,12 @@ func initializekeys() {
 func generateKeybindString(quantity int) string {
 	var result string
 	for _, k := range keys {
-		if k.viewname == "" || k.viewname == input{
+		if k.viewname == "" || k.viewname == input {
 			if getKeyQuantity(k.shortkey) == quantity {
 				result = result + fmt.Sprintf("%s->%s ", aur.BgBlue(aur.Black(k.shortkey)), k.shortname)
 			} else {
-				result = result + fmt.Sprintf("%s->%s ", aur.BgGray(aur.Black(k.shortkey)), k.shortname)
+				const GrayLevel = 12
+				result = result + fmt.Sprintf("%s->%s ", aur.BgGray(GrayLevel, aur.Black(k.shortkey)), k.shortname)
 			}
 		}
 	}
