@@ -204,6 +204,12 @@ func resetViewCursor(v *gocui.View) error {
 	return nil
 }
 
+// scrollView scrolls the user's current highlighted selection in a gocui view
+// by the given number of rows.
+//
+// Positive dy corresponds to a downward movement, while negative dy moves the
+// cursor up. If the cursor cannot be moved, it is clipped to the maximum or
+// minimum row.
 func scrollView(v *gocui.View, dy int) error {
 	if v != nil {
 		v.Autoscroll = false
@@ -221,6 +227,7 @@ func scrollView(v *gocui.View, dy int) error {
 	return nil
 }
 
+// setTitle sets the title of a view in the main gocui object.
 func setTitle(view string, title string) {
 	v, _ := g.View(view)
 	v.Title = title

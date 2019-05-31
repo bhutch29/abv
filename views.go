@@ -34,6 +34,7 @@ type viewDrawer struct {
 	maxY int
 }
 
+// layout handles the creation of all gocui views.
 func (vd *viewDrawer) layout(g *gocui.Gui) (err error) {
 	vd.maxX, vd.maxY = g.Size()
 	if err = vd.makeLogPanel(); err != nil {
@@ -55,6 +56,7 @@ func (vd *viewDrawer) layout(g *gocui.Gui) (err error) {
 	return
 }
 
+// makeLogPanel creates the logging view, which logs all user actions.
 func (vd *viewDrawer) makeLogPanel() error {
 	viewHeight := vd.maxY - inputHeight
 	logWidth := float64(vd.maxX) - float64(vd.maxX)/stockDivisor
@@ -77,6 +79,7 @@ func (vd *viewDrawer) makeLogPanel() error {
 	return nil
 }
 
+// makeSelectOptionsPopup creates the popup view for option selection.
 func (vd *viewDrawer) makeSelectOptionsPopup() error {
 	w := vd.maxX / 2
 	h := vd.maxY / 4
@@ -129,6 +132,7 @@ func (vd *viewDrawer) makeSelectOptionsPopup() error {
 	return nil
 }
 
+// makeInfoPanel creates the info view.
 func (vd *viewDrawer) makeInfoPanel() error {
 	viewHeight := vd.maxY - inputHeight
 	infoStart := float64(vd.maxX) - float64(vd.maxX)/stockDivisor
@@ -145,6 +149,8 @@ func (vd *viewDrawer) makeInfoPanel() error {
 	return nil
 }
 
+// makePromptPanels creates the main prompt view, which contains the input
+// line and the keybinding hints.
 func (vd *viewDrawer) makePromptPanels() error {
 	promptStartHeight := vd.maxY - inputHeight
 	promptDividerHeight := vd.maxY - (inputHeight / 2)

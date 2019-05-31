@@ -42,6 +42,7 @@ func SearchUntappdByName(name string) ([]model.Drink, error) {
 	return drinks, nil
 }
 
+// trimWS trims a string of any whitespace characters defined in the Latin-1 space.
 func trimWS(s string) string {
 	const CutSet = " \f\t\n\r\v\x85\xA0" // TODO: also consider whitespace characters outside of the Latin-1 space
 	return strings.Trim(s, CutSet)
