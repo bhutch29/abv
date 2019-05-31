@@ -109,12 +109,12 @@ func displayError(e error) error {
 	return nil
 }
 
-func hideError(g *gocui.Gui, v *gocui.View) error {
+func hideError(g *gocui.Gui, _ *gocui.View) error {
 	g.DeleteView(errorView)
 	return nil
 }
 
-func popupScrollUp(g *gocui.Gui, v *gocui.View) error {
+func popupScrollUp(_ *gocui.Gui, v *gocui.View) error {
 	err := moveViewCursorUp(v)
 	if err != nil {
 		logAllError(err)
@@ -122,7 +122,7 @@ func popupScrollUp(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
-func popupScrollDown(g *gocui.Gui, v *gocui.View) error {
+func popupScrollDown(_ *gocui.Gui, v *gocui.View) error {
 	err := moveViewCursorDown(v, false)
 	if err != nil {
 		logAllError(err)

@@ -163,7 +163,7 @@ func refreshInventory() error {
 	return nil
 }
 
-func parseInput(g *gocui.Gui, v *gocui.View) error {
+func parseInput(_ *gocui.Gui, v *gocui.View) error {
 	bc := strings.TrimSuffix(v.Buffer(), "\n")
 	clearView(input)
 	if bc == "" {
@@ -222,7 +222,7 @@ func handleNewBarcode() {
 	togglePopup()
 }
 
-func handleSearch(g *gocui.Gui, v *gocui.View) error {
+func handleSearch(_ *gocui.Gui, v *gocui.View) error {
 	text := v.Buffer()
 
 	logFile.WithFields(logrus.Fields{
@@ -237,13 +237,13 @@ func handleSearch(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
-func cancelSearch(g *gocui.Gui, v *gocui.View) error {
+func cancelSearch(_ *gocui.Gui, _ *gocui.View) error {
 	togglePopup()
 	logAllInfo("Canceled entering information for new barcode")
 	return nil
 }
 
-func cancelPopup(g *gocui.Gui, v *gocui.View) error {
+func cancelPopup(_ *gocui.Gui, _ *gocui.View) error {
 	togglePopup()
 	logAllInfo("Canceled selecting beer from list")
 	return nil
@@ -269,7 +269,7 @@ func updatePopup(name string) {
 	return
 }
 
-func popupSelectItem(g *gocui.Gui, v *gocui.View) error {
+func popupSelectItem(_ *gocui.Gui, v *gocui.View) error {
 	line, err := getViewLine(v)
 	if err != nil {
 		logAllError(err)
@@ -334,7 +334,7 @@ func findDrinkFromSelection(line string) (model.Drink, error) {
 	return d, errors.New("Could not parse brand and drink name from selected text: " + line)
 }
 
-func setInputMode(g *gocui.Gui, v *gocui.View) error {
+func setInputMode(_ *gocui.Gui, _ *gocui.View) error {
 	if m := c.GetMode(); m != stocking {
 		c.SetMode(stocking)
 		updatePromptSymbol()
@@ -355,25 +355,25 @@ func setOutputMode(g *gocui.Gui, v *gocui.View) error {
 	return nil
 }
 
-func undoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
+func undoLastKeyboardAction(_ *gocui.Gui, _ *gocui.View) error {
 	c.Undo("")
 	refreshInventory()
 	return nil
 }
 
-func redoLastKeyboardAction(g *gocui.Gui, v *gocui.View) error {
+func redoLastKeyboardAction(_ *gocui.Gui, _ *gocui.View) error {
 	c.Redo("")
 	refreshInventory()
 	return nil
 }
 
-func scrollInventoryUp(g *gocui.Gui, v *gocui.View) error {
+func scrollInventoryUp(g *gocui.Gui, _ *gocui.View) error {
 	vi, _ := g.View(info)
 	scrollView(vi, -1)
 	return nil
 }
 
-func scrollInventoryDown(g *gocui.Gui, v *gocui.View) error {
+func scrollInventoryDown(g *gocui.Gui, _ *gocui.View) error {
 	vi, _ := g.View(info)
 	scrollView(vi, 1)
 	return nil
@@ -394,26 +394,26 @@ func trySetQuantity(q int) {
 	}
 }
 
-func setQuantity1(g *gocui.Gui, v *gocui.View) error {
+func setQuantity1(_ *gocui.Gui, _ *gocui.View) error {
 	trySetQuantity(1)
 	return nil
 }
 
-func setQuantity4(g *gocui.Gui, v *gocui.View) error {
+func setQuantity4(_ *gocui.Gui, _ *gocui.View) error {
 	trySetQuantity(4)
 	return nil
 }
 
-func setQuantity6(g *gocui.Gui, v *gocui.View) error {
+func setQuantity6(_ *gocui.Gui, _ *gocui.View) error {
 	trySetQuantity(6)
 	return nil
 }
 
-func setQuantity12(g *gocui.Gui, v *gocui.View) error {
+func setQuantity12(_ *gocui.Gui, _ *gocui.View) error {
 	trySetQuantity(12)
 	return nil
 }
 
-func quit(g *gocui.Gui, v *gocui.View) error {
+func quit(_ *gocui.Gui, _ *gocui.View) error {
 	return gocui.ErrQuit
 }
