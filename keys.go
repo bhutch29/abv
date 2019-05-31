@@ -10,6 +10,7 @@ import (
 	aur "github.com/logrusorgru/aurora"
 )
 
+// key is a representation of a keybinding.
 type key struct {
 	viewname  string
 	key       interface{}
@@ -20,6 +21,7 @@ type key struct {
 
 var keys []key
 
+// initializekeys sets up all keybindings for the main gui.
 func initializekeys() {
 	keys = []key{
 		{"", gocui.KeyCtrlI, setInputMode, "Ctrl-i", "stocking"},

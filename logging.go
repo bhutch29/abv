@@ -6,6 +6,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// The hidden and user-facing loggers.
 var (
 	logFile = logrus.New()
 	logGui  = logrus.New()

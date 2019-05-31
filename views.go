@@ -29,6 +29,8 @@ const (
 	searchCursorPos   = 4
 )
 
+// viewDrawer represents the user's screen size according to the number of
+// rows and columns of the console's fixed-width font.
 type viewDrawer struct {
 	maxX int
 	maxY int
