@@ -1,3 +1,4 @@
+// Package config handles the registration of environment variables and preferred filesystem paths.
 package config
 
 import (

@@ -1,13 +1,15 @@
+// Package model provides drink and inventory models for the backend of ABV.
 package model
 
 import (
 	"os"
 
-	"github.com/jmoiron/sqlx"
-	// Registers the sqlite3 db driver
 	"github.com/bhutch29/abv/config"
+	"github.com/jmoiron/sqlx"
+
+	// Registers the sqlite3 db driver
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/mitchellh/go-homedir"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 

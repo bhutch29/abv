@@ -1,3 +1,4 @@
+// ABV is the bartender's user interface for inventorying and serving.
 package main
 
 import (
