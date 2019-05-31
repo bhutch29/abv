@@ -112,6 +112,7 @@ func handleFlags() {
 	}
 }
 
+// backupDatabase backs up the abv drinks database to the given destination.
 func backupDatabase(destination string) {
 	log.Print("Backup up database to " + destination)
 	cmd := exec.Command("sqlite3", "abv.sqlite", ".backup "+destination)
@@ -121,6 +122,7 @@ func backupDatabase(destination string) {
 	}
 }
 
+// setupGui creates the main gui object with keybindings initialized.
 func setupGui() {
 	var err error
 	g, err = gocui.NewGui(gocui.Output256)
@@ -206,6 +208,8 @@ func parseIDFromBarcode(bc string) (string, string) {
 	return "", bc
 }
 
+// handleBarcodeEntry determines whether a barcode should result in the creation
+// of a new drink model, or otherwise be handled as a stocking or serving event.
 func handleBarcodeEntry(id string, bc string) {
 	logAllDebug("Scanned barcode: ", bc, " with ID=", id)
 	exists, err := c.HandleBarcode(id, bc, quantity)
