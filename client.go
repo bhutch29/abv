@@ -1,3 +1,4 @@
+// ABV is the bartender's user interface for inventorying and serving.
 package main
 
 import (
@@ -42,11 +43,13 @@ func SearchUntappdByName(name string) ([]model.Drink, error) {
 	return drinks, nil
 }
 
+// trimWS trims a string of any whitespace characters defined in the Latin-1 space.
 func trimWS(s string) string {
 	const CutSet = " \f\t\n\r\v\x85\xA0" // TODO: also consider whitespace characters outside of the Latin-1 space
 	return strings.Trim(s, CutSet)
 }
 
+// queryUntappdByName returns an unmarshalled json response from an Untappd query.
 func queryUntappdByName(name string) (map[string]interface{}, error) {
 	var result map[string]interface{}
 	safeName := url.QueryEscape(name)
@@ -82,6 +85,7 @@ func queryUntappdByName(name string) (map[string]interface{}, error) {
 	return result, err
 }
 
+// fetchClientCredentials gets the user's untappdId and untappdSecret.
 func fetchClientCredentials() (clientID, clientSecret string, err error) {
 	clientID = conf.GetString("untappdId")
 	if clientID == "" {
@@ -94,6 +98,8 @@ func fetchClientCredentials() (clientID, clientSecret string, err error) {
 	return clientID, clientSecret, nil
 }
 
+// validateUntappdResponse checks the http status code and either returns nil
+// or a human readable error message.
 func validateUntappdResponse(response map[string]interface{}) (err error) {
 	meta := response["meta"].(map[string]interface{})
 	code := int(meta["code"].(float64))

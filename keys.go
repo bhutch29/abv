@@ -10,6 +10,7 @@ import (
 	aur "github.com/logrusorgru/aurora"
 )
 
+// key is a representation of a keybinding.
 type key struct {
 	viewname  string
 	key       interface{}
@@ -20,6 +21,7 @@ type key struct {
 
 var keys []key
 
+// initializekeys sets up all keybindings for the main gui.
 func initializekeys() {
 	keys = []key{
 		{"", gocui.KeyCtrlI, setInputMode, "Ctrl-i", "stocking"},
@@ -46,6 +48,7 @@ func initializekeys() {
 	}
 }
 
+// generateKeybindString produces a hint string for each keybinding.
 func generateKeybindString(quantity int) string {
 	var result string
 	for _, k := range keys {
@@ -60,6 +63,9 @@ func generateKeybindString(quantity int) string {
 	return result
 }
 
+// getKeyQuantity parses the number from a string representing a function key name.
+//
+// If the provided string is not a function key name, -1 is returned instead.
 func getKeyQuantity(shortkey string) int {
 	res, err := strconv.Atoi(strings.TrimPrefix(shortkey, "F"))
 	if err != nil {
@@ -68,6 +74,7 @@ func getKeyQuantity(shortkey string) int {
 	return res
 }
 
+// configureKeys registers all keybindings with the main gocui object.
 func configureKeys() error {
 	for _, key := range keys {
 		err := g.SetKeybinding(key.viewname, key.key, gocui.ModNone, key.handler)

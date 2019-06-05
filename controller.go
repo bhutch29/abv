@@ -10,6 +10,7 @@ import (
 // Mode is an Enum of operating modes
 type Mode string
 
+// The two main modes: serving and stocking.
 const (
 	serving  Mode = "serving"
 	stocking      = "stocking"
@@ -113,6 +114,9 @@ func (c *ModalController) HandleBarcode(id string, bc string, quantity int) (boo
 	return false, nil
 }
 
+// handleDrink calls either the modal controller's input or output drink
+// methods for the given input device and settings, depending on whether
+// the current mode is stocking or serving.
 func (c *ModalController) handleDrink(id string, bc string, quantity int) {
 	d := model.DrinkEntry{Barcode: bc, Quantity: quantity}
 
@@ -137,6 +141,7 @@ func (c *ModalController) handleDrink(id string, bc string, quantity int) {
 	}
 }
 
+// outputDrinks handles the removing of a drink from inventory.
 func (c *ModalController) outputDrinks(id string, de model.DrinkEntry, d model.Drink) {
 	a := undo.NewOutputDrinksAction(de)
 	logAllDebug("Adding action with id = ", id)
@@ -152,6 +157,7 @@ func (c *ModalController) outputDrinks(id string, de model.DrinkEntry, d model.D
 	}
 }
 
+// inputDrinks handles the adding of a drink to inventory.
 func (c *ModalController) inputDrinks(id string, de model.DrinkEntry, d model.Drink) {
 	a := undo.NewInputDrinksAction(de)
 	logAllDebug("Adding action with id = ", id)
@@ -193,6 +199,7 @@ func (c *ModalController) Redo(id string) {
 	}
 }
 
+// prettyID returns a human readable message with the input device ID.
 func (c *ModalController) prettyID(id string) string {
 	if id == "" {
 		return ""

@@ -19,9 +19,10 @@ import (
 )
 
 var (
-	conf    *viper.Viper
-	version = "undefined"
-	tmpl    *template.Template
+	conf     *viper.Viper
+	myClient = &http.Client{Timeout: 10 * time.Second}
+	tmpl     *template.Template
+	version  = "undefined"
 )
 
 // Page is the backing type for all pages
@@ -34,11 +35,15 @@ type FrontPage struct {
 	Drinks []model.StockedDrink
 }
 
+// stringFromFile reads a file into a string ignoring errors
+//
+// TODO: this function is not used anywhere, is it needed?
 func stringFromFile(path string) string {
 	b, _ := ioutil.ReadFile(path)
 	return string(b)
 }
 
+// TODO: this function is not used anywhere, is it needed?
 func newFrontPage() FrontPage {
 	var frontPage FrontPage
 	frontPage.Page = Page{}
@@ -85,26 +90,22 @@ func handleFlags() {
 }
 
 func jsHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	w.Header().Add("Content-Type", "application/javascript")
-	filePath := ps.ByName("filePath")
-	root := conf.GetString("webRoot")
-	fullPath := path.Join(root, "static", "js", filePath)
-	http.ServeFile(w, r, fullPath)
+	fileHandler(w, r, ps, "application/javascript", "js")
 }
 
 func cssHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	w.Header().Add("Content-Type", "text/css")
-	filePath := ps.ByName("filePath")
-	root := conf.GetString("webRoot")
-	fullPath := path.Join(root, "static", "css", filePath)
-	http.ServeFile(w, r, fullPath)
+	fileHandler(w, r, ps, "text/css", "css")
 }
 
 func htmlHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-	w.Header().Add("Content-Type", "text/html")
+	fileHandler(w, r, ps, "text/html", "html")
+}
+
+func fileHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Params, headVal string, dir string) {
+	w.Header().Add("Content-Type", headVal)
 	filePath := ps.ByName("filePath")
 	root := conf.GetString("webRoot")
-	fullPath := path.Join(root, "static", "html", filePath)
+	fullPath := path.Join(root, "static", dir, filePath)
 	http.ServeFile(w, r, fullPath)
 }
 
@@ -113,8 +114,7 @@ func frontPageHandler(w http.ResponseWriter, r *http.Request, ps httprouter.Para
 	tmpl.Execute(w, apiURL)
 }
 
-var myClient = &http.Client{Timeout: 10 * time.Second}
-
+// TODO: this function is unused, is it needed for the frontend?
 func checkError(e error, w http.ResponseWriter) {
 	if e != nil {
 		http.Error(w, e.Error(), http.StatusInternalServerError)

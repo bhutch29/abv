@@ -1,3 +1,4 @@
+// Package config handles the registration of environment variables and preferred filesystem paths.
 package config
 
 import (
@@ -17,6 +18,7 @@ func New() (*viper.Viper, error) {
 	return v, nil
 }
 
+// newViper collects config settings and returns a Viper object
 func newViper() (*viper.Viper, error) {
 	v = viper.New()
 	v.SetConfigName("config")

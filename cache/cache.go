@@ -1,3 +1,4 @@
+// Package cache provides methods for caching brand logo images.
 package cache
 
 import (
@@ -48,6 +49,7 @@ func Image(url string) error {
 	return nil
 }
 
+// exists returns whether or not a file or directory exists.
 func exists(name string) bool {
 	if _, err := os.Stat(name); err != nil {
 		if os.IsNotExist(err) {
