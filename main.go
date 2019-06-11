@@ -367,8 +367,7 @@ func findDrinkFromSelection(line string) (model.Drink, error) {
 
 // setInputMode prepares the modal controller for stocking mode.
 func setInputMode(_ *gocui.Gui, _ *gocui.View) error {
-	m := c.GetMode()
-	if m == stocking {
+	if c.GetMode() == stocking {
 		return nil
 	}
 	c.SetMode(stocking)
@@ -380,8 +379,7 @@ func setInputMode(_ *gocui.Gui, _ *gocui.View) error {
 
 // setOutputMode prepares the modal controller for serving mode.
 func setOutputMode(g *gocui.Gui, v *gocui.View) error {
-	m := c.GetMode()
-	if m == serving {
+	if c.GetMode() == serving {
 		return nil
 	}
 	c.SetMode(serving)
@@ -432,14 +430,15 @@ func trySetQuantity(q int) {
 		logAllInfo("Serving of multiple drinks at once is not supported")
 		return
 	}
-	if q != quantity {
-		quantity = q
-		logAllInfo("Quantity of drinks per scan changed to ", quantity)
-
-		v, _ := g.View(prompt)
-		v.Clear()
-		fmt.Fprintf(v, generateKeybindString(q))
+	if q == quantity {
+		return
 	}
+	quantity = q
+	logAllInfo("Quantity of drinks per scan changed to ", quantity)
+
+	v, _ := g.View(prompt)
+	v.Clear()
+	fmt.Fprintf(v, generateKeybindString(q))
 }
 
 // setQuantity1 prepares the controller for either the scanning or serving
